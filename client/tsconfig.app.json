@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "incremental": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "resolvePackageJsonExports": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@assets/*": ["src/assets/*"],
+      "@model/*": ["src/model/*"],
+      "@animations/*": ["src/model/core/animations/*"],
+      "@events/*": ["src/model/core/events/*"],
+      "@intractions/*": ["src/model/core/intractions/*"],
+      "@core/*": ["src/model/core/*"],
+      "@recoil/*": ["src/recoil/*"],
+      "@units/*": ["src/entities/units/*"],
+      "@entities/*": ["src/entities/*"],
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src"]
+}
