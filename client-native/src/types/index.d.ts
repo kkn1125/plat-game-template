@@ -1,4 +1,4 @@
-import * as maps from "@store/maps";
+import * as maps from '@store/maps';
 
 export declare global {
   type Id = string;
@@ -7,5 +7,10 @@ export declare global {
     worldAxisX: number;
     worldAxisY: number;
   };
+  type XY = {
+    x: number;
+    y: number;
+  };
   type Maps = keyof typeof maps;
+  type Gaze = 'top' | 'left' | 'right' | 'bottom';
 }

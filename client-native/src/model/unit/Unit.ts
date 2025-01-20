@@ -1,15 +1,16 @@
+import { CharacterSprites } from '@/source/sprites';
 import GAME_CONF from '@config/game.conf';
-import { AttackableUnit } from './implement/AttackableUnit';
-import TouchableUnit from './implement/TouchableUnit';
-import UseStat from './implement/UseStat';
-import Stat from './option/Stat';
-import UseEquipment from './implement/UseEquipment';
-import Equipment from './option/Equipment';
-import { UnitState } from '@variable/constant';
-import MoveableUnit from './implement/MoveableUnit';
 import Logger from '@util/Logger';
 import { makeId } from '@util/makeId';
+import { UnitState } from '@variable/constant';
+import { AttackableUnit } from './implement/AttackableUnit';
+import MoveableUnit from './implement/MoveableUnit';
+import TouchableUnit from './implement/TouchableUnit';
+import UseEquipment from './implement/UseEquipment';
+import UseStat from './implement/UseStat';
+import Equipment from './option/Equipment';
 import Location from './option/Location';
+import Stat from './option/Stat';
 
 type Option = {
   hp?: number;
@@ -24,23 +25,17 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
   id = makeId('unit');
   name: string;
 
-  position: {
-    x: number;
-    y: number;
-  } = {
+  position: XY = {
     x: 0,
     y: 0,
   };
 
-  size: {
-    x: number;
-    y: number;
-  } = {
+  size: XY = {
     x: GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X,
     y: GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y,
   };
 
-  velocity: { x: number; y: number } = {
+  velocity: XY = {
     x: 0,
     y: 0,
   };
@@ -58,6 +53,12 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
 
   defaultDamage: number = GAME_CONF.UNIT_CONF.DEFAULT.DAMAGE;
   unitColor: string = 'black';
+
+  FPS: number = 60;
+  frame = 0;
+  readonly sprites = CharacterSprites;
+
+  gaze: Gaze = GAME_CONF.UNIT_CONF.DEFAULT.GAZE;
 
   constructor(name: string, option?: Option) {
     this.name = name;
@@ -83,24 +84,33 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     return +((this.minDamage + rangeDamage) / 10).toFixed(1);
   }
 
-  blocking(dir: 'up' | 'down' | 'left' | 'right') {
-    switch (dir) {
-      case 'up':
-        this.position.y += this.speed;
-        break;
-      case 'down':
-        this.position.y -= this.speed;
-        break;
-      case 'left':
-        this.position.x += this.speed;
-        break;
-      case 'right':
-        this.position.x -= this.speed;
-        break;
-      default:
-        break;
-    }
+  setPosition(x: number, y: number) {
+    this.position.x = x;
+    this.position.y = y;
   }
+
+  setState(state: UnitState) {
+    this.state = state;
+  }
+
+  // blocking(dir: Gaze) {
+  //   switch (dir) {
+  //     case 'top':
+  //       this.position.y += this.speed;
+  //       break;
+  //     case 'bottom':
+  //       this.position.y -= this.speed;
+  //       break;
+  //     case 'left':
+  //       this.position.x += this.speed;
+  //       break;
+  //     case 'right':
+  //       this.position.x -= this.speed;
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
   changeLocation(location: Maps) {
     this.logger.debug('위치 변경:', location);
@@ -112,11 +122,66 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     this.position.y = this.position.y + y;
   }
 
+  get gazeValue() {
+    switch (this.gaze) {
+      case 'bottom':
+        return 0;
+      case 'top':
+        return 200;
+      case 'left':
+        return 400;
+      case 'right':
+        return 600;
+      default:
+        return 0;
+    }
+  }
+
   draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+    // ctx.fillStyle = this.unitColor;
+    const moveScreenX = this.position.x;
+    const moveScreenY = this.position.y;
+    const positionX = worldAxisX + moveScreenX;
+    const positionY = worldAxisY + moveScreenY;
+
+    const frame = this.state === UnitState.Idle ? 0 : Math.floor((this.frame / (this.FPS * 0.15)) % 4);
+    const cropPositionX = 10 + frame * 150; // next frame
+    const cropPositionY = 20 + this.gazeValue; // gaze
+    const cropSizeX = 150 - 20;
+    const cropSizeY = 200 - 40;
+
+    // 색상 표시
+    // ctx.fillRect(positionX, positionY, this.size.x, this.size.y);
+
+    this.drawName(ctx, { worldAxisX, worldAxisY });
+    // 스프라이츠 표시
+    ctx.drawImage(this.sprites, cropPositionX, cropPositionY, cropSizeX, cropSizeY, positionX, positionY, this.size.x, this.size.y);
+    if (this.state === UnitState.Move) {
+      this.frame = this.frame + 1;
+    } else {
+      this.frame = 0;
+    }
+  }
+
+  drawName(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
     ctx.fillStyle = this.unitColor;
     const moveScreenX = this.position.x;
     const moveScreenY = this.position.y;
-    ctx.fillRect(worldAxisX + moveScreenX, worldAxisY + moveScreenY, this.size.x, this.size.y);
+    const positionX = worldAxisX + moveScreenX;
+    const positionY = worldAxisY + moveScreenY;
+    ctx.font = 'bold 16px "Fira Fonts", sans-serif';
+
+    /* stroke */
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.strokeText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
+
+    /* font */
+    ctx.textAlign = 'center';
+    ctx.fillText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
+    // ctx.strokeStyle = 'black';
+    // ctx.lineWidth = 0.7;
+    // ctx.strokeText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
   }
 
   attack(): void {

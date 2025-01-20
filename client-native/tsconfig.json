@@ -25,6 +25,7 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
+      "@assets/*": ["src/assets/*"],
       "@types/*": ["src/types/*"],
       "@variable/*": ["src/variable/*"],
       "@api/*": ["src/api/*"],

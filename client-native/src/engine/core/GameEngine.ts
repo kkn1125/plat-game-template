@@ -1,6 +1,6 @@
 import Renderer from '@animation/Renderer';
+import UserInterface from '@animation/UserInterface';
 import EventManager from '@event/EventManager';
-import GameMap from '@model/gamemap/GameMap';
 import { Unit } from '@model/unit';
 import Logger from '@util/Logger';
 import { GameMode, GameState } from '@variable/constant';
@@ -13,6 +13,7 @@ export default class GameEngine {
   state: GameState = GameState.Init;
 
   gameMode: GameMode = GameMode.Test;
+  ui!: UserInterface;
   renderer!: Renderer;
   eventManager!: EventManager;
   gameMapManager!: GameMapManager;
@@ -41,6 +42,11 @@ export default class GameEngine {
     this.units.push(unit);
   }
 
+  loadUi(ui: UserInterface) {
+    this.logger.scope('LoadUi').debug('인터페이스 로드');
+    this.ui = ui;
+  }
+
   loadRenderer(renderer: Renderer) {
     this.logger.scope('LoadRenderer').debug('렌더러 로드');
     this.renderer = renderer;
@@ -49,6 +55,12 @@ export default class GameEngine {
   loadEventManager(eventManager: EventManager) {
     this.logger.scope('LoadEventManager').debug('이벤트매니저 로드');
     this.eventManager = eventManager;
+
+    this.eventManager.listen('loginUser', () => {
+      const user = new Unit('test-user');
+      user.setPosition(50, -50);
+      this.setControlUnit(user);
+    });
   }
 
   loadGameMapManager(gameMapManager: GameMapManager) {

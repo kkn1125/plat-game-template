@@ -1,6 +1,6 @@
-import GameEngine from "@core/GameEngine";
-import Logger from "@util/Logger";
-import JoystickEvent from "./JoystickEvent";
+import GameEngine from '@core/GameEngine';
+import Logger from '@util/Logger';
+import JoystickEvent from './JoystickEvent';
 
 type Handler = (manager: EventManager) => void;
 
@@ -31,6 +31,12 @@ class EventManager implements Subject {
     this.initialize();
   }
 
+  emit(name: Id) {
+    const listener = this.listeners.get(name);
+    if (!listener) return;
+    listener.forEach((handler) => handler(this));
+  }
+
   private initialize() {
     this.joystickEvent.run();
   }
@@ -40,7 +46,7 @@ class EventManager implements Subject {
   }
 
   watch(observer: Observer) {
-    this.logger.scope("Watch").debug("옵저버 등록:", observer);
+    this.logger.scope('Watch').debug('옵저버 등록:', observer);
     this.observers.push(observer);
   }
 

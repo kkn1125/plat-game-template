@@ -2,6 +2,7 @@ import GameEngine from '@core/GameEngine';
 import { Unit } from '@model/unit';
 import Logger from '@util/Logger';
 import { gameStart, initializeGameMap } from './setting/gameStart';
+import { MD } from '@store/npc/MD';
 
 const logger = new Logger();
 const gameEngine = new GameEngine();
@@ -9,14 +10,10 @@ const gameEngine = new GameEngine();
 gameStart(gameEngine);
 initializeGameMap(gameEngine);
 
-const user = new Unit('test-user');
-const user2 = new Unit('test-user2');
 const user3 = new Unit('test-user2');
-user2.unitColor = 'yellow';
-user3.position.x = 100;
-gameEngine.setControlUnit(user);
-// gameEngine.addUnit(user);
-gameEngine.addUnit(user2);
+user3.setPosition(150, -150);
+
+gameEngine.addUnit(MD);
 gameEngine.addUnit(user3);
 
 // gameEngine.singlePlay();

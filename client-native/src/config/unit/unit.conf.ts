@@ -10,6 +10,7 @@ export const UNIT_CONF = {
     SPEED: 2,
     INCREASE_SPEED: 2,
     DECREASE_SPEED: 1,
+    GAZE: 'bottom',
     SIZE: {
       X: 50,
       Y: 50,

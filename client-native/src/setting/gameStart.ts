@@ -1,4 +1,5 @@
 import Renderer from '@animation/Renderer';
+import UserInterface from '@animation/UserInterface';
 import GameEngine from '@core/GameEngine';
 import GameMapManager from '@core/GameMapManager';
 import EventManager from '@event/EventManager';
@@ -14,6 +15,7 @@ export function gameStart(gameEngine: GameEngine) {
   gameEngine.loadGameMapManager(new GameMapManager(gameEngine));
   gameEngine.loadEventManager(new EventManager(gameEngine));
   emitEvent(gameEngine);
+  gameEngine.loadUi(new UserInterface(gameEngine));
   gameEngine.loadRenderer(new Renderer(gameEngine));
 
   gameEngine.setState(GameState.Loading);

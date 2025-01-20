@@ -3,6 +3,7 @@ import GameMap from '@model/gamemap/GameMap';
 import { Unit } from '@model/unit';
 import Logger from '@util/Logger';
 import GameEngine from './GameEngine';
+import { Tile } from '@variable/constant';
 
 export default class GameMapManager {
   logger = new Logger<GameMapManager>(this);
@@ -37,7 +38,7 @@ export default class GameMapManager {
   }
 
   // 유닛 중심 좌표 계산
-  private getAxis(currentMap: GameMap, controlUnit: Unit) {
+  getAxis(currentMap: GameMap, controlUnit: Unit) {
     const unitPosition = controlUnit.position;
     const fields = currentMap.fields;
     const width = fields[0].length * this.mapSizeX;
@@ -78,7 +79,7 @@ export default class GameMapManager {
     const field = fields?.[cellTopY]?.[cellX];
     const fieldRight = fields?.[cellTopY]?.[cellRightX];
 
-    if ([fieldLeft, field, fieldRight].some((field) => field?.name === '0')) {
+    if ([fieldLeft, field, fieldRight].some((field) => !field?.passable)) {
       /* 충돌 */
       return true;
     }
@@ -105,7 +106,24 @@ export default class GameMapManager {
     const field = fields?.[cellBottomY]?.[cellX];
     const fieldRight = fields?.[cellBottomY]?.[cellRightX];
 
-    if ([fieldLeft, field, fieldRight].some((field) => field?.name === '0')) {
+    // 물 연접 부 컬리젼 범위 조정 - 물로 상단에서 접근
+    {
+      const cellBottomY = Math.floor((y + unitHalfSizeY + 20 + controlUnit.increaseSpeed) / this.mapSizeY);
+
+      const fieldLeft = fields?.[cellBottomY]?.[cellLeftX];
+      const field = fields?.[cellBottomY]?.[cellX];
+      const fieldRight = fields?.[cellBottomY]?.[cellRightX];
+
+      if (
+        [fieldLeft, field, fieldRight].some((field) => field?.name === Tile.Water) &&
+        [fieldLeft, field, fieldRight].some((field) => !field?.passable)
+      ) {
+        /* 충돌 */
+        return true;
+      }
+    }
+
+    if ([fieldLeft, field, fieldRight].some((field) => !field?.passable)) {
       /* 충돌 */
       return true;
     }
@@ -132,7 +150,22 @@ export default class GameMapManager {
     const field = fields?.[cellY]?.[cellLeftX];
     const fieldBottom = fields?.[cellBottomY]?.[cellLeftX];
 
-    if ([fieldTop, field, fieldBottom].some((field) => field?.name === '0')) {
+    // 물 연접 부 컬리젼 범위 조정 - 물로 좌측에서 접근
+    {
+      const cellLeftX = Math.floor((x - unitHalfSizeX - controlUnit.increaseSpeed) / this.mapSizeX);
+      const cellBottomY = Math.floor((y + 20 + unitHalfSizeY) / this.mapSizeY);
+
+      const fieldTop = fields?.[cellTopY]?.[cellLeftX];
+      const field = fields?.[cellY]?.[cellLeftX];
+      const fieldBottom = fields?.[cellBottomY]?.[cellLeftX];
+
+      if (field?.name === Tile.Grass && fieldBottom?.name === Tile.Water && [fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
+        /* 충돌 */
+        return true;
+      }
+    }
+
+    if ([fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
       /* 충돌 */
       return true;
     }
@@ -159,7 +192,22 @@ export default class GameMapManager {
     const field = fields?.[cellY]?.[cellRightX];
     const fieldBottom = fields?.[cellBottomY]?.[cellRightX];
 
-    if ([fieldTop, field, fieldBottom].some((field) => field?.name === '0')) {
+    // 물 연접 부 컬리젼 범위 조정 - 물로 우측에서 접근
+    {
+      const cellRightX = Math.floor((x + unitHalfSizeX + controlUnit.increaseSpeed) / this.mapSizeX);
+      const cellBottomY = Math.floor((y + 20 + unitHalfSizeY) / this.mapSizeY);
+
+      const fieldTop = fields?.[cellTopY]?.[cellRightX];
+      const field = fields?.[cellY]?.[cellRightX];
+      const fieldBottom = fields?.[cellBottomY]?.[cellRightX];
+
+      if (field?.name === Tile.Grass && fieldBottom?.name === Tile.Water && [fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
+        /* 충돌 */
+        return true;
+      }
+    }
+
+    if ([fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
       /* 충돌 */
       return true;
     }

@@ -7,14 +7,10 @@ class Renderer {
   prevTime: number = 0;
   logger = new Logger<Renderer>(this);
   engine: GameEngine;
-  readonly APP: HTMLElement = document.getElementById('app') as HTMLElement;
-  canvasMap: Map<Id, { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }> = new Map();
 
   constructor(engine: GameEngine) {
     this.logger.scope().debug('렌더러 초기화');
     this.engine = engine;
-    this.engine.setState(GameState.Loading);
-    this.createLayer('layer-map');
   }
 
   get currentMap() {
@@ -44,42 +40,11 @@ class Renderer {
     return this.worldSize.y / 2;
   }
 
-  getLayer(id: Id) {
-    return this.canvasMap.get(id) as {
-      canvas: HTMLCanvasElement;
-      ctx: CanvasRenderingContext2D;
-    };
-  }
-
-  /* Renderer 전용 */
-  handleCanvasResize(canvas: HTMLCanvasElement) {
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-  }
-
-  createLayer(id: Id) {
-    this.logger.scope('CreateLayer').debug(`${id} 레이어 생성`);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    canvas.id = id;
-    ctx.globalAlpha = 1;
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-
-    window.addEventListener('resize', this.handleCanvasResize.bind(this, canvas));
-
-    this.canvasMap.set(id, { canvas, ctx });
-    return { canvas, ctx };
-  }
-
   render() {
     this.logger.scope('Render').debug('렌더링');
 
-    for (const { canvas } of this.canvasMap.values()) {
-      this.APP.appendChild(canvas);
+    for (const { canvas } of this.engine.ui.canvasMap.values()) {
+      this.engine.ui.APP.appendChild(canvas);
     }
 
     this.animate();
@@ -89,7 +54,7 @@ class Renderer {
     requestAnimationFrame(this.draw.bind(this));
   }
 
-  private tiktok(time: number) {
+  private ticktock(time: number) {
     const now = Math.floor(time);
     if (now !== this.prevTime) {
       // 애니메이션 초당 처리 영역
@@ -97,35 +62,88 @@ class Renderer {
   }
 
   private clearDraw() {
-    const { canvas: layerMapCanvas, ctx: layerMapCtx } = this.getLayer('layer-map');
-    layerMapCtx.clearRect(0, 0, layerMapCanvas.width, layerMapCanvas.height);
+    for (const { canvas, ctx } of this.engine.ui.canvasMap.values()) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  private getCameraMoveableRange(positionX: number, positionY: number) {
+    const fieldSizeX = GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
+    const fieldSizeY = GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+    const fieldXLength = this.currentMap?.fields[0].length || 0;
+    const fieldYLength = this.currentMap?.fields.length || 0;
+    const fieldWidth = fieldXLength * fieldSizeX;
+    const fieldHeight = fieldYLength * fieldSizeY;
+
+    // 유닛 카메라 고정 범위 X
+    const limitScreenX = fieldWidth / 2;
+    // 유닛 카메라 고정 범위 Y
+    const limitScreenY = fieldHeight / 2;
+
+    // 윈도우 넘어가는 맵의 길이 만큼
+    const windowOverflowX = innerWidth / 2 > limitScreenX ? 0 : limitScreenX - innerWidth / 2;
+    const windowOverflowY = innerHeight / 2 > limitScreenY ? 0 : limitScreenY - innerHeight / 2;
+
+    let rangeX = 0;
+    let rangeY = 0;
+    if (positionX < -windowOverflowX) {
+      rangeX = positionX + windowOverflowX;
+    }
+    if (positionX > windowOverflowX) {
+      rangeX = positionX - windowOverflowX;
+    }
+    if (positionY < -windowOverflowY) {
+      rangeY = positionY + windowOverflowY;
+    }
+    if (positionY > windowOverflowY) {
+      rangeY = positionY - windowOverflowY;
+    }
+    return { rangeX, rangeY };
   }
 
   private mapDraw() {
-    const { ctx: layerMapCtx } = this.getLayer('layer-map');
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-map');
     if (!this.currentMap) return;
     const width = this.currentMap.fields[0].length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
     const height = this.currentMap.fields.length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+    const positionX = this.controlUnit?.position.x || 0;
+    const positionY = this.controlUnit?.position.y || 0;
+    const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
     this.currentMap.draw(layerMapCtx, {
-      worldAxisX: this.worldAxisX - (this.controlUnit?.position.x || 0) - width / 2,
-      worldAxisY: this.worldAxisY - (this.controlUnit?.position.y || 0) - height / 2,
+      worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
+      worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
     });
   }
 
   private unitDraw() {
-    const { ctx: layerMapCtx } = this.getLayer('layer-map');
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
 
     this.units.forEach((unit) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
       unit.draw(layerMapCtx, {
-        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - (this.controlUnit?.position.x || 0),
-        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - (this.controlUnit?.position.y || 0),
+        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
       });
-      // unit.update();
     });
-    if (this.controlUnit) {
+
+    if (this.controlUnit && this.currentMap) {
+      const positionX = this.controlUnit.position.x;
+      const positionY = this.controlUnit.position.y;
+      const sizeX = GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X;
+      const sizeY = GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y;
+      const worldCenterX = this.worldAxisX - sizeX / 2;
+      const worldCenterY = this.worldAxisY - sizeY / 2;
+      const characterX = worldCenterX - positionX;
+      const characterY = worldCenterY - positionY;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
       this.controlUnit.draw(layerMapCtx, {
-        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - (this.controlUnit.position.x || 0),
-        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - (this.controlUnit.position.y || 0),
+        worldAxisX: characterX + rangeX,
+        worldAxisY: characterY + rangeY,
       });
     }
   }
@@ -136,17 +154,24 @@ class Renderer {
     // const origin = time;
     time *= 0.001;
     const now = Math.floor(time);
-    this.tiktok(time);
+    this.ticktock(time);
 
     const { joystick } = this.engine.eventManager.joystickEvent;
 
     this.mapDraw();
-    // this.engine.gameMapManager.collision(joystick);
     this.unitDraw();
 
     if (this.currentMap && this.controlUnit) {
-      if (this.controlUnit.state === UnitState.Idle) {
+      if (this.controlUnit.state !== UnitState.Die) {
         const velocity = this.controlUnit.increaseSpeed;
+        if (joystick.w || joystick.s || joystick.a || joystick.d) {
+          this.controlUnit.setState(UnitState.Move);
+        }
+
+        if (!joystick.w && !joystick.s && !joystick.a && !joystick.d) {
+          this.controlUnit.setState(UnitState.Idle);
+        }
+
         if (joystick.w) {
           if (!this.engine.gameMapManager.collisionTop(this.currentMap, this.controlUnit)) {
             this.controlUnit.move(0, -velocity);

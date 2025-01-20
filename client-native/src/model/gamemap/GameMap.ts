@@ -3,8 +3,8 @@ import { makeId } from '@util/makeId';
 import Field from './Field';
 
 export default class GameMap {
-  static createMap(fields: string[][]): Field[][] {
-    return fields.map((row, y) => row.map((field, x) => new Field(field).setPosition(x, y)));
+  static createMap(fields: string[][], gameMap: GameMap): Field[][] {
+    return fields.map((row, y) => row.map((field, x) => new Field(field, gameMap).setPosition(x, y)));
   }
 
   id = makeId('gamemap');
@@ -14,7 +14,7 @@ export default class GameMap {
 
   constructor(name: string, fields: string[][]) {
     this.name = name;
-    this.fields = GameMap.createMap(fields);
+    this.fields = GameMap.createMap(fields, this);
   }
 
   forward(unit: Unit) {}
