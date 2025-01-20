@@ -29,6 +29,8 @@ export default class GameEngine {
   setControlUnit(unit: Unit) {
     unit.unitColor = 'red';
     this.controlUnit = unit;
+    unit.setGameEngine(this);
+    // unit.detectable = false;
   }
 
   setState(state: GameState) {
@@ -40,6 +42,7 @@ export default class GameEngine {
   addUnit(unit: Unit) {
     this.logger.scope('AddUnit').debug('유닛 추가', unit.id);
     this.units.push(unit);
+    unit.setGameEngine(this);
   }
 
   loadUi(ui: UserInterface) {

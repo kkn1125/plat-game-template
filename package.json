@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@primer/octicons": "^19.14.0"
+  },
+  "devDependencies": {
+    "@types/primer__octicons": "^19.11.0"
+  }
+}

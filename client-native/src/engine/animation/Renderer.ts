@@ -13,18 +13,22 @@ class Renderer {
     this.engine = engine;
   }
 
+  /* 현재 맵 */
   get currentMap() {
     return this.engine.gameMapManager.currentMap;
   }
 
+  /* 제어 유닛 */
   get controlUnit() {
     return this.engine.controlUnit;
   }
 
+  /* 등록된 유닛들 */
   get units() {
     return this.engine.units;
   }
 
+  /* 윈도우 사이즈 */
   get worldSize() {
     return {
       x: innerWidth,
@@ -32,12 +36,44 @@ class Renderer {
     };
   }
 
+  /* 윈도우 너비 절반 */
   get worldAxisX() {
     return this.worldSize.x / 2;
   }
 
+  /* 윈도우 높이 절반 */
   get worldAxisY() {
     return this.worldSize.y / 2;
+  }
+
+  // 맵 상 캐릭터 좌표
+  get characterPosition() {
+    if (!this.controlUnit)
+      return {
+        characterX: 0,
+        characterY: 0,
+      };
+    const positionX = this.controlUnit.position.x;
+    const positionY = this.controlUnit.position.y;
+    const sizeX = GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X;
+    const sizeY = GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y;
+    const worldCenterX = this.worldAxisX - sizeX / 2;
+    const worldCenterY = this.worldAxisY - sizeY / 2;
+    return {
+      characterX: worldCenterX - positionX,
+      characterY: worldCenterY - positionY,
+    };
+  }
+
+  get worldPosition() {
+    if (!this.controlUnit) return { worldAxisX: 0, worldAxisY: 0 };
+    const { x, y } = this.controlUnit.position;
+    const { characterX, characterY } = this.characterPosition;
+    const { rangeX, rangeY } = this.engine.renderer.getCameraMoveableRange(x, y);
+    return {
+      worldAxisX: characterX + rangeX,
+      worldAxisY: characterY + rangeY,
+    };
   }
 
   render() {
@@ -67,7 +103,7 @@ class Renderer {
     }
   }
 
-  private getCameraMoveableRange(positionX: number, positionY: number) {
+  getCameraMoveableRange(positionX: number, positionY: number) {
     const fieldSizeX = GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
     const fieldSizeY = GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
     const fieldXLength = this.currentMap?.fields[0].length || 0;
@@ -131,20 +167,13 @@ class Renderer {
     });
 
     if (this.controlUnit && this.currentMap) {
-      const positionX = this.controlUnit.position.x;
-      const positionY = this.controlUnit.position.y;
-      const sizeX = GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X;
-      const sizeY = GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y;
-      const worldCenterX = this.worldAxisX - sizeX / 2;
-      const worldCenterY = this.worldAxisY - sizeY / 2;
-      const characterX = worldCenterX - positionX;
-      const characterY = worldCenterY - positionY;
-      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+      const { worldAxisX, worldAxisY } = this.worldPosition;
 
       this.controlUnit.draw(layerMapCtx, {
-        worldAxisX: characterX + rangeX,
-        worldAxisY: characterY + rangeY,
+        worldAxisX,
+        worldAxisY,
       });
+      this.controlUnit.around();
     }
   }
 

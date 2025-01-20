@@ -1,14 +1,14 @@
 import { Npc } from '@model/unit';
 import { UnitState } from '@variable/constant';
 
-export const MD = new Npc('MD', {
+export const MD2 = new Npc('MD2', {
   hp: Infinity,
   mp: Infinity,
 });
 let dir = true;
-MD.setPosition(-150, -270); // MD.position.x = 100;
-MD.unitColor = 'green';
-let originPosition = { ...MD.position };
+MD2.setPosition(150, -150);
+MD2.unitColor = 'green';
+let originPosition = { ...MD2.position };
 let state = 'Idle';
 
 setInterval(() => {
@@ -18,8 +18,8 @@ setInterval(() => {
     state = 'Move';
   }
 }, 2000);
-MD.question.addQuestion('보다 나은 게임을 준비 중입니다.', '어서오세요.');
-MD.routine = (unit) => {
+MD2.question.addQuestion('Hello', 'World');
+MD2.routine = (unit) => {
   const { x } = unit.position;
   const { x: originX } = originPosition;
   const distance = Math.abs(x - originX);
@@ -35,12 +35,12 @@ MD.routine = (unit) => {
   }
   if (state === 'Move') {
     if (dir) {
-      unit.move(-1, 0);
-      unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'a');
-      unit.state = UnitState.Move;
-    } else {
       unit.move(1, 0);
       unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'd');
+      unit.state = UnitState.Move;
+    } else {
+      unit.move(-1, 0);
+      unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'a');
       unit.state = UnitState.Move;
     }
   }

@@ -3,6 +3,7 @@ import { Unit } from '@model/unit';
 import Logger from '@util/Logger';
 import { gameStart, initializeGameMap } from './setting/gameStart';
 import { MD } from '@store/npc/MD';
+import { MD2 } from '@store/npc/MD2';
 
 const logger = new Logger();
 const gameEngine = new GameEngine();
@@ -10,11 +11,8 @@ const gameEngine = new GameEngine();
 gameStart(gameEngine);
 initializeGameMap(gameEngine);
 
-const user3 = new Unit('test-user2');
-user3.setPosition(150, -150);
-
 gameEngine.addUnit(MD);
-gameEngine.addUnit(user3);
+gameEngine.addUnit(MD2);
 
 // gameEngine.singlePlay();
 // gameEngine.multiPlay();

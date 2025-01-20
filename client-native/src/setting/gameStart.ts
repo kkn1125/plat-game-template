@@ -11,12 +11,18 @@ import { GameMode, GameState } from '@variable/constant';
 const logger = new Logger('GameStart');
 
 export function gameStart(gameEngine: GameEngine) {
+  /* init */
+  const gameMapManager = new GameMapManager(gameEngine);
+  const eventManager = new EventManager(gameEngine);
+  const ui = new UserInterface(gameEngine);
+  const renderer = new Renderer(gameEngine);
+
   /* load */
-  gameEngine.loadGameMapManager(new GameMapManager(gameEngine));
-  gameEngine.loadEventManager(new EventManager(gameEngine));
+  gameEngine.loadGameMapManager(gameMapManager);
+  gameEngine.loadEventManager(eventManager);
   emitEvent(gameEngine);
-  gameEngine.loadUi(new UserInterface(gameEngine));
-  gameEngine.loadRenderer(new Renderer(gameEngine));
+  gameEngine.loadUi(ui);
+  gameEngine.loadRenderer(renderer);
 
   gameEngine.setState(GameState.Loading);
   gameEngine.playMode(GameMode.Single);

@@ -39,6 +39,17 @@ class EventManager implements Subject {
 
   private initialize() {
     this.joystickEvent.run();
+
+    window.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const conversation = target.closest('#conversation');
+      if (!conversation) return;
+      e.preventDefault();
+
+      if (target.tagName === 'BUTTON') {
+        this.emit('conversationNext');
+      }
+    });
   }
 
   notify() {

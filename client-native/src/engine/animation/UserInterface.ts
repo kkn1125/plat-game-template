@@ -2,6 +2,8 @@ import GameEngine from '@core/GameEngine';
 import { $ } from '@util/$';
 import Logger from '@util/Logger';
 import { makeId } from '@util/makeId';
+import octicons from '@primer/octicons';
+import Question from '@model/unit/option/Question';
 
 export default class UserInterface {
   logger = new Logger<UserInterface>(this);
@@ -16,11 +18,38 @@ export default class UserInterface {
     this.engine = engine;
     this.createLayer('layer-map');
     this.createLayer('layer-unit');
+    this.createInterface();
     this.createLoginDialog();
   }
 
   get eventManager() {
     return this.engine.eventManager;
+  }
+
+  button(content: (options?: { height?: number | undefined }) => string, size: number, helper: string) {
+    return `<button class="btn rounded-circle transition helper" content="${helper}">${content({ height: size })}</button>`;
+  }
+
+  createInterface() {
+    const ui = document.createElement('div');
+    ui.id = 'user-interface';
+    ui.classList.add('d-flex', 'rounded', 'gap-1');
+    ui.innerHTML = `
+      ${this.button(octicons.gear.toSVG, 30, 'setting')}
+      ${this.button(octicons['three-bars'].toSVG, 30, 'menu')}
+      ${this.button(octicons.home.toSVG, 30, 'home')}
+    `.trim();
+    const conversation = document.createElement('div');
+    conversation.id = 'conversation';
+    conversation.classList.add('rounded', 'centeredX', 'hide');
+    conversation.insertAdjacentHTML(
+      'beforeend',
+      `<h2>Conversation</h2>
+      <p class="conversation"></p>
+      <button class="btn btn-primary">Next</button>`.trim(),
+    );
+    this.INTERFACE.appendChild(conversation);
+    this.INTERFACE.appendChild(ui);
   }
 
   /* Renderer 전용 */
@@ -70,15 +99,42 @@ export default class UserInterface {
 
   createLoginDialog() {
     const loginDialog = document.createElement('div');
+    loginDialog.id = 'login-dialog';
+    loginDialog.classList.add('rounded', 'centered');
     loginDialog.innerHTML = `
-      <div id="login-dialog" class="rounded centered">
         <h2>Login</h2>
         <button class="btn btn-primary">로그인</button>
-      </div>  
     `.trim();
     const handler = this.login.bind(this);
     this.eventMap.set('login', handler);
     loginDialog.addEventListener('click', handler);
-    this.INTERFACE.append(loginDialog);
+    this.INTERFACE.appendChild(loginDialog);
+  }
+
+  conversation(question: Question) {
+    const conversation = $('#conversation') as HTMLDivElement;
+
+    if (question.scripts.length > 0) {
+      this.engine.eventManager.listen('conversationNext', (manager) => {
+        const result = question.next();
+        console.log(result);
+        const current = question.current;
+        if (!result) {
+          conversation.classList.remove('hide');
+        } else {
+          const content = conversation.querySelector('.conversation') as HTMLDivElement;
+          content.innerHTML = current;
+        }
+      });
+      if (conversation.classList.contains('hide')) {
+        conversation.classList.remove('hide');
+      }
+
+      question.start();
+      const content = conversation.querySelector('.conversation') as HTMLDivElement;
+      content.innerHTML = question.current;
+    } else {
+      conversation.classList.add('hide');
+    }
   }
 }

@@ -1,4 +1,5 @@
 import GameEngine from '@core/GameEngine';
+import { Npc, Unit } from '@model/unit';
 
 export default class JoystickEvent {
   engine: GameEngine;
@@ -21,6 +22,83 @@ export default class JoystickEvent {
 
   get controlUnit() {
     return this.engine.controlUnit;
+  }
+
+  manualKeyDown(unit: Unit, key: 'w' | 'a' | 's' | 'd') {
+    if (key === 'w') {
+      if (!this.joystick.w) {
+        unit.gaze = 'top';
+        if (!unit.order.includes('top')) {
+          unit.order.push('top');
+        }
+      }
+    }
+    if (key === 'a') {
+      if (!this.joystick.a) {
+        unit.gaze = 'left';
+        if (!unit.order.includes('left')) {
+          unit.order.push('left');
+        }
+      }
+    }
+    if (key === 'd') {
+      if (!this.joystick.d) {
+        unit.gaze = 'right';
+        if (!unit.order.includes('right')) {
+          unit.order.push('right');
+        }
+      }
+    }
+    if (key === 's') {
+      if (!this.joystick.s) {
+        unit.gaze = 'bottom';
+        if (!unit.order.includes('bottom')) {
+          unit.order.push('bottom');
+        }
+      }
+    }
+  }
+
+  manualKeyUp(unit: Unit, key: 'w' | 'a' | 's' | 'd') {
+    if (key.match(/[wsad]/)) {
+      if (key === 'w') {
+        unit.joystick.w = false;
+        unit.order.splice(unit.order.indexOf('top'), 1);
+      }
+      if (key === 's') {
+        unit.joystick.s = false;
+        unit.order.splice(unit.order.indexOf('bottom'), 1);
+      }
+      if (key === 'a') {
+        unit.joystick.a = false;
+        unit.order.splice(unit.order.indexOf('left'), 1);
+      }
+      if (key === 'd') {
+        unit.joystick.d = false;
+        unit.order.splice(unit.order.indexOf('right'), 1);
+      }
+      const lastKey = unit.order.at(-1);
+      if (lastKey) {
+        switch (lastKey) {
+          case 'top': {
+            unit.gaze = 'top';
+            break;
+          }
+          case 'bottom': {
+            unit.gaze = 'bottom';
+            break;
+          }
+          case 'left': {
+            unit.gaze = 'left';
+            break;
+          }
+          case 'right': {
+            unit.gaze = 'right';
+            break;
+          }
+        }
+      }
+    }
   }
 
   private handleKeyDown(e: KeyboardEvent) {
@@ -62,6 +140,13 @@ export default class JoystickEvent {
           this.order.push('bottom');
         }
       }
+    }
+    if (key === ' ') {
+      const closeUnit = this.engine.controlUnit?.closeUnit as Npc;
+      if (!closeUnit) return;
+      console.log(closeUnit);
+      const question = closeUnit.startConversation();
+      this.engine.ui.conversation(question);
     }
   }
 

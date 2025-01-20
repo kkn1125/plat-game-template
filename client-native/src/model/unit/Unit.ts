@@ -11,6 +11,7 @@ import UseStat from './implement/UseStat';
 import Equipment from './option/Equipment';
 import Location from './option/Location';
 import Stat from './option/Stat';
+import GameEngine from '@core/GameEngine';
 
 type Option = {
   hp?: number;
@@ -18,6 +19,21 @@ type Option = {
 };
 
 class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, MoveableUnit {
+  order: string[] = [];
+  joystick: {
+    w: boolean;
+    a: boolean;
+    d: boolean;
+    s: boolean;
+  } = {
+    w: false,
+    a: false,
+    d: false,
+    s: false,
+  };
+
+  engine!: GameEngine;
+
   logger = new Logger<Unit>(this);
 
   location = new Location('Town1');
@@ -60,6 +76,12 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
 
   gaze: Gaze = GAME_CONF.UNIT_CONF.DEFAULT.GAZE;
 
+  // GameEngine 제어 유닛 등록 부분 참조
+  detectable: boolean = true;
+  boundary: Unit | null = null;
+
+  aroundUnits: Unit[] = [];
+
   constructor(name: string, option?: Option) {
     this.name = name;
     if (option) {
@@ -69,12 +91,18 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     }
   }
 
+  get isControlUnit() {
+    return this === this.engine.controlUnit;
+  }
+
   get minDamage() {
     return (this.defaultDamage + this.stat.str) * 10;
   }
+
   get maxDamage() {
     return +Math.floor((this.defaultDamage + this.stat.str + this.stat.dex * GAME_CONF.UNIT_CONF.INCREASE_DAMAGE_RATIO) * 10).toFixed(1);
   }
+
   get damageGap() {
     return +(this.maxDamage - this.minDamage + 1).toFixed(1);
   }
@@ -84,42 +112,10 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     return +((this.minDamage + rangeDamage) / 10).toFixed(1);
   }
 
-  setPosition(x: number, y: number) {
-    this.position.x = x;
-    this.position.y = y;
-  }
+  get fieldPosition() {
+    const fields = this.engine.gameMapManager.currentMap?.fields;
 
-  setState(state: UnitState) {
-    this.state = state;
-  }
-
-  // blocking(dir: Gaze) {
-  //   switch (dir) {
-  //     case 'top':
-  //       this.position.y += this.speed;
-  //       break;
-  //     case 'bottom':
-  //       this.position.y -= this.speed;
-  //       break;
-  //     case 'left':
-  //       this.position.x += this.speed;
-  //       break;
-  //     case 'right':
-  //       this.position.x -= this.speed;
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-
-  changeLocation(location: Maps) {
-    this.logger.debug('위치 변경:', location);
-    this.location.locate = location;
-  }
-
-  move(x: number, y: number): void {
-    this.position.x = this.position.x + x;
-    this.position.y = this.position.y + y;
+    if (!fields) return [];
   }
 
   get gazeValue() {
@@ -137,7 +133,158 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     }
   }
 
+  setGameEngine(engine: GameEngine) {
+    this.engine = engine;
+  }
+
+  setPosition(x: number, y: number) {
+    this.position.x = x;
+    this.position.y = y;
+  }
+
+  setState(state: UnitState) {
+    this.state = state;
+  }
+
+  changeLocation(location: Maps) {
+    this.logger.debug('위치 변경:', location);
+    this.location.locate = location;
+  }
+
+  move(x: number, y: number): void {
+    this.position.x = this.position.x + x;
+    this.position.y = this.position.y + y;
+  }
+
+  detect(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+    const currentMap = this.engine.gameMapManager.currentMap;
+    const controlUnit = this.engine.controlUnit;
+    if (!currentMap) return;
+    if (!controlUnit) return;
+    // const fields = currentMap.fields;
+    const mapSizeX = this.engine.gameMapManager.mapSizeX;
+    const mapSizeY = this.engine.gameMapManager.mapSizeY;
+
+    const { x, y } = this.position;
+    const fieldX = Math.floor(x / mapSizeX);
+    const fieldY = Math.floor(y / mapSizeY);
+
+    const cUnitX = Math.floor(controlUnit.position.x / mapSizeX);
+    const cUnitY = Math.floor(controlUnit.position.y / mapSizeY);
+    if (fieldX - 1 <= cUnitX && cUnitX <= fieldX + 1 && fieldY - 1 <= cUnitY && cUnitY <= fieldY + 1) {
+      this.boundary = controlUnit;
+    } else {
+      this.boundary = null;
+    }
+  }
+
+  around() {
+    const currentMap = this.engine.gameMapManager.currentMap;
+    const units = this.engine.units;
+    if (!currentMap) return;
+    if (units.length === 0) return;
+    // const fields = currentMap.fields;
+    const mapSizeX = this.engine.gameMapManager.mapSizeX;
+    const mapSizeY = this.engine.gameMapManager.mapSizeY;
+
+    const { x, y } = this.position;
+    const fieldX = Math.floor(x / mapSizeX);
+    const fieldY = Math.floor(y / mapSizeY);
+
+    for (const unit of units) {
+      const cUnitX = Math.floor(unit.position.x / mapSizeX);
+      const cUnitY = Math.floor(unit.position.y / mapSizeY);
+      if (fieldX - 1 <= cUnitX && cUnitX <= fieldX + 1 && fieldY - 1 <= cUnitY && cUnitY <= fieldY + 1) {
+        if (!this.aroundUnits.includes(unit)) {
+          this.aroundUnits.push(unit);
+        }
+      } else {
+        this.aroundUnits = this.aroundUnits.filter((u) => u !== unit);
+      }
+    }
+  }
+
+  get closeUnit(): Unit | null {
+    let closeUnit = null;
+    const getDistance = (x1: number, y1: number, x2: number, y2: number) => Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+    const { x, y } = this.position;
+    for (const unit of this.aroundUnits) {
+      const { x: uX, y: uY } = unit.position;
+      const distance = getDistance(x, y, uX, uY);
+      if (!closeUnit) {
+        closeUnit = unit;
+      } else {
+        if (distance < getDistance(x, y, closeUnit.position.x, closeUnit.position.y)) {
+          closeUnit = unit;
+        }
+      }
+    }
+
+    return closeUnit;
+  }
+
   draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+    if (!this.isControlUnit && this.detectable) {
+      this.detect(ctx, { worldAxisX, worldAxisY });
+      this.drawDetect(ctx, { worldAxisX, worldAxisY });
+    }
+
+    // if (this.isControlUnit && this.aroundUnits.length > 0 && this.closeUnit) {
+    //   this.boundary = this.closeUnit;
+    // } else {
+    //   this.boundary = null;
+    // }
+
+    // 색상 표시
+    // ctx.fillRect(positionX, positionY, this.size.x, this.size.y);
+
+    this.drawName(ctx, { worldAxisX, worldAxisY });
+    this.drawCharacter(ctx, { worldAxisX, worldAxisY });
+  }
+
+  drawDetect(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+    if (this.boundary) {
+      const moveScreenX = this.position.x;
+      const moveScreenY = this.position.y;
+
+      const positionX = worldAxisX + moveScreenX;
+      const positionY = worldAxisY + moveScreenY;
+
+      ctx.font = 'bold 20px auto';
+
+      /* stroke */
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+
+      ctx.strokeText('!', positionX + (this.size.x + 3 / 2) / 2, positionY - 30);
+
+      /* font */
+      ctx.fillStyle = 'red';
+      ctx.textAlign = 'center';
+      ctx.fillText('!', positionX + this.size.x / 2, positionY - 30);
+    }
+  }
+
+  drawName(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+    ctx.fillStyle = this.unitColor;
+    const moveScreenX = this.position.x;
+    const moveScreenY = this.position.y;
+    const positionX = worldAxisX + moveScreenX;
+    const positionY = worldAxisY + moveScreenY;
+    ctx.font = 'bold 16px auto';
+
+    /* stroke */
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+
+    ctx.strokeText(this.name.toUpperCase(), positionX + (this.size.x + 3 / 2) / 2, positionY - 10);
+
+    /* font */
+    ctx.textAlign = 'center';
+    ctx.fillText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
+  }
+
+  drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
     // ctx.fillStyle = this.unitColor;
     const moveScreenX = this.position.x;
     const moveScreenY = this.position.y;
@@ -149,11 +296,6 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     const cropPositionY = 20 + this.gazeValue; // gaze
     const cropSizeX = 150 - 20;
     const cropSizeY = 200 - 40;
-
-    // 색상 표시
-    // ctx.fillRect(positionX, positionY, this.size.x, this.size.y);
-
-    this.drawName(ctx, { worldAxisX, worldAxisY });
     // 스프라이츠 표시
     ctx.drawImage(this.sprites, cropPositionX, cropPositionY, cropSizeX, cropSizeY, positionX, positionY, this.size.x, this.size.y);
     if (this.state === UnitState.Move) {
@@ -161,27 +303,6 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     } else {
       this.frame = 0;
     }
-  }
-
-  drawName(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
-    ctx.fillStyle = this.unitColor;
-    const moveScreenX = this.position.x;
-    const moveScreenY = this.position.y;
-    const positionX = worldAxisX + moveScreenX;
-    const positionY = worldAxisY + moveScreenY;
-    ctx.font = 'bold 16px "Fira Fonts", sans-serif';
-
-    /* stroke */
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.strokeText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
-
-    /* font */
-    ctx.textAlign = 'center';
-    ctx.fillText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
-    // ctx.strokeStyle = 'black';
-    // ctx.lineWidth = 0.7;
-    // ctx.strokeText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
   }
 
   attack(): void {
