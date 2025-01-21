@@ -1,4 +1,3 @@
-import { Unit } from '@model/unit';
 import { makeId } from '@util/makeId';
 import Field from './Field';
 
@@ -8,16 +7,19 @@ export default class GameMap {
   }
 
   id = makeId('gamemap');
-  name: string;
+  name: Maps;
 
   fields: Field[][] = [];
+  defaultSpawnPosition: XY = { x: 0, y: 0 };
 
-  constructor(name: string, fields: string[][]) {
+  constructor(name: Maps, fields: string[][]) {
     this.name = name;
     this.fields = GameMap.createMap(fields, this);
   }
 
-  forward(unit: Unit) {}
+  setDefaultSpawnPosition(x: number, y: number) {
+    this.defaultSpawnPosition = { x, y };
+  }
 
   draw(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis) {
     for (const row of this.fields) {

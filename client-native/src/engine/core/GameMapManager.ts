@@ -4,6 +4,7 @@ import { Unit } from '@model/unit';
 import Logger from '@util/Logger';
 import GameEngine from './GameEngine';
 import { Tile } from '@variable/constant';
+import { textChangeFx } from '@store/effects/textChangeFx';
 
 export default class GameMapManager {
   logger = new Logger<GameMapManager>(this);
@@ -35,6 +36,17 @@ export default class GameMapManager {
       this.currentMap = gameMap;
     }
     this.gameMaps.set(gameMap.name, gameMap);
+  }
+
+  changeMap(forwardMap: GameMap) {
+    if (this.gameMaps.has(forwardMap.name)) {
+      this.logger.scope('AddGameMap').info('맵 변경:', forwardMap.name);
+      this.logger.scope('AddGameMap').info('기본 게임 맵:', forwardMap.name);
+      this.currentMap = forwardMap;
+      textChangeFx(forwardMap.name);
+    } else {
+      this.logger.scope('ChangeMap').error('존재하지 않는 맵입니다.');
+    }
   }
 
   // 유닛 중심 좌표 계산

@@ -1,4 +1,5 @@
 import { Npc } from '@model/unit';
+import { Town2 } from '@store/maps';
 import { UnitState } from '@variable/constant';
 
 export const MD = new Npc('MD', {
@@ -6,6 +7,7 @@ export const MD = new Npc('MD', {
   mp: Infinity,
 });
 let dir = true;
+MD.setLocation(Town2);
 MD.setPosition(-150, -270); // MD.position.x = 100;
 MD.unitColor = 'green';
 let originPosition = { ...MD.position };

@@ -1,5 +1,6 @@
 import Logger from '@util/Logger';
 import Npc from '../npc/Npc';
+import { QuestionState, UnitState } from '@variable/constant';
 
 export default class Question {
   logger = new Logger<Question>(this);
@@ -7,6 +8,8 @@ export default class Question {
 
   scripts: string[] = [];
   index: number = 0;
+
+  state: QuestionState = QuestionState.Idle;
 
   constructor(npc: Npc) {
     this.npc = npc;
@@ -20,12 +23,23 @@ export default class Question {
     return this.scripts[this.index];
   }
 
-  next() {
-    this.index = (this.index + 1) % this.scripts.length;
-    return this.index !== this.scripts.length - 1;
+  *getNext() {
+    for (const word of this.scripts) {
+      yield word;
+    }
   }
 
   start() {
     this.logger.scope('Start').debug('스크립트 시작');
+    this.state = QuestionState.Talk;
+  }
+
+  end() {
+    this.state = QuestionState.Idle;
+  }
+
+  reset() {
+    this.index = 0;
+    this.scripts = [];
   }
 }

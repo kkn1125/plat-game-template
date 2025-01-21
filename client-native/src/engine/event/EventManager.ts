@@ -40,14 +40,18 @@ class EventManager implements Subject {
   private initialize() {
     this.joystickEvent.run();
 
+    /* Conversation */
     window.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       const conversation = target.closest('#conversation');
       if (!conversation) return;
       e.preventDefault();
 
-      if (target.tagName === 'BUTTON') {
+      if (target.classList.contains('next')) {
         this.emit('conversationNext');
+      }
+      if (target.classList.contains('cancel')) {
+        this.emit('conversationCancel');
       }
     });
   }
@@ -70,7 +74,7 @@ class EventManager implements Subject {
   }
 
   close(name: Id) {
-    this.listeners.delete(name);
+    return this.listeners.delete(name);
   }
 }
 

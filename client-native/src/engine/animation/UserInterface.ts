@@ -18,6 +18,7 @@ export default class UserInterface {
     this.engine = engine;
     this.createLayer('layer-map');
     this.createLayer('layer-unit');
+    this.createLayer('layer-portal');
     this.createInterface();
     this.createLoginDialog();
   }
@@ -27,7 +28,7 @@ export default class UserInterface {
   }
 
   button(content: (options?: { height?: number | undefined }) => string, size: number, helper: string) {
-    return `<button class="btn rounded-circle transition helper" content="${helper}">${content({ height: size })}</button>`;
+    return `<button class="btn-circle rounded-circle transition helper" content="${helper}">${content({ height: size })}</button>`;
   }
 
   createInterface() {
@@ -44,9 +45,12 @@ export default class UserInterface {
     conversation.classList.add('rounded', 'centeredX', 'hide');
     conversation.insertAdjacentHTML(
       'beforeend',
-      `<h2>Conversation</h2>
+      `<h2 class="title">Conversation</h2>
       <p class="conversation"></p>
-      <button class="btn btn-primary">Next</button>`.trim(),
+      <div class="btn-group">
+        <button class="cancel btn btn-error rounded">취소</button>
+        <button class="next btn btn-primary rounded">Next</button>
+      </div>`.trim(),
     );
     this.INTERFACE.appendChild(conversation);
     this.INTERFACE.appendChild(ui);
@@ -113,25 +117,38 @@ export default class UserInterface {
 
   conversation(question: Question) {
     const conversation = $('#conversation') as HTMLDivElement;
+    const content = conversation.querySelector('.conversation') as HTMLDivElement;
+    const npcConversation = question.getNext();
+    const title = conversation.querySelector('.title') as HTMLDivElement;
+
+    let result = npcConversation.next();
+    const handler = () => {
+      result = npcConversation.next();
+      if (result.done) {
+        conversation.classList.add('hide');
+        this.engine.eventManager.close('conversationCancel');
+        this.engine.eventManager.close('conversationNext');
+        question.npc.endConversation();
+      } else {
+        content.innerHTML = result.value;
+      }
+    };
+    const handleCancel = () => {
+      conversation.classList.add('hide');
+      this.engine.eventManager.close('conversationCancel');
+      this.engine.eventManager.close('conversationNext');
+      question.npc.endConversation();
+    };
 
     if (question.scripts.length > 0) {
-      this.engine.eventManager.listen('conversationNext', (manager) => {
-        const result = question.next();
-        console.log(result);
-        const current = question.current;
-        if (!result) {
-          conversation.classList.remove('hide');
-        } else {
-          const content = conversation.querySelector('.conversation') as HTMLDivElement;
-          content.innerHTML = current;
-        }
-      });
+      title.innerHTML = `[${question.npc.constructor.name.toUpperCase()}] ${question.npc.name}`;
+      this.engine.eventManager.listen('conversationNext', handler);
+      this.engine.eventManager.listen('conversationCancel', handleCancel);
+
       if (conversation.classList.contains('hide')) {
         conversation.classList.remove('hide');
       }
 
-      question.start();
-      const content = conversation.querySelector('.conversation') as HTMLDivElement;
       content.innerHTML = question.current;
     } else {
       conversation.classList.add('hide');

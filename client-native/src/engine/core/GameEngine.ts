@@ -6,6 +6,7 @@ import Logger from '@util/Logger';
 import { GameMode, GameState } from '@variable/constant';
 import { makeAutoObservable } from 'mobx';
 import GameMapManager from './GameMapManager';
+import Portal from '@model/unit/portal/Portal';
 
 export default class GameEngine {
   logger = new Logger<GameEngine>(this);
@@ -20,6 +21,15 @@ export default class GameEngine {
   controlUnit: Unit | null = null;
 
   units: Unit[] = [];
+  portals: Portal[] = [];
+
+  get sameLocationPortals() {
+    return this.portals.filter((portal) => this.gameMapManager.currentMap?.name === portal.location.locate);
+  }
+
+  get sameLocationUnits() {
+    return this.units.filter((unit) => this.gameMapManager.currentMap?.name === unit.location.locate);
+  }
 
   constructor() {
     this.logger.scope().debug('초기화 게임엔진 모드:', this.gameMode);
@@ -45,6 +55,12 @@ export default class GameEngine {
     unit.setGameEngine(this);
   }
 
+  addPortal(portal: Portal) {
+    this.logger.scope('AddPortal').debug('포탈 추가', portal.id);
+    this.portals.push(portal);
+    portal.setGameEngine(this);
+  }
+
   loadUi(ui: UserInterface) {
     this.logger.scope('LoadUi').debug('인터페이스 로드');
     this.ui = ui;
@@ -61,7 +77,7 @@ export default class GameEngine {
 
     this.eventManager.listen('loginUser', () => {
       const user = new Unit('test-user');
-      user.setPosition(50, -50);
+      user.setPosition(0, 0);
       this.setControlUnit(user);
     });
   }

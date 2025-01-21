@@ -12,11 +12,7 @@ import Equipment from './option/Equipment';
 import Location from './option/Location';
 import Stat from './option/Stat';
 import GameEngine from '@core/GameEngine';
-
-type Option = {
-  hp?: number;
-  mp?: number;
-};
+import GameMap from '@model/gamemap/GameMap';
 
 class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, MoveableUnit {
   order: string[] = [];
@@ -38,7 +34,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
 
   location = new Location('Town1');
 
-  id = makeId('unit');
+  id: MakeId<string> = makeId('unit');
   name: string;
 
   position: XY = {
@@ -70,9 +66,14 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
   defaultDamage: number = GAME_CONF.UNIT_CONF.DEFAULT.DAMAGE;
   unitColor: string = 'black';
 
+  cropSizeX = 150;
+  cropSizeY = 200;
+  cropPadX = 10;
+  cropPadY = 20;
+  limitFrame = 4;
   FPS: number = 60;
   frame = 0;
-  readonly sprites = CharacterSprites;
+  sprites = CharacterSprites;
 
   gaze: Gaze = GAME_CONF.UNIT_CONF.DEFAULT.GAZE;
 
@@ -82,7 +83,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
 
   aroundUnits: Unit[] = [];
 
-  constructor(name: string, option?: Option) {
+  constructor(name: string, option?: HealthOption) {
     this.name = name;
     if (option) {
       option.hp && (this.hp = option.hp);
@@ -133,6 +134,14 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     }
   }
 
+  setLocation(gameMap: GameMap) {
+    this.location.locate = gameMap.name;
+  }
+
+  setSprites(sprites: HTMLImageElement) {
+    this.sprites = sprites;
+  }
+
   setGameEngine(engine: GameEngine) {
     this.engine = engine;
   }
@@ -156,7 +165,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     this.position.y = this.position.y + y;
   }
 
-  detect(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  detect() {
     const currentMap = this.engine.gameMapManager.currentMap;
     const controlUnit = this.engine.controlUnit;
     if (!currentMap) return;
@@ -180,7 +189,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
 
   around() {
     const currentMap = this.engine.gameMapManager.currentMap;
-    const units = this.engine.units;
+    const units = [...this.engine.sameLocationUnits, ...this.engine.sameLocationPortals];
     if (!currentMap) return;
     if (units.length === 0) return;
     // const fields = currentMap.fields;
@@ -208,6 +217,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     let closeUnit = null;
     const getDistance = (x1: number, y1: number, x2: number, y2: number) => Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     const { x, y } = this.position;
+    console.log(this.aroundUnits)
     for (const unit of this.aroundUnits) {
       const { x: uX, y: uY } = unit.position;
       const distance = getDistance(x, y, uX, uY);
@@ -225,7 +235,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
 
   draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
     if (!this.isControlUnit && this.detectable) {
-      this.detect(ctx, { worldAxisX, worldAxisY });
+      this.detect();
       this.drawDetect(ctx, { worldAxisX, worldAxisY });
     }
 
@@ -291,11 +301,11 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     const positionX = worldAxisX + moveScreenX;
     const positionY = worldAxisY + moveScreenY;
 
-    const frame = this.state === UnitState.Idle ? 0 : Math.floor((this.frame / (this.FPS * 0.15)) % 4);
-    const cropPositionX = 10 + frame * 150; // next frame
-    const cropPositionY = 20 + this.gazeValue; // gaze
-    const cropSizeX = 150 - 20;
-    const cropSizeY = 200 - 40;
+    const frame = this.state === UnitState.Idle ? 0 : Math.floor((this.frame / (this.FPS * 0.15)) % this.limitFrame);
+    const cropPositionX = this.cropPadX + frame * this.cropSizeX; // next frame
+    const cropPositionY = this.cropPadY + this.gazeValue; // gaze
+    const cropSizeX = this.cropSizeX - this.cropPadX * 2;
+    const cropSizeY = this.cropSizeY - this.cropPadY * 2;
     // 스프라이츠 표시
     ctx.drawImage(this.sprites, cropPositionX, cropPositionY, cropSizeX, cropSizeY, positionX, positionY, this.size.x, this.size.y);
     if (this.state === UnitState.Move) {

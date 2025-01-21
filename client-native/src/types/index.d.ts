@@ -13,4 +13,8 @@ export declare global {
   };
   type Maps = keyof typeof maps;
   type Gaze = 'top' | 'left' | 'right' | 'bottom';
+  type HealthOption = {
+    hp?: number;
+    mp?: number;
+  };
 }

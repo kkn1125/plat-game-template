@@ -15,6 +15,9 @@ export default class Field {
   groundLevel: number = 0;
   passable: boolean = true;
   gameMap: GameMap;
+  frame: number = 0;
+  FPS: number = 60;
+  frameLate: number = 0.3;
 
   constructor(name: string, gameMap: GameMap) {
     this.name = name;
@@ -77,70 +80,229 @@ export default class Field {
 
     let tile: [HTMLImageElement, number, number] = [sprites, 1, 5];
 
-    if (this.includes([center, bottom, right], Tile.Grass) && this.equals(bottomRight, Tile.Water)) {
+    if (this.includes([top, left, bottom, right], Tile.Water)) {
+      // ✨ 물 내부 1칸 길
+      tile = [sprites, 7, 7];
+    } else if (this.includes([top, bottom], Tile.Water) && this.includes([left, right], Tile.Grass)) {
+      // ✨✨ Grass-Water 상하 물, 좌우 길 ㅡ
+      tile = [sprites, 5, 7];
+    } else if (this.includes([top, bottom, right], Tile.Water) && this.equals(left, Tile.Grass)) {
+      // ✨✨ Grass-Water 상하우 물, 좌길 ㅡ 우끝
+      tile = [sprites, 6, 7];
+    } else if (this.includes([top, bottom, left], Tile.Water) && this.equals(right, Tile.Grass)) {
+      // ✨✨ Grass-Water 상하좌 물, 우길 ㅡ 좌끝
+      tile = [sprites, 4, 7];
+    } else if (this.includes([top, bottom, left, right], Tile.Grass) && this.includes([topRight, bottomRight], Tile.Water)) {
+      // ✨✨✨✨ Grass-Water 상하좌 물, 우길 ├ 좌시작
+      tile = [sprites, 9, 11];
+    } else if (this.includes([top, bottom, left, right], Tile.Grass) && this.includes([topLeft, bottomLeft], Tile.Water)) {
+      // ✨✨✨✨ Grass-Water 상하좌 물, 우길 ┤ 우시작
+      tile = [sprites, 9, 13];
+    } else if (this.includes([left, right], Tile.Water) && this.includes([top, bottom], Tile.Grass)) {
+      // ✨ Grass-Water 좌우 물, 상하 길
+      tile = [sprites, 7, 5];
+    } else if (this.includes([left, right, top], Tile.Water) && this.equals(bottom, Tile.Grass)) {
+      // ✨ Grass-Water 좌우상 물, 하길
+      tile = [sprites, 7, 4];
+    } else if (this.includes([left, right, bottom], Tile.Water) && this.equals(top, Tile.Grass)) {
+      // ✨ Grass-Water 좌우하 물, 상 잔디
+      tile = [sprites, 7, 6];
+    } else if (
+      this.includes([left, right], Tile.Grass) &&
+      this.includes([top, bottom], Tile.Grass) &&
+      this.includes([topLeft, topRight], Tile.Water)
+    ) {
+      // ✨ Grass-Water 길에서 상단으로 1칸너비 이어지는 길
+      tile = [sprites, 8, 10];
+    } else if (
+      this.includes([left, right], Tile.Grass) &&
+      this.includes([top, bottom], Tile.Grass) &&
+      this.includes([bottomLeft, bottomRight], Tile.Water)
+    ) {
+      // ✨ Grass-Water 길에서 하단으로 1칸너비 이어지는 길
+      tile = [sprites, 8, 12];
+    } else if (this.includes([top, left], Tile.Grass) && this.equals(topLeft, Tile.Water)) {
       // Grass-Water 좌상단
-      tile = [sprites2, 4, 6];
-    } else if (this.includes([center, bottom, left], Tile.Grass) && this.equals(bottomLeft, Tile.Water)) {
+      tile = [sprites, 3, 9];
+    } else if (this.includes([top, right], Tile.Grass) && this.equals(topRight, Tile.Water)) {
       // Grass-Water 우상단
-      tile = [sprites2, 5, 6];
-    } else if (this.includes([center, top, right], Tile.Grass) && this.equals(topRight, Tile.Water)) {
+      tile = [sprites, 2, 9];
+    } else if (this.includes([bottom, left], Tile.Grass) && this.equals(bottomLeft, Tile.Water)) {
       // Grass-Water 좌하단
-      tile = [sprites2, 4, 7];
-    } else if (this.includes([center, top, left], Tile.Grass) && this.equals(topLeft, Tile.Water)) {
+      tile = [sprites, 3, 8];
+    } else if (this.includes([bottom, right], Tile.Grass) && this.equals(bottomRight, Tile.Water)) {
       // Grass-Water 우하단
-      tile = [sprites2, 5, 7];
+      tile = [sprites, 2, 8];
+    } else if (this.includes([bottom, left], Tile.Water)) {
+      // ✨ Road-Water 좌,하 물
+      tile = [sprites, 4, 6];
+    } else if (this.includes([bottom, right], Tile.Water)) {
+      // ✨ Road-Water 우,하 물
+      tile = [sprites, 6, 6];
+    } else if (this.includes([top, right], Tile.Water)) {
+      // ✨ Road-Water 우,상 물
+      tile = [sprites, 6, 4];
+    } else if (this.includes([top, right], Tile.Water)) {
+      // ✨ Road-Water 좌,상 물
+      tile = [sprites, 2, 4];
     } else if (this.equals(right, Tile.Grass) && this.equals(left, Tile.Water)) {
       // Grass-Water 좌측
-      tile = [sprites2, 4, 1];
+      tile = [sprites, 4, 5];
     } else if (this.equals(left, Tile.Grass) && this.equals(right, Tile.Water)) {
       // Grass-Water 우측
-      tile = [sprites2, 6, 1];
+      tile = [sprites, 6, 5];
     } else if (this.equals(bottom, Tile.Grass) && this.equals(top, Tile.Water)) {
       // Grass-Water 상단
-      tile = [sprites2, 5, 0];
+      tile = [sprites, 5, 4];
     } else if (this.equals(top, Tile.Grass) && this.equals(bottom, Tile.Water)) {
       // Grass-Water 하단
-      tile = [sprites2, 5, 2];
+      tile = [sprites, 5, 6];
     }
 
-    if (this.includes([top, right, center], Tile.Grass) && this.equals(topRight, Tile.Road)) {
+    if (this.includes([top, bottom, left, right], Tile.Road)) {
+      // ✨ Road-Grass 1칸
+      tile = [sprites, 3, 7];
+    } else if (this.includes([left, right], Tile.Road) && this.includes([top, bottom], Tile.Grass)) {
+      // ✨ Road-Grass | 잔디길
+      tile = [sprites, 3, 5];
+    } else if (this.includes([left, right, bottom], Tile.Road) && this.equals(top, Tile.Grass)) {
+      // ✨ Road-Grass | 잔디길 하끝
+      tile = [sprites, 3, 6];
+    } else if (this.includes([left, right, top], Tile.Road) && this.equals(bottom, Tile.Grass)) {
+      // ✨ Road-Grass | 잔디길 상끝
+      tile = [sprites, 3, 4];
+    } else if (this.includes([top, bottom], Tile.Road) && this.includes([left, right], Tile.Grass)) {
+      // ✨ Road-Grass ㅡ 잔디길
+      tile = [sprites, 1, 7];
+    } else if (this.includes([top, bottom, left], Tile.Road) && this.equals(right, Tile.Grass)) {
+      // ✨ Road-Grass ㅡ 잔디길 좌끝
+      tile = [sprites, 0, 7];
+    } else if (this.includes([top, bottom, right], Tile.Road) && this.equals(left, Tile.Grass)) {
+      // ✨ Road-Grass ㅡ 잔디길 우끝
+      tile = [sprites, 2, 7];
+    } else if (this.includes([top, right], Tile.Grass) && this.equals(topRight, Tile.Road)) {
       // Road-Grass 좌하단
       tile = [sprites, 0, 2];
-    } else if (this.includes([top, left, center], Tile.Grass) && this.equals(topLeft, Tile.Road)) {
+    } else if (this.includes([top, left], Tile.Grass) && this.equals(topLeft, Tile.Road)) {
       // Road-Grass 우하단
       tile = [sprites, 2, 2];
-    } else if (this.includes([bottom, right, center], Tile.Grass) && this.equals(bottomRight, Tile.Road)) {
+    } else if (this.includes([bottom, right], Tile.Grass) && this.equals(bottomRight, Tile.Road)) {
       // Road-Grass 좌상단
       tile = [sprites, 0, 0];
-    } else if (this.includes([bottom, left, center], Tile.Grass) && this.equals(bottomLeft, Tile.Road)) {
+    } else if (this.includes([bottom, left], Tile.Grass) && this.equals(bottomLeft, Tile.Road)) {
       // Road-Grass 우상단
       tile = [sprites, 2, 0];
-    } else if (this.includes([topLeft, top, left], Tile.Road) && this.equals(center, Tile.Grass)) {
+    } else if (this.includes([top, left], Tile.Road) && this.equals(right, Tile.Grass)) {
       // Grass-Road 좌상단
       tile = [sprites, 0, 4];
-    } else if (this.includes([topRight, top, right], Tile.Road) && this.equals(center, Tile.Grass)) {
+    } else if (this.includes([top, right], Tile.Road)) {
       // Grass-Road 우상단
       tile = [sprites, 2, 4];
-    } else if (this.includes([bottomLeft, bottom, left], Tile.Road) && this.equals(center, Tile.Grass)) {
+    } else if (this.includes([bottom, left], Tile.Road)) {
       // Grass-Road 좌하단
       tile = [sprites, 0, 6];
-    } else if (this.includes([bottomRight, bottom, right], Tile.Road) && this.equals(center, Tile.Grass)) {
+    } else if (this.includes([bottom, right], Tile.Road)) {
       // Grass-Road 우하단
       tile = [sprites, 2, 6];
-    } else if (this.equals(center, Tile.Grass) && this.equals(left, Tile.Road)) {
+    } else if (this.equals(left, Tile.Road)) {
       // Grass-Road 좌측
       tile = [sprites, 0, 5];
-    } else if (this.equals(center, Tile.Grass) && this.equals(right, Tile.Road)) {
+    } else if (this.equals(right, Tile.Road)) {
       // Grass-Road 우측
       tile = [sprites, 2, 5];
-    } else if (this.equals(center, Tile.Grass) && this.equals(top, Tile.Road)) {
+    } else if (this.equals(top, Tile.Road)) {
       // Grass-Road 상단
       tile = [sprites, 1, 4];
-    } else if (this.equals(center, Tile.Grass) && this.equals(bottom, Tile.Road)) {
+    } else if (this.equals(bottom, Tile.Road)) {
       // Grass-Road 하단
       tile = [sprites, 1, 6];
     } else {
     }
+    return tile;
+  }
+
+  validateRoad(): [HTMLImageElement, number, number] {
+    const sprites = MapSprites;
+    const sprites2 = MapSprites2;
+    const { top, topLeft, topRight, bottom, bottomLeft, bottomRight, left, right, center } = this.roundFields;
+
+    let tile: [HTMLImageElement, number, number] = [sprites, 1, 1];
+
+    if (this.includes([top, left, bottom, right], Tile.Water)) {
+      // ✨ 물 내부 1칸 길
+      tile = [sprites, 7, 3];
+    } else if (this.includes([top, bottom], Tile.Water) && this.includes([left, right], Tile.Road)) {
+      // ✨✨ Road-Water 상하 물, 좌우 길 ㅡ
+      tile = [sprites, 5, 3];
+    } else if (this.includes([top, bottom, right], Tile.Water) && this.equals(left, Tile.Road)) {
+      // ✨✨ Road-Water 상하우 물, 좌길 ㅡ 우끝
+      tile = [sprites, 6, 3];
+    } else if (this.includes([top, bottom, left], Tile.Water) && this.equals(right, Tile.Road)) {
+      // ✨✨ Road-Water 상하좌 물, 우길 ㅡ 좌끝
+      tile = [sprites, 4, 3];
+    } else if (this.includes([top, bottom, left, right], Tile.Road) && this.includes([topRight, bottomRight], Tile.Water)) {
+      // ✨✨✨✨ Road-Water 상하좌 물, 우길 ├ 좌시작
+      tile = [sprites, 8, 5];
+    } else if (this.includes([top, bottom, left, right], Tile.Road) && this.includes([topLeft, bottomLeft], Tile.Water)) {
+      // ✨✨✨✨ Road-Water 상하좌 물, 우길 ┤ 우시작
+      tile = [sprites, 8, 8];
+    } else if (this.includes([left, right], Tile.Water) && this.includes([top, bottom], Tile.Road)) {
+      // ✨ Road-Water 좌우 물, 상하 길 |
+      tile = [sprites, 7, 1];
+    } else if (this.includes([left, right, top], Tile.Water) && this.equals(bottom, Tile.Road)) {
+      // ✨ Road-Water 좌우상 물, 하길 | 하끝
+      tile = [sprites, 7, 0];
+    } else if (this.includes([left, right, bottom], Tile.Water) && this.equals(top, Tile.Road)) {
+      // ✨ Road-Water 좌우하 물, 상길 | 상끝
+      tile = [sprites, 7, 2];
+    } else if (this.includes([left, right], Tile.Road) && this.includes([top, bottom], Tile.Road) && this.includes([topLeft, topRight], Tile.Water)) {
+      // ✨ Road-Water 길에서 상단으로 1칸너비 이어지는 길
+      tile = [sprites, 8, 4];
+    } else if (
+      this.includes([left, right], Tile.Road) &&
+      this.includes([top, bottom], Tile.Road) &&
+      this.includes([bottomLeft, bottomRight], Tile.Water)
+    ) {
+      // ✨ Road-Water 길에서 하단으로 1칸너비 이어지는 길
+      tile = [sprites, 9, 6];
+    } else if (this.includes([top, left], Tile.Road) && this.equals(topLeft, Tile.Water)) {
+      // Road-Water 좌상단
+      tile = [sprites, 1, 9];
+    } else if (this.includes([top, right], Tile.Road) && this.equals(topRight, Tile.Water)) {
+      // Road-Water 우상단
+      tile = [sprites, 0, 9];
+    } else if (this.includes([bottom, left], Tile.Road) && this.equals(bottomLeft, Tile.Water)) {
+      // Road-Water 좌하단
+      tile = [sprites, 1, 8];
+    } else if (this.includes([bottom, right], Tile.Road) && this.equals(bottomRight, Tile.Water)) {
+      // Road-Water 우하단
+      tile = [sprites, 0, 8];
+    } else if (this.includes([bottom, left], Tile.Water)) {
+      // ✨ Road-Water 좌,하 물
+      tile = [sprites, 4, 2];
+    } else if (this.includes([bottom, right], Tile.Water)) {
+      // ✨ Road-Water 우,하 물
+      tile = [sprites, 6, 2];
+    } else if (this.includes([top, right], Tile.Water)) {
+      // ✨ Road-Water 우,상 물
+      tile = [sprites, 6, 0];
+    } else if (this.includes([top, right], Tile.Water)) {
+      // ✨ Road-Water 좌,상 물
+      tile = [sprites, 2, 0];
+    } else if (this.equals(left, Tile.Water)) {
+      // Road-Water 좌측
+      tile = [sprites, 4, 1];
+    } else if (this.equals(right, Tile.Water)) {
+      // Road-Water 우측
+      tile = [sprites, 6, 1];
+    } else if (this.equals(top, Tile.Water)) {
+      // Road-Water 상단
+      tile = [sprites, 5, 0];
+    } else if (this.equals(bottom, Tile.Water)) {
+      // Road-Water 하단
+      tile = [sprites, 5, 2];
+    }
+
     return tile;
   }
 
@@ -152,7 +314,7 @@ export default class Field {
       case Tile.Water:
         return [sprites, 3, 15];
       case Tile.Road:
-        return [sprites, 1, 1];
+        return this.validateRoad();
       default:
         return [sprites, 1, 1];
     }
@@ -181,12 +343,12 @@ export default class Field {
   subDraw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis, sprites: HTMLImageElement, indexX: number, indexY: number) {
     const { x, y } = this.position;
     const { X, Y } = GAME_CONF.MAP_CONF.DEFAULT.SIZE;
-    const cropSizeX = 32 * indexX + 1.07;
-    const cropSizeY = 32 * indexY + 1.07;
-    const cropWidth = 32 - 0.7;
-    const cropHeight = 32 - 0.8;
+    const cropSizeX = 32 * indexX + 0.07;
+    const cropSizeY = 32 * indexY + 0.07;
+    const cropWidth = 32 - 0.07;
+    const cropHeight = 32 - 0.07;
 
-    ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.58, Y + 0.58);
+    ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
   }
 
   draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
@@ -198,20 +360,44 @@ export default class Field {
     // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X, Y);
     // const sprites = MapSprites;
     const [sprites, indexX, indexY] = this.spriteTile;
-    const cropSizeX = 32 * indexX + 1.07;
-    const cropSizeY = 32 * indexY + 1.07;
-    const cropWidth = 32 - 0.7;
-    const cropHeight = 32 - 0.8;
+    const cropSizeX = 32 * indexX + 0.2;
+    const cropSizeY = 32 * indexY + 0.2;
+    const cropWidth = 32 - 0.07;
+    const cropHeight = 32 - 0.07;
 
-    if (this.name === Tile.Grass && [4, 5, 6].includes(indexX) && [1, 2, 6, 7].includes(indexY)) {
-      const cropSizeX = 32 * 3 + 1.07;
-      const cropSizeY = 32 * 15 + 1.07;
-      const cropWidth = 32 - 0.7;
-      const cropHeight = 32 - 0.8;
+    if ((this.name === Tile.Grass || this.name === Tile.Road) && [4, 5, 6].includes(indexX) && [0, 1, 2, 6, 7].includes(indexY)) {
+      const cropSizeX = 32 * 3 + 0.07;
+      const cropSizeY = 32 * 15 + 0.07;
+      const cropWidth = 32 - 0.07;
+      const cropHeight = 32 - 0.07;
 
-      ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.58, Y + 0.58);
+      ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
     }
 
-    ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.58, Y + 0.58);
+    const frame = Math.floor((this.frame / (this.FPS * this.frameLate)) % 4);
+    const frameValue = Math.abs((frame % 4) - 2) - 1;
+    // console.log(frame, frameValue);
+    // console.log(frameValue)
+    // if (Math.abs(frame) === 2) {
+    //   this.waterDir = !this.waterDir;
+    // }
+    // const dir = this.waterDir ? 1 : -1;
+    if (indexX === 3 && indexY === 15) {
+      ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
+      ctx.drawImage(
+        sprites,
+        cropSizeX,
+        cropSizeY,
+        cropWidth,
+        cropHeight,
+        worldAxisX + x * X,
+        worldAxisY + y * Y,
+        X + 0.5 + 2 + frameValue * 1.5,
+        Y + 0.5,
+      );
+    } else {
+      ctx.drawImage(sprites, cropSizeX, cropSizeY , cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
+    }
+    this.frame += 1 /* (this.frame + 1) % this.FPS */;
   }
 }

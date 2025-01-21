@@ -67,9 +67,35 @@ body,
 }
 
 #interface {
+  @media (min-width: 0px) and (max-width: 767px) {
+    #conversation {
+      bottom: 2rem;
+    }
+    #login-dialog {
+      top: 50%;
+    }
+  }
+  @media (min-width: 768px) and (max-width: 1023px) {
+    #conversation {
+      bottom: 5rem;
+    }
+    #login-dialog {
+      top: 40%;
+    }
+  }
+  @media (min-width: 1024px) {
+    #conversation {
+      bottom: 10rem;
+    }
+    #login-dialog {
+      top: 40%;
+    }
+  }
   #conversation {
+    width: 95vmax;
+    min-width: 150px;
+    max-width: 90%;
     position: fixed;
-    bottom: 15px;
     left: 50%;
     z-index: 1200;
     background: white;
@@ -83,6 +109,13 @@ body,
     &.hide {
       opacity: 0;
       bottom: -50px;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      gap: 1rem;
     }
   }
   #user-interface {
@@ -100,9 +133,9 @@ body,
     flex-direction: column;
     justify-content: space-between;
     padding: 1rem;
-
     position: fixed;
-    top: 50%;
+    /*top: 50%;
+    */
     left: 50%;
     min-width: 200px;
     z-index: 1000;
@@ -110,6 +143,11 @@ body,
     min-height: 200px;
     text-align: center;
     box-shadow: 0 0 0 3px #aaa, 0 0 7px 0 #000;
+    transition: 150ms ease-in-out;
+    -webkit-transition: 150ms ease-in-out;
+    -moz-transition: 150ms ease-in-out;
+    -ms-transition: 150ms ease-in-out;
+    -o-transition: 150ms ease-in-out;
   }
 }
 
@@ -122,6 +160,28 @@ body,
 }
 
 .btn {
+  font-weight: 700;
+  text-transform: uppercase;
+  position: relative;
+  border: 1px solid #aaa;
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  padding: 0.4rem 0.6rem;
+  font-size: 14px;
+  &:hover {
+    border: 1px solid #000;
+  }
+}
+
+.btn-circle {
+  font-weight: 700;
+  text-transform: uppercase;
   position: relative;
   border: 1px solid #aaa;
   background: #fff;
@@ -194,4 +254,13 @@ body,
 
 .gap-4 {
   gap: 2rem;
+}
+
+.btn-error {
+  border-color: #ef8e8e;
+  color: #c53737;
+  &:hover {
+    border-color: #f14c4c;
+    color: #a02424;
+  }
 }

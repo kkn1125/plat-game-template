@@ -1,5 +1,8 @@
 import GameEngine from '@core/GameEngine';
 import { Npc, Unit } from '@model/unit';
+import Portal from '@model/unit/portal/Portal';
+import { QuestionState } from '@variable/constant';
+import { isBlockedAll, isBlockedMove } from '@variable/globalControl';
 
 export default class JoystickEvent {
   engine: GameEngine;
@@ -8,11 +11,13 @@ export default class JoystickEvent {
     a: boolean;
     d: boolean;
     s: boolean;
+    space: boolean;
   } = {
     w: false,
     a: false,
     d: false,
     s: false,
+    space: false,
   };
   order: Gaze[] = [];
 
@@ -105,54 +110,86 @@ export default class JoystickEvent {
     if (!this.controlUnit) return;
 
     const key = e.key;
-    if (key === 'w') {
-      if (!this.joystick.w) {
-        this.joystick.w = true;
-        this.controlUnit.gaze = 'top';
-        if (!this.order.includes('top')) {
-          this.order.push('top');
+    if (!isBlockedMove()) {
+      if (key === 'w') {
+        if (!this.joystick.w) {
+          this.joystick.w = true;
+          this.controlUnit.gaze = 'top';
+          if (!this.order.includes('top')) {
+            this.order.push('top');
+          }
         }
       }
-    }
-    if (key === 'a') {
-      if (!this.joystick.a) {
-        this.joystick.a = true;
-        this.controlUnit.gaze = 'left';
-        if (!this.order.includes('left')) {
-          this.order.push('left');
+      if (key === 'a') {
+        if (!this.joystick.a) {
+          this.joystick.a = true;
+          this.controlUnit.gaze = 'left';
+          if (!this.order.includes('left')) {
+            this.order.push('left');
+          }
         }
       }
-    }
-    if (key === 'd') {
-      if (!this.joystick.d) {
-        this.joystick.d = true;
-        this.controlUnit.gaze = 'right';
-        if (!this.order.includes('right')) {
-          this.order.push('right');
+      if (key === 'd') {
+        if (!this.joystick.d) {
+          this.joystick.d = true;
+          this.controlUnit.gaze = 'right';
+          if (!this.order.includes('right')) {
+            this.order.push('right');
+          }
         }
       }
-    }
-    if (key === 's') {
-      if (!this.joystick.s) {
-        this.joystick.s = true;
-        this.controlUnit.gaze = 'bottom';
-        if (!this.order.includes('bottom')) {
-          this.order.push('bottom');
+      if (key === 's') {
+        if (!this.joystick.s) {
+          this.joystick.s = true;
+          this.controlUnit.gaze = 'bottom';
+          if (!this.order.includes('bottom')) {
+            this.order.push('bottom');
+          }
         }
       }
     }
     if (key === ' ') {
-      const closeUnit = this.engine.controlUnit?.closeUnit as Npc;
+      if (isBlockedAll()) return;
+      if (this.joystick.space) return;
+      e.preventDefault();
+
+      this.joystick.space = true;
+      const controlUnit = this.engine.controlUnit;
+      if (!controlUnit) return;
+
+      const closeUnit = controlUnit.closeUnit as Npc;
       if (!closeUnit) return;
-      console.log(closeUnit);
-      const question = closeUnit.startConversation();
-      this.engine.ui.conversation(question);
+
+      if (closeUnit instanceof Portal) {
+        if (closeUnit.forward) {
+          this.engine.gameMapManager.changeMap(closeUnit.forwardMap);
+          closeUnit.forward(controlUnit);
+          controlUnit.aroundUnits = [];
+          this.clearMove();
+        }
+      } else {
+        if (closeUnit.question.state === QuestionState.Idle) {
+          const question = closeUnit.startConversation();
+          this.engine.ui.conversation(question);
+          this.clearMove();
+        } else {
+          this.engine.eventManager.emit('conversationNext');
+        }
+      }
+    }
+
+    if (key === 'Escape') {
+      this.engine.eventManager.emit('conversationCancel');
     }
   }
 
   private handleKeyUp(e: KeyboardEvent) {
     if (!this.controlUnit) return;
     const key = e.key;
+    if (key === ' ') {
+      e.preventDefault();
+      this.joystick.space = false;
+    }
     if (key.match(/[wsad]/)) {
       if (key === 'w') {
         this.joystick.w = false;
@@ -205,6 +242,13 @@ export default class JoystickEvent {
     // if (key === 's') {
     //   this.joystick.s = false;
     // }
+  }
+
+  clearMove() {
+    this.joystick.w = false;
+    this.joystick.s = false;
+    this.joystick.a = false;
+    this.joystick.d = false;
   }
 
   run() {

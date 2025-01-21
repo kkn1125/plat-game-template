@@ -27,6 +27,10 @@ class Renderer {
   get units() {
     return this.engine.units;
   }
+  /* 등록된 포탈들 */
+  get portals() {
+    return this.engine.portals;
+  }
 
   /* 윈도우 사이즈 */
   get worldSize() {
@@ -152,10 +156,33 @@ class Renderer {
     });
   }
 
+  get sameLocationPortals() {
+    return this.portals.filter((portal) => this.currentMap?.name === portal.location.locate);
+  }
+
+  get sameLocationUnits() {
+    return this.units.filter((unit) => this.currentMap?.name === unit.location.locate);
+  }
+
+  private portalDraw(){
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-portal');
+
+    this.sameLocationPortals.forEach((portal) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
+      portal.draw(layerMapCtx, {
+        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      });
+    });
+  }
+
   private unitDraw() {
     const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
 
-    this.units.forEach((unit) => {
+    this.sameLocationUnits.forEach((unit) => {
       const positionX = this.controlUnit?.position.x || 0;
       const positionY = this.controlUnit?.position.y || 0;
       const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
@@ -189,6 +216,7 @@ class Renderer {
 
     this.mapDraw();
     this.unitDraw();
+    this.portalDraw();
 
     if (this.currentMap && this.controlUnit) {
       if (this.controlUnit.state !== UnitState.Die) {

@@ -7,12 +7,19 @@ export type GameMode = (typeof GameMode)[keyof typeof GameMode];
 
 export const UnitState = {
   Die: 'Die',
+  Talk: 'Talk',
   Idle: 'Idle',
   Move: 'Move',
   Attack: 'Attack',
   Skill: 'Skill',
 };
 export type UnitState = (typeof UnitState)[keyof typeof UnitState];
+
+export const QuestionState = {
+  Talk: 'Talk',
+  Idle: 'Idle',
+};
+export type QuestionState = (typeof QuestionState)[keyof typeof QuestionState];
 
 export const EventName = {
   AddUnit: 'AddUnit',

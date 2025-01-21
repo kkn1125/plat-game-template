@@ -2,10 +2,17 @@ import GAME_CONF from '@config/game.conf';
 import AutoMoveable from '../implement/AutoMoveable';
 import Question from '../option/Question';
 import Unit from '../Unit';
-import { UnitState } from '@variable/constant';
+import { QuestionState, UnitState } from '@variable/constant';
+import { addConstraint, deleteConstraint } from '@variable/globalControl';
+import { makeId } from '@util/makeId';
 
 export default class Npc extends Unit implements AutoMoveable {
   routine!: (unit: Unit) => void;
+
+  constructor(name: string, option?: HealthOption) {
+    super(name, option);
+    this.id = makeId('npc');
+  }
 
   draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void {
     if (!this.boundary) {
@@ -47,6 +54,13 @@ export default class Npc extends Unit implements AutoMoveable {
 
   /* NPC 기능 */
   startConversation() {
+    this.question.start();
+    addConstraint('move');
     return this.question;
+  }
+
+  endConversation() {
+    deleteConstraint('move');
+    this.question.end();
   }
 }
