@@ -1,0 +1,11 @@
+import Portal from '@model/unit/portal/Portal';
+import { Town1, Town2 } from '@store/maps';
+export const PortalTown1Town2 = new Portal('타운2 포탈');
+PortalTown1Town2.setLocation(Town1);
+PortalTown1Town2.setForwardMap(Town2);
+PortalTown1Town2.setPosition(-200, 0);
+PortalTown1Town2.cropSizeX = 30;
+PortalTown1Town2.cropSizeY = 33;
+PortalTown1Town2.cropPadX = 32;
+PortalTown1Town2.cropPadY = 33;
+PortalTown1Town2.limitFrame = 3;

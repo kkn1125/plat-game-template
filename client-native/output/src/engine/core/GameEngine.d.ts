@@ -1,0 +1,32 @@
+import Renderer from '@animation/Renderer';
+import UserInterface from '@animation/UserInterface';
+import EventManager from '@event/EventManager';
+import { Unit } from '@model/unit';
+import Logger from '@util/Logger';
+import { GameMode, GameState } from '@variable/constant';
+import GameMapManager from './GameMapManager';
+import Portal from '@model/unit/portal/Portal';
+export default class GameEngine {
+    logger: Logger<GameEngine>;
+    state: GameState;
+    gameMode: GameMode;
+    ui: UserInterface;
+    renderer: Renderer;
+    eventManager: EventManager;
+    gameMapManager: GameMapManager;
+    controlUnit: Unit | null;
+    units: Unit[];
+    portals: Portal[];
+    get sameLocationPortals(): Portal[];
+    get sameLocationUnits(): Unit[];
+    constructor();
+    setControlUnit(unit: Unit): void;
+    setState(state: GameState): void;
+    addUnit(unit: Unit): void;
+    addPortal(portal: Portal): void;
+    loadUi(ui: UserInterface): void;
+    loadRenderer(renderer: Renderer): void;
+    loadEventManager(eventManager: EventManager): void;
+    loadGameMapManager(gameMapManager: GameMapManager): void;
+    playMode(mode: GameMode): void;
+}
