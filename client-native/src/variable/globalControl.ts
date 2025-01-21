@@ -22,3 +22,5 @@ export function deleteConstraint(type: string) {
   const index = taskQueue.indexOf(type);
   taskQueue.splice(index, 1);
 }
+
+export const mode = process.env.MODE || 'production';

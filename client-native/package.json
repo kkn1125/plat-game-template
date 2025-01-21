@@ -6,7 +6,6 @@
   "exports": {
     ".": {
       "import": "./output/src/index.js",
-      "require": "./output/src/index.js",
       "types": "./output/src/index.d.ts"
     }
   },
@@ -16,7 +15,10 @@
   ],
   "scripts": {
     "dev": "vite",
+    "prebuild": "rm -rf dist/",
     "build": "tsc && vite build",
+    "predeploy": "touch ./dist/.nojekyll",
+    "deploy": "cd dist && git init && git add -A && git commit -m \"gh-pages\" && git push https://github.com/kkn1125/plat-game-template.git master:gh-pages -f",
     "webpack": "webpack --config ./webpack.config.cjs",
     "preview": "vite preview",
     "test": "vitest"

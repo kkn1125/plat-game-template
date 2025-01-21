@@ -15,6 +15,8 @@ export default defineConfig(({ mode }) => {
   // `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), '');
 
+  const MODE = process.env.NODE_ENV || 'production';
+
   const host = process.env.HOST;
   const port = +(process.env.PORT || 5000);
   const playMode = process.env.PLAY_MODE || 'single';
@@ -23,14 +25,18 @@ export default defineConfig(({ mode }) => {
     // vite config
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
+      'process.env': {
+        MODE,
+      },
     },
     server: {
       host,
       port,
       playMode,
     },
+    base: mode === 'development' ? '/' : '/plat-game-template/',
     build: {
-      outDir: 'output',
+      outDir: 'dist',
       minify: 'terser',
       terserOptions: {
         keep_classnames: true,
