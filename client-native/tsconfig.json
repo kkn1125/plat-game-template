@@ -5,18 +5,23 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+    "esModuleInterop": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
+    "moduleResolution": "node",
+    // "allowImportingTsExtensions": true,
+    // "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    // "noEmit": true,
     "typeRoots": ["node_modules/@types", "src/types"],
     "declaration": true,
+
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-
+    "emitDeclarationOnly": false,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "output",
+    "rootDirs": ["src", "test"],
     /* Linting */
     "strict": true,
     "noUnusedLocals": false,
@@ -42,5 +47,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "editor", "test"]
+  "include": ["src", "test"],
+  "exclude": ["node_modules", "editor"]
 }

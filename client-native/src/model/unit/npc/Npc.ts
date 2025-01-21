@@ -1,10 +1,9 @@
-import GAME_CONF from '@config/game.conf';
+import { makeId } from '@util/makeId';
+import { UnitState } from '@variable/constant';
+import { addConstraint, deleteConstraint } from '@variable/globalControl';
 import AutoMoveable from '../implement/AutoMoveable';
 import Question from '../option/Question';
 import Unit from '../Unit';
-import { QuestionState, UnitState } from '@variable/constant';
-import { addConstraint, deleteConstraint } from '@variable/globalControl';
-import { makeId } from '@util/makeId';
 
 export default class Npc extends Unit implements AutoMoveable {
   routine!: (unit: Unit) => void;

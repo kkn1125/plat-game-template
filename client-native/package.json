@@ -3,23 +3,45 @@
   "private": true,
   "version": "0.0.2",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./output/src/index.js",
+      "require": "./output/src/index.js",
+      "types": "./output/src/index.d.ts"
+    }
+  },
+  "main": "src/index.ts",
+  "files": [
+    "output"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "webpack": "webpack --config ./webpack.config.cjs",
     "preview": "vite preview",
     "test": "vitest"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
     "@types/node": "^22.10.7",
+    "babel-loader": "^9.2.1",
+    "babel-plugin-module-resolver": "^5.0.2",
     "dotenv": "^16.4.7",
     "jsdom": "^26.0.0",
     "mobx": "^6.13.5",
+    "terser": "^5.37.0",
+    "terser-webpack-plugin": "^5.3.11",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "~5.6.2",
     "uuid": "^11.0.5",
     "vite": "^6.0.5",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.2"
+    "vitest": "^3.0.2",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
   },
   "dependencies": {
     "dayjs": "^1.11.13"

@@ -13,7 +13,7 @@ export default class GameEngine {
 
   state: GameState = GameState.Init;
 
-  gameMode: GameMode = GameMode.Test;
+  gameMode: GameMode = GameMode.Single;
   ui!: UserInterface;
   renderer!: Renderer;
   eventManager!: EventManager;

@@ -4,6 +4,8 @@ import Logger from '@util/Logger';
 import { makeId } from '@util/makeId';
 import octicons from '@primer/octicons';
 import Question from '@model/unit/option/Question';
+import { GameMode } from '@variable/constant';
+import { Unit } from '@model/unit';
 
 export default class UserInterface {
   logger = new Logger<UserInterface>(this);
@@ -19,8 +21,15 @@ export default class UserInterface {
     this.createLayer('layer-map');
     this.createLayer('layer-unit');
     this.createLayer('layer-portal');
-    this.createInterface();
-    this.createLoginDialog();
+    if (engine.gameMode !== GameMode.Test) {
+      this.createInterface();
+      this.createLoginDialog();
+    } else {
+      const user = new Unit('test-user');
+      user.setPosition(0, 0);
+      this.engine.setControlUnit(user);
+      user.increaseSpeed = 15;
+    }
   }
 
   get eventManager() {
