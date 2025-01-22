@@ -11,6 +11,7 @@ export default class GameMapManager {
     get controlUnit(): Unit | null;
     get mapSizeX(): 60;
     get mapSizeY(): 60;
+    setCurrentMap(gameMap: GameMap): void;
     addGameMap(gameMap: GameMap): void;
     changeMap(forwardMap: GameMap): void;
     getAxis(currentMap: GameMap, controlUnit: Unit): {

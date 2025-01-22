@@ -7,5 +7,6 @@ export default class GameMap {
     defaultSpawnPosition: XY;
     constructor(name: Maps, fields: string[][]);
     setDefaultSpawnPosition(x: number, y: number): void;
-    draw(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis): void;
+    drawMap(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis): void;
+    drawObject(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis, emboss?: boolean): void;
 }

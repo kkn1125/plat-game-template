@@ -38,12 +38,28 @@ export declare const GameState: {
 };
 export type GameState = (typeof GameState)[keyof typeof GameState];
 export declare const Tile: {
-    readonly Grass: "0";
-    readonly Road: "1";
-    readonly RoadRock: "1r";
-    readonly Water: "2";
-    readonly GrassTree: "0t";
-    readonly GrassBush: "0b";
-    readonly GrassRock: "0r";
+    readonly Grass: "g";
+    readonly Road: "r";
+    readonly Water: "w";
+    readonly RoadRock: "rR";
+    readonly RoadTree: "rT";
+    readonly RoadBush: "rB";
+    readonly GrassRock: "gR";
+    readonly GrassTree: "gT";
+    readonly GrassBush: "gB";
 };
 export type Tile = (typeof Tile)[keyof typeof Tile];
+export declare const TileCrop: {
+    GrassTree: {
+        CropSizeX: number;
+        CropSizeY: number;
+        CropWidth: number;
+        CropHeight: number;
+    };
+    RoadTree: {
+        CropSizeX: number;
+        CropSizeY: number;
+        CropWidth: number;
+        CropHeight: number;
+    };
+};

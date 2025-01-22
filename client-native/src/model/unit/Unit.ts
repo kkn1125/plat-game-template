@@ -8,9 +8,9 @@ import MoveableUnit from './implement/MoveableUnit';
 import TouchableUnit from './implement/TouchableUnit';
 import UseEquipment from './implement/UseEquipment';
 import UseStat from './implement/UseStat';
-import Equipment from './option/Equipment';
-import Location from './option/Location';
-import Stat from './option/Stat';
+import Equipment from '../option/Equipment';
+import Location from '../option/Location';
+import Stat from '../option/Stat';
 import GameEngine from '@core/GameEngine';
 import GameMap from '@model/gamemap/GameMap';
 
@@ -151,6 +151,11 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     this.position.y = y;
   }
 
+  setPositionByField(indexX: number, indexY: number) {
+    this.position.x = indexX * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
+    this.position.y = indexY * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+  }
+
   setState(state: UnitState) {
     this.state = state;
   }
@@ -217,7 +222,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     let closeUnit = null;
     const getDistance = (x1: number, y1: number, x2: number, y2: number) => Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     const { x, y } = this.position;
-    console.log(this.aroundUnits);
+    // console.log(this.aroundUnits);
     for (const unit of this.aroundUnits) {
       const { x: uX, y: uY } = unit.position;
       const distance = getDistance(x, y, uX, uY);
@@ -233,7 +238,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     return closeUnit;
   }
 
-  draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  draw(ctx: CanvasRenderingContext2D, labelCtx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
     if (!this.isControlUnit && this.detectable) {
       this.detect();
       this.drawDetect(ctx, { worldAxisX, worldAxisY });
@@ -248,7 +253,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     // 색상 표시
     // ctx.fillRect(positionX, positionY, this.size.x, this.size.y);
 
-    this.drawName(ctx, { worldAxisX, worldAxisY });
+    this.drawName(labelCtx, { worldAxisX, worldAxisY });
     this.drawCharacter(ctx, { worldAxisX, worldAxisY });
   }
 
@@ -260,18 +265,18 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
       const positionX = worldAxisX + moveScreenX;
       const positionY = worldAxisY + moveScreenY;
 
-      ctx.font = 'bold 20px auto';
+      ctx.font = 'bold 30px auto';
 
       /* stroke */
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 3;
 
-      ctx.strokeText('!', positionX + (this.size.x + 3 / 2) / 2, positionY - 30);
+      ctx.strokeText('!', positionX + (this.size.x + 3 / 2) / 2, positionY - 40);
 
       /* font */
       ctx.fillStyle = 'red';
       ctx.textAlign = 'center';
-      ctx.fillText('!', positionX + this.size.x / 2, positionY - 30);
+      ctx.fillText('!', positionX + this.size.x / 2, positionY - 40);
     }
   }
 

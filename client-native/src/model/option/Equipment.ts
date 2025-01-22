@@ -1,5 +1,5 @@
-import Item from "../object/Item";
-import Unit from "../Unit";
+import Item from "../unit/object/Item";
+import Unit from "../unit/Unit";
 
 export default class Equipment {
   parent: Unit;

@@ -2,18 +2,25 @@ import { makeId } from '@util/makeId';
 import { UnitState } from '@variable/constant';
 import { addConstraint, deleteConstraint } from '@variable/globalControl';
 import AutoMoveable from '../implement/AutoMoveable';
-import Question from '../option/Question';
+import Question from '../../option/Question';
 import Unit from '../Unit';
+import Quest from '@model/option/Quest';
 
 export default class Npc extends Unit implements AutoMoveable {
   routine!: (unit: Unit) => void;
+
+  quest: Quest[] = [];
 
   constructor(name: string, option?: HealthOption) {
     super(name, option);
     this.id = makeId('npc');
   }
 
-  draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void {
+  addQuest(quest: Quest) {
+    this.quest.push(quest);
+  }
+
+  draw(ctx: CanvasRenderingContext2D, labelCtx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void {
     if (!this.boundary) {
       this.autoMove();
     } else {
@@ -38,7 +45,7 @@ export default class Npc extends Unit implements AutoMoveable {
         this.engine.eventManager.joystickEvent.manualKeyDown(this, 's');
       }
     }
-    super.draw(ctx, { worldAxisX, worldAxisY });
+    super.draw(ctx, labelCtx, { worldAxisX, worldAxisY });
   }
 
   setRoutine(routine: (unit: Unit) => void) {

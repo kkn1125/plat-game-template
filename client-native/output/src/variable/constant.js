@@ -33,11 +33,27 @@ export const GameState = {
     Close: 'Close',
 };
 export const Tile = {
-    Grass: '0',
-    Road: '1',
-    RoadRock: '1r',
-    Water: '2',
-    GrassTree: '0t',
-    GrassBush: '0b',
-    GrassRock: '0r',
+    Grass: 'g',
+    Road: 'r',
+    Water: 'w',
+    RoadRock: 'rR',
+    RoadTree: 'rT',
+    RoadBush: 'rB',
+    GrassRock: 'gR',
+    GrassTree: 'gT',
+    GrassBush: 'gB',
+};
+export const TileCrop = {
+    GrassTree: {
+        CropSizeX: 0,
+        CropSizeY: 0,
+        CropWidth: 0,
+        CropHeight: 0,
+    },
+    RoadTree: {
+        CropSizeX: 0,
+        CropSizeY: 0,
+        CropWidth: 0,
+        CropHeight: 0,
+    },
 };

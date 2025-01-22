@@ -103,11 +103,12 @@ class Renderer {
 
   private clearDraw() {
     for (const { canvas, ctx } of this.engine.ui.canvasMap.values()) {
-      ctx.clearRect(0 - innerWidth, 0 - innerHeight, (canvas.width * 2) / GAME_CONF.SCALE, (canvas.height * 2) / GAME_CONF.SCALE);
-      // ctx.save(); // 이전 상태 저장
-
-      // ctx.translate(translateX, translateY); // 이동
-      // ctx.scale(scale, scale); // 스케일 적용
+      ctx.clearRect(
+        -canvas.width / GAME_CONF.SCALE,
+        -canvas.height / GAME_CONF.SCALE,
+        (canvas.width * 2) / GAME_CONF.SCALE,
+        (canvas.height * 2) / GAME_CONF.SCALE,
+      );
     }
   }
 
@@ -118,21 +119,23 @@ class Renderer {
   }
 
   getCameraMoveableRange(positionX: number, positionY: number) {
-    const fieldSizeX = GAME_CONF.MAP_CONF.DEFAULT.SIZE.X * GAME_CONF.SCALE;
-    const fieldSizeY = GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y * GAME_CONF.SCALE;
+    const fieldSizeX = GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
+    const fieldSizeY = GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
     const fieldXLength = this.currentMap?.fields[0].length || 0;
     const fieldYLength = this.currentMap?.fields.length || 0;
     const fieldWidth = fieldXLength * fieldSizeX;
-    const fieldHeight = fieldYLength * fieldSizeY;
+    const fieldHeight = fieldYLength * fieldSizeY * GAME_CONF.SCALE;
 
     // 유닛 카메라 고정 범위 X
     const limitScreenX = fieldWidth / 2;
     // 유닛 카메라 고정 범위 Y
     const limitScreenY = fieldHeight / 2;
 
+    const windowWidthAsScale = innerWidth / GAME_CONF.SCALE;
+    const windowHeightAsScale = innerHeight / GAME_CONF.SCALE;
     // 윈도우 넘어가는 맵의 길이 만큼
-    const windowOverflowX = innerWidth / 2 > limitScreenX ? 0 : limitScreenX - innerWidth / 2;
-    const windowOverflowY = innerHeight / 2 > limitScreenY ? 0 : limitScreenY - innerHeight / 2;
+    const windowOverflowX = windowWidthAsScale / 2 > limitScreenX ? 0 : limitScreenX - windowWidthAsScale / 2;
+    const windowOverflowY = windowHeightAsScale / 2 > limitScreenY ? 0 : limitScreenY - windowHeightAsScale / 2;
 
     let rangeX = 0;
     let rangeY = 0;
@@ -191,13 +194,14 @@ class Renderer {
 
   private portalDraw() {
     const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-portal');
+    const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
 
     this.sameLocationPortals.forEach((portal) => {
       const positionX = this.controlUnit?.position.x || 0;
       const positionY = this.controlUnit?.position.y || 0;
       const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
 
-      portal.draw(layerMapCtx, {
+      portal.draw(layerMapCtx, layerMapLabelCtx, {
         worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
         worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
       });
@@ -206,12 +210,13 @@ class Renderer {
 
   private unitDraw() {
     const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
+    const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
     this.sameLocationUnits.forEach((unit) => {
       const positionX = this.controlUnit?.position.x || 0;
       const positionY = this.controlUnit?.position.y || 0;
       const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
 
-      unit.draw(layerMapCtx, {
+      unit.draw(layerMapCtx, layerMapLabelCtx, {
         worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
         worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
       });
@@ -220,7 +225,7 @@ class Renderer {
     if (this.controlUnit && this.currentMap) {
       const { worldAxisX, worldAxisY } = this.worldPosition;
 
-      this.controlUnit.draw(layerMapCtx, {
+      this.controlUnit.draw(layerMapCtx, layerMapLabelCtx, {
         worldAxisX,
         worldAxisY,
       });

@@ -27,6 +27,7 @@ declare class Renderer {
     private animate;
     private ticktock;
     private clearDraw;
+    private afterDraw;
     getCameraMoveableRange(positionX: number, positionY: number): {
         rangeX: number;
         rangeY: number;

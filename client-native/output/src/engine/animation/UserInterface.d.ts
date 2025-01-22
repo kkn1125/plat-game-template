@@ -1,6 +1,6 @@
 import GameEngine from '@core/GameEngine';
-import Logger from '@util/Logger';
 import Question from '@model/unit/option/Question';
+import Logger from '@util/Logger';
 export default class UserInterface {
     logger: Logger<UserInterface>;
     id: `ui-${string}`;

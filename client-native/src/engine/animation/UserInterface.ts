@@ -1,7 +1,7 @@
 import GAME_CONF from '@config/game.conf';
 import GameEngine from '@core/GameEngine';
+import Question from '@model/option/Question';
 import { Unit } from '@model/unit';
-import Question from '@model/unit/option/Question';
 import octicons from '@primer/octicons';
 import { $ } from '@util/$';
 import Logger from '@util/Logger';
@@ -19,18 +19,20 @@ export default class UserInterface {
 
   constructor(engine: GameEngine) {
     this.engine = engine;
-    this.createLayer('layer-map');
-    this.createLayer('layer-unit');
-    this.createLayer('layer-portal');
-    this.createLayer('layer-map-object');
+    this.createLayer('layer-map', true);
+    this.createLayer('layer-unit', true);
+    this.createLayer('layer-portal', true);
+    this.createLayer('layer-map-object', true);
+    this.createLayer('layer-unit-label', true);
     this.createInterface();
     if (engine.gameMode !== GameMode.Test) {
       this.createLoginDialog();
     } else {
       const user = new Unit('test-user');
-      user.setPosition(0, 0);
+      const position = this.engine.gameMapManager.currentMap?.defaultSpawnPosition;
+      user.setPosition(position?.x ?? 0, position?.y ?? 0);
       this.engine.setControlUnit(user);
-      user.increaseSpeed = 3;
+      // user.increaseSpeed = 2;
     }
   }
 
@@ -80,7 +82,7 @@ export default class UserInterface {
     };
   }
 
-  createLayer(id: Id) {
+  createLayer(id: Id, useScale: boolean = false) {
     this.logger.scope('CreateLayer').debug(`${id} 레이어 생성`);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -96,22 +98,15 @@ export default class UserInterface {
 
     this.canvasMap.set(id, { canvas, ctx });
 
-    // // ctx.scale(GAME_CONF.SCALE, GAME_CONF.SCALE);
+    if (useScale) {
+      const fields = this.engine.gameMapManager.currentMap?.fields;
 
-    // const fields = this.engine.gameMapManager.currentMap?.fields;
+      if (fields) {
+        ctx.translate((innerWidth * (1 - GAME_CONF.SCALE)) / 2, (innerHeight * (1 - GAME_CONF.SCALE)) / 2);
+      }
+      ctx.scale(GAME_CONF.SCALE, GAME_CONF.SCALE);
+    }
 
-    // if (fields) {
-    //   const width = fields[0].length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
-    //   const height = fields.length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y * GAME_CONF.SCALE;
-    //   console.log(innerWidth);
-    //   ctx.translate((innerWidth - width * GAME_CONF.SCALE) / 2, (innerHeight - height * GAME_CONF.SCALE) / 2);
-    //   ctx.transform;
-    // }
-
-    // ctx.translate(
-    //   (innerWidth / 2) * GAME_CONF.SCALE - (GAME_CONF.SCALE * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X) / (1 - GAME_CONF.SCALE),
-    //   (innerHeight / 2) * GAME_CONF.SCALE - (GAME_CONF.SCALE * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y) / (1 - GAME_CONF.SCALE),
-    // );
     return { canvas, ctx };
   }
 

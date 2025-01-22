@@ -1,5 +1,5 @@
 import { makeId } from '@util/makeId';
-import Stat from '../option/Stat';
+import Stat from '../../option/Stat';
 
 export default class Item {
   id = makeId('item');

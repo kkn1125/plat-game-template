@@ -35,10 +35,17 @@ export default class GameMap {
     setDefaultSpawnPosition(x, y) {
         this.defaultSpawnPosition = { x, y };
     }
-    draw(ctx, worldAxis) {
+    drawMap(ctx, worldAxis) {
         for (const row of this.fields) {
             for (const field of row) {
-                field.draw(ctx, worldAxis);
+                field.drawMap(ctx, worldAxis);
+            }
+        }
+    }
+    drawObject(ctx, worldAxis, emboss) {
+        for (const row of this.fields) {
+            for (const field of row) {
+                field.drawObject(ctx, worldAxis, emboss);
             }
         }
     }

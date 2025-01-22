@@ -13,8 +13,8 @@ declare const GAME_CONF: {
             readonly DECREASE_SPEED: 1;
             readonly GAZE: "bottom";
             readonly SIZE: {
-                readonly X: 50;
-                readonly Y: 50;
+                readonly X: 40;
+                readonly Y: 40;
             };
         };
         readonly INCREASE_DAMAGE_RATIO: 0.07;
@@ -29,5 +29,6 @@ declare const GAME_CONF: {
         };
     };
     readonly QUEST_CONF: {};
+    readonly SCALE: 1;
 };
 export default GAME_CONF;

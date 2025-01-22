@@ -37,7 +37,7 @@ export default class Portal extends Unit {
         const cropSizeX = this.cropSizeX - this.cropPadX * 2;
         const cropSizeY = this.cropSizeY - this.cropPadY * 2;
         // 스프라이츠 표시
-        ctx.drawImage(this.sprites, cropPositionX, cropPositionY, cropSizeX, cropSizeY, positionX, positionY, this.size.x, this.size.y);
+        ctx.drawImage(this.sprites, cropPositionX, cropPositionY, cropSizeX, cropSizeY, positionX - 5, positionY - 10, this.size.x + 10, this.size.y + 10);
         this.frame = this.frame + 1;
     }
 }

@@ -6,8 +6,9 @@ export const MD = new Npc('MD', {
     mp: Infinity,
 });
 let dir = true;
+let topBottom = true;
 MD.setLocation(Town2);
-MD.setPosition(-150, -270); // MD.position.x = 100;
+MD.setPosition(-215, -150); // MD.position.x = 100;
 MD.unitColor = 'green';
 let originPosition = { ...MD.position };
 let state = 'Idle';
@@ -20,9 +21,9 @@ setInterval(() => {
 }, 2000);
 MD.question.addQuestion('보다 나은 게임을 준비 중입니다.', '어서오세요.');
 MD.routine = (unit) => {
-    const { x } = unit.position;
-    const { x: originX } = originPosition;
-    const distance = Math.abs(x - originX);
+    const { y } = unit.position;
+    const { y: originY } = originPosition;
+    const distance = Math.abs(y - originY);
     if (distance >= 50) {
         dir = !dir;
         state = 'Idle';
@@ -35,13 +36,13 @@ MD.routine = (unit) => {
     }
     if (state === 'Move') {
         if (dir) {
-            unit.move(-1, 0);
-            unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'a');
+            unit.move(0, -1);
+            unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'w');
             unit.state = UnitState.Move;
         }
         else {
-            unit.move(1, 0);
-            unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'd');
+            unit.move(0, 1);
+            unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 's');
             unit.state = UnitState.Move;
         }
     }

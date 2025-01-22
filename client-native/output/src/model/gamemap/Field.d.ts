@@ -29,10 +29,12 @@ export default class Field {
     validateGrass(): [HTMLImageElement, number, number];
     validateRoad(): [HTMLImageElement, number, number];
     get spriteTile(): [HTMLImageElement, number, number];
+    get objectSpriteTile(): HTMLImageElement;
     get fields(): Field[][];
     setX(x: number): this;
     setY(y: number): this;
     setPosition(x: number, y: number): this;
     subDraw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis, sprites: HTMLImageElement, indexX: number, indexY: number): void;
-    draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void;
+    drawMap(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void;
+    drawObject(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis, emboss?: boolean): void;
 }

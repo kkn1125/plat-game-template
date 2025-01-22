@@ -7,8 +7,8 @@ import JoystickEvent from '@event/JoystickEvent';
 import Field from '@model/gamemap/Field';
 import GameMap from '@model/gamemap/GameMap';
 import { Monster, Npc, Unit } from '@model/index';
-import Question from '@model/unit/option/Question';
-import Stat from '@model/unit/option/Stat';
+import Question from '@model/option/Question';
+import Stat from '@model/option/Stat';
 import Portal from '@model/unit/portal/Portal';
 import { GameMode, GameState, QuestionState, UnitState } from '@variable/constant';
 

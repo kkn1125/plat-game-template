@@ -14,12 +14,15 @@ export function gameStart(gameEngine) {
     /* init */
     const gameMapManager = new GameMapManager(gameEngine);
     const eventManager = new EventManager(gameEngine);
-    const ui = new UserInterface(gameEngine);
     const renderer = new Renderer(gameEngine);
     /* load */
     gameEngine.loadGameMapManager(gameMapManager);
+    gameEngine.gameMapManager.addGameMap(Town2);
+    gameEngine.gameMapManager.addGameMap(Town1);
+    gameEngine.gameMapManager.setCurrentMap(Town2);
     gameEngine.loadEventManager(eventManager);
     emitEvent(gameEngine);
+    const ui = new UserInterface(gameEngine);
     gameEngine.loadUi(ui);
     gameEngine.loadRenderer(renderer);
     gameEngine.setState(GameState.Loading);
@@ -27,8 +30,6 @@ export function gameStart(gameEngine) {
     gameEngine.renderer.render();
 }
 export function initializeGameMap(gameEngine) {
-    gameEngine.gameMapManager.addGameMap(Town2);
-    gameEngine.gameMapManager.addGameMap(Town1);
     gameEngine.addUnit(MD);
     gameEngine.addUnit(MD2);
     gameEngine.addPortal(PortalTown1Town2);

@@ -396,10 +396,10 @@ class Unit {
         /* stroke */
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 3;
-        ctx.strokeText(this.name.toUpperCase(), positionX + (this.size.x + 3 / 2) / 2, positionY - 10);
+        ctx.strokeText(this.name.toUpperCase(), positionX + (this.size.x + 3 / 2) / 2, positionY - 20);
         /* font */
         ctx.textAlign = 'center';
-        ctx.fillText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
+        ctx.fillText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 20);
     }
     drawCharacter(ctx, { worldAxisX, worldAxisY }) {
         // ctx.fillStyle = this.unitColor;
@@ -413,7 +413,7 @@ class Unit {
         const cropSizeX = this.cropSizeX - this.cropPadX * 2;
         const cropSizeY = this.cropSizeY - this.cropPadY * 2;
         // 스프라이츠 표시
-        ctx.drawImage(this.sprites, cropPositionX, cropPositionY, cropSizeX, cropSizeY, positionX, positionY, this.size.x, this.size.y);
+        ctx.drawImage(this.sprites, cropPositionX, cropPositionY, cropSizeX, cropSizeY, positionX - 5, positionY - 10, this.size.x + 10, this.size.y + 10);
         if (this.state === UnitState.Move) {
             this.frame = this.frame + 1;
         }

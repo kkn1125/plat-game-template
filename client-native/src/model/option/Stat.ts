@@ -1,6 +1,6 @@
 import GAME_CONF from "@config/game.conf";
-import Unit from "../Unit";
-import Item from "../object/Item";
+import Unit from "../unit/Unit";
+import Item from "../unit/object/Item";
 
 type StatKey = Extract<keyof Stat, "str" | "dex" | "int" | "luk">;
 

@@ -17,18 +17,19 @@ const logger = new Logger('GameStart');
 export function gameStart(gameEngine: GameEngine) {
   /* init */
   const gameMapManager = new GameMapManager(gameEngine);
-  const eventManager = new EventManager(gameEngine);
-  const renderer = new Renderer(gameEngine);
-  
-  /* load */
   gameEngine.loadGameMapManager(gameMapManager);
   gameEngine.gameMapManager.addGameMap(Town2);
   gameEngine.gameMapManager.addGameMap(Town1);
   gameEngine.gameMapManager.setCurrentMap(Town2);
+  
+  /* load */
+  const eventManager = new EventManager(gameEngine);
   gameEngine.loadEventManager(eventManager);
   emitEvent(gameEngine);
+
   const ui = new UserInterface(gameEngine);
   gameEngine.loadUi(ui);
+  const renderer = new Renderer(gameEngine);
   gameEngine.loadRenderer(renderer);
 
   gameEngine.setState(GameState.Loading);

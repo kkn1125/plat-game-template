@@ -1,5 +1,5 @@
 import Logger from '@util/Logger';
-import Npc from '../npc/Npc';
+import Npc from '../unit/npc/Npc';
 import { QuestionState, UnitState } from '@variable/constant';
 
 export default class Question {
