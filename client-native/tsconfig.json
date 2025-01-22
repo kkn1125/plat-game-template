@@ -20,7 +20,7 @@
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": false,
     "allowSyntheticDefaultImports": true,
-    "outDir": "output",
+    "outDir": "dist",
     "rootDirs": ["src", "test"],
     /* Linting */
     "strict": true,

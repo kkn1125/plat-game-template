@@ -9,9 +9,9 @@ export default class Monster extends Unit {
             value: void 0
         });
     }
-    draw(ctx, { worldAxisX, worldAxisY }) {
+    draw(ctx, labelCtx, { worldAxisX, worldAxisY }) {
         this.autoMove();
-        super.draw(ctx, { worldAxisX, worldAxisY });
+        super.draw(ctx, labelCtx, { worldAxisX, worldAxisY });
     }
     setRoutine(routine) {
         this.routine = routine;
