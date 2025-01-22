@@ -6,6 +6,8 @@ import GameEngine from './GameEngine';
 import { Tile } from '@variable/constant';
 import { textChangeFx } from '@store/effects/textChangeFx';
 
+const WATER_COLLISION_GAP = 15;
+
 export default class GameMapManager {
   logger = new Logger<GameMapManager>(this);
 
@@ -27,6 +29,11 @@ export default class GameMapManager {
 
   get mapSizeY() {
     return GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+  }
+
+  setCurrentMap(gameMap: GameMap) {
+    this.logger.scope('AddGameMap').info('맵 설정:', gameMap.name);
+    this.currentMap = gameMap;
   }
 
   addGameMap(gameMap: GameMap) {
@@ -59,19 +66,6 @@ export default class GameMapManager {
     const y = height / 2 + unitPosition.y;
     return { x, y };
   }
-
-  // private getCellInformation(currentMap: GameMap, controlUnit: Unit) {
-  //   const { x, y } = this.getAxis(currentMap, controlUnit);
-  //   const unitHalfSizeX = controlUnit.size.x / 2;
-  //   const unitHalfSizeY = controlUnit.size.y / 2;
-  //   const cellLeftX = Math.floor((x - unitHalfSizeX) / this.mapSizeX);
-  //   const cellX = Math.floor(x / this.mapSizeX);
-  //   const cellRightX = Math.floor((x + unitHalfSizeX) / this.mapSizeX);
-  //   const cellTopY = Math.floor((y - unitHalfSizeY) / this.mapSizeY);
-  //   const cellY = Math.floor(y / this.mapSizeY);
-  //   const cellBottomY = Math.floor((y + unitHalfSizeY) / this.mapSizeY);
-  //   return { cellLeftX, cellX, cellRightX, cellTopY, cellY, cellBottomY };
-  // }
 
   // 유닛 상단 컬리젼
   collisionTop(currentMap: GameMap, controlUnit: Unit) {
@@ -120,7 +114,7 @@ export default class GameMapManager {
 
     // 물 연접 부 컬리젼 범위 조정 - 물로 상단에서 접근
     {
-      const cellBottomY = Math.floor((y + unitHalfSizeY + 20 + controlUnit.increaseSpeed) / this.mapSizeY);
+      const cellBottomY = Math.floor((y + unitHalfSizeY + WATER_COLLISION_GAP + controlUnit.increaseSpeed) / this.mapSizeY);
 
       const fieldLeft = fields?.[cellBottomY]?.[cellLeftX];
       const field = fields?.[cellBottomY]?.[cellX];
@@ -165,13 +159,13 @@ export default class GameMapManager {
     // 물 연접 부 컬리젼 범위 조정 - 물로 좌측에서 접근
     {
       const cellLeftX = Math.floor((x - unitHalfSizeX - controlUnit.increaseSpeed) / this.mapSizeX);
-      const cellBottomY = Math.floor((y + 20 + unitHalfSizeY) / this.mapSizeY);
+      const cellBottomY = Math.floor((y + WATER_COLLISION_GAP + unitHalfSizeY) / this.mapSizeY);
 
       const fieldTop = fields?.[cellTopY]?.[cellLeftX];
       const field = fields?.[cellY]?.[cellLeftX];
       const fieldBottom = fields?.[cellBottomY]?.[cellLeftX];
 
-      if (field?.name === Tile.Grass && fieldBottom?.name === Tile.Water && [fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
+      if (fieldBottom?.name === Tile.Water && [fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
         /* 충돌 */
         return true;
       }
@@ -207,13 +201,13 @@ export default class GameMapManager {
     // 물 연접 부 컬리젼 범위 조정 - 물로 우측에서 접근
     {
       const cellRightX = Math.floor((x + unitHalfSizeX + controlUnit.increaseSpeed) / this.mapSizeX);
-      const cellBottomY = Math.floor((y + 20 + unitHalfSizeY) / this.mapSizeY);
+      const cellBottomY = Math.floor((y + WATER_COLLISION_GAP + unitHalfSizeY) / this.mapSizeY);
 
       const fieldTop = fields?.[cellTopY]?.[cellRightX];
       const field = fields?.[cellY]?.[cellRightX];
       const fieldBottom = fields?.[cellBottomY]?.[cellRightX];
 
-      if (field?.name === Tile.Grass && fieldBottom?.name === Tile.Water && [fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
+      if (fieldBottom?.name === Tile.Water && [fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
         /* 충돌 */
         return true;
       }

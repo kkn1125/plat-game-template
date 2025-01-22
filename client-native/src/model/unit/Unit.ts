@@ -217,7 +217,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     let closeUnit = null;
     const getDistance = (x1: number, y1: number, x2: number, y2: number) => Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     const { x, y } = this.position;
-    console.log(this.aroundUnits)
+    console.log(this.aroundUnits);
     for (const unit of this.aroundUnits) {
       const { x: uX, y: uY } = unit.position;
       const distance = getDistance(x, y, uX, uY);
@@ -287,11 +287,11 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 3;
 
-    ctx.strokeText(this.name.toUpperCase(), positionX + (this.size.x + 3 / 2) / 2, positionY - 10);
+    ctx.strokeText(this.name.toUpperCase(), positionX + (this.size.x + 3 / 2) / 2, positionY - 20);
 
     /* font */
     ctx.textAlign = 'center';
-    ctx.fillText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 10);
+    ctx.fillText(this.name.toUpperCase(), positionX + this.size.x / 2, positionY - 20);
   }
 
   drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
@@ -307,7 +307,17 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     const cropSizeX = this.cropSizeX - this.cropPadX * 2;
     const cropSizeY = this.cropSizeY - this.cropPadY * 2;
     // 스프라이츠 표시
-    ctx.drawImage(this.sprites, cropPositionX, cropPositionY, cropSizeX, cropSizeY, positionX, positionY, this.size.x, this.size.y);
+    ctx.drawImage(
+      this.sprites,
+      cropPositionX,
+      cropPositionY,
+      cropSizeX,
+      cropSizeY,
+      positionX - 5,
+      positionY - 10,
+      this.size.x + 10,
+      this.size.y + 10,
+    );
     if (this.state === UnitState.Move) {
       this.frame = this.frame + 1;
     } else {

@@ -12,8 +12,8 @@ export const UNIT_CONF = {
     DECREASE_SPEED: 1,
     GAZE: 'bottom',
     SIZE: {
-      X: 50,
-      Y: 50,
+      X: 40,
+      Y: 40,
     },
   },
   INCREASE_DAMAGE_RATIO: 0.07,

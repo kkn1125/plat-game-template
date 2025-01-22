@@ -8,6 +8,7 @@ const GAME_CONF = {
   WEAPON_CONF,
   MAP_CONF,
   QUEST_CONF,
+  SCALE: 1,
 } as const;
 
 export default GAME_CONF;

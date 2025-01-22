@@ -21,10 +21,17 @@ export default class GameMap {
     this.defaultSpawnPosition = { x, y };
   }
 
-  draw(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis) {
+  drawMap(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis) {
     for (const row of this.fields) {
       for (const field of row) {
-        field.draw(ctx, worldAxis);
+        field.drawMap(ctx, worldAxis);
+      }
+    }
+  }
+  drawObject(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis, emboss?: boolean) {
+    for (const row of this.fields) {
+      for (const field of row) {
+        field.drawObject(ctx, worldAxis, emboss);
       }
     }
   }

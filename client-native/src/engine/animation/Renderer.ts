@@ -103,13 +103,23 @@ class Renderer {
 
   private clearDraw() {
     for (const { canvas, ctx } of this.engine.ui.canvasMap.values()) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0 - innerWidth, 0 - innerHeight, (canvas.width * 2) / GAME_CONF.SCALE, (canvas.height * 2) / GAME_CONF.SCALE);
+      // ctx.save(); // 이전 상태 저장
+
+      // ctx.translate(translateX, translateY); // 이동
+      // ctx.scale(scale, scale); // 스케일 적용
+    }
+  }
+
+  private afterDraw() {
+    for (const { canvas, ctx } of this.engine.ui.canvasMap.values()) {
+      // ctx.restore(); // 상태 복원
     }
   }
 
   getCameraMoveableRange(positionX: number, positionY: number) {
-    const fieldSizeX = GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
-    const fieldSizeY = GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+    const fieldSizeX = GAME_CONF.MAP_CONF.DEFAULT.SIZE.X * GAME_CONF.SCALE;
+    const fieldSizeY = GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y * GAME_CONF.SCALE;
     const fieldXLength = this.currentMap?.fields[0].length || 0;
     const fieldYLength = this.currentMap?.fields.length || 0;
     const fieldWidth = fieldXLength * fieldSizeX;
@@ -150,10 +160,25 @@ class Renderer {
     const positionY = this.controlUnit?.position.y || 0;
     const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
 
-    this.currentMap.draw(layerMapCtx, {
+    this.currentMap.drawMap(layerMapCtx, {
       worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
       worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
     });
+    this.currentMap.drawObject(layerMapCtx, {
+      worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
+      worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
+    });
+    {
+      const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-map-object');
+      this.currentMap.drawObject(
+        layerMapCtx,
+        {
+          worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
+          worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
+        },
+        true,
+      );
+    }
   }
 
   get sameLocationPortals() {
@@ -164,7 +189,7 @@ class Renderer {
     return this.units.filter((unit) => this.currentMap?.name === unit.location.locate);
   }
 
-  private portalDraw(){
+  private portalDraw() {
     const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-portal');
 
     this.sameLocationPortals.forEach((portal) => {
@@ -181,7 +206,6 @@ class Renderer {
 
   private unitDraw() {
     const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
-
     this.sameLocationUnits.forEach((unit) => {
       const positionX = this.controlUnit?.position.x || 0;
       const positionY = this.controlUnit?.position.y || 0;
@@ -251,6 +275,7 @@ class Renderer {
         }
       }
     }
+    this.afterDraw();
 
     requestAnimationFrame(this.draw.bind(this));
     this.prevTime = now;

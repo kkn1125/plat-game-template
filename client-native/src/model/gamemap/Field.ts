@@ -1,9 +1,9 @@
-import { MapSprites, MapSprites2 } from '@/source/sprites';
+import { MapSprites, MapSprites2, ObjectSprites } from '@/source/sprites';
 import GAME_CONF from '@config/game.conf';
 import GameMapManager from '@core/GameMapManager';
 import { makeId } from '@util/makeId';
 import GameMap from './GameMap';
-import { Tile } from '@variable/constant';
+import { Tile, TileCrop } from '@variable/constant';
 
 export default class Field {
   id = makeId('field');
@@ -31,8 +31,12 @@ export default class Field {
         return false;
       case Tile.Grass:
         return true;
+      case Tile.GrassTree:
+        return false;
       case Tile.Road:
         return true;
+      case Tile.RoadTree:
+        return false;
       default:
         return true;
     }
@@ -66,11 +70,11 @@ export default class Field {
   }
 
   includes(fields: Field[], tile: Tile) {
-    return fields.every((field) => field?.name === tile);
+    return fields.every((field) => field?.name[0] === tile);
   }
 
   equals(field: Field, tile: Tile) {
-    return field?.name === tile;
+    return field?.name[0] === tile;
   }
 
   validateGrass(): [HTMLImageElement, number, number] {
@@ -142,9 +146,9 @@ export default class Field {
     } else if (this.includes([top, right], Tile.Water)) {
       // ✨ Road-Water 우,상 물
       tile = [sprites, 6, 4];
-    } else if (this.includes([top, right], Tile.Water)) {
+    } else if (this.includes([top, left], Tile.Water)) {
       // ✨ Road-Water 좌,상 물
-      tile = [sprites, 2, 4];
+      tile = [sprites, 4, 4];
     } else if (this.equals(right, Tile.Grass) && this.equals(left, Tile.Water)) {
       // Grass-Water 좌측
       tile = [sprites, 4, 5];
@@ -286,9 +290,9 @@ export default class Field {
     } else if (this.includes([top, right], Tile.Water)) {
       // ✨ Road-Water 우,상 물
       tile = [sprites, 6, 0];
-    } else if (this.includes([top, right], Tile.Water)) {
+    } else if (this.includes([top, left], Tile.Water)) {
       // ✨ Road-Water 좌,상 물
-      tile = [sprites, 2, 0];
+      tile = [sprites, 4, 0];
     } else if (this.equals(left, Tile.Water)) {
       // Road-Water 좌측
       tile = [sprites, 4, 1];
@@ -308,7 +312,8 @@ export default class Field {
 
   get spriteTile(): [HTMLImageElement, number, number] {
     const sprites = MapSprites;
-    switch (this.name) {
+    const tile = this.name[0];
+    switch (tile) {
       case Tile.Grass:
         return this.validateGrass();
       case Tile.Water:
@@ -317,6 +322,18 @@ export default class Field {
         return this.validateRoad();
       default:
         return [sprites, 1, 1];
+    }
+  }
+
+  get objectSpriteTile() {
+    const objectSprites = ObjectSprites;
+    switch (this.name) {
+      case Tile.GrassTree:
+        return objectSprites;
+      case Tile.RoadTree:
+        return objectSprites;
+      default:
+        return objectSprites;
     }
   }
 
@@ -351,11 +368,21 @@ export default class Field {
     ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
   }
 
-  draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  // draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  //   this.drawMap(ctx, { worldAxisX, worldAxisY });
+  //   this.drawObject(ctx, { worldAxisX, worldAxisY });
+  // }
+
+  drawMap(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
     // const { color } = GAME_CONF.MAP_CONF.FIELD_VALIDATE(this);
     // ctx.fillStyle = color;
     const { x, y } = this.position;
     const { X, Y } = GAME_CONF.MAP_CONF.DEFAULT.SIZE;
+    const tile = this.name[0];
+
+    // if (this.name === Tile.GrassTree) {
+    //   console.log(tile);
+    // }
 
     // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X, Y);
     // const sprites = MapSprites;
@@ -365,7 +392,12 @@ export default class Field {
     const cropWidth = 32 - 0.07;
     const cropHeight = 32 - 0.07;
 
-    if ((this.name === Tile.Grass || this.name === Tile.Road) && [4, 5, 6].includes(indexX) && [0, 1, 2, 6, 7].includes(indexY)) {
+    /* 물 연접 타일 아래 물 렌더링 */
+    if (
+      (tile === Tile.Grass || tile === Tile.Road) &&
+      [0, 1, 4, 5, 6, 7, 8, 9].includes(indexX) &&
+      [0, 1, 2, 4, 5, 6, 7, 7, 9, 10, 12].includes(indexY)
+    ) {
       const cropSizeX = 32 * 3 + 0.07;
       const cropSizeY = 32 * 15 + 0.07;
       const cropWidth = 32 - 0.07;
@@ -382,7 +414,9 @@ export default class Field {
     //   this.waterDir = !this.waterDir;
     // }
     // const dir = this.waterDir ? 1 : -1;
-    if (indexX === 3 && indexY === 15) {
+
+    /* 물 움직임 애니메이션 */
+    if (tile === Tile.Water) {
       ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
       ctx.drawImage(
         sprites,
@@ -396,8 +430,54 @@ export default class Field {
         Y + 0.5,
       );
     } else {
-      ctx.drawImage(sprites, cropSizeX, cropSizeY , cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
+      ctx.drawImage(sprites, cropSizeX, cropSizeY, cropWidth, cropHeight, worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
     }
+
     this.frame += 1 /* (this.frame + 1) % this.FPS */;
+  }
+
+  drawObject(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis, emboss: boolean = false) {
+    const { x, y } = this.position;
+    const { X, Y } = GAME_CONF.MAP_CONF.DEFAULT.SIZE;
+    const tile = this.name[0];
+
+    // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X, Y);
+    // const sprites = MapSprites;
+    const sprites = this.objectSpriteTile;
+    // const cropSizeX = 32 * 0 + 0.2;
+    // const cropSizeY = 32 * 0 + 0.2;
+    // const cropWidth = 32 - 0.07;
+    // const cropHeight = 32 - 0.07;
+
+    const { bottom } = this.roundFields;
+    const isBottomWater = bottom?.name[0] === Tile.Water;
+    if (this.name === Tile.GrassTree) {
+      const { CropSizeX, CropSizeY, CropWidth, CropHeight } = TileCrop.GrassTree;
+      ctx.drawImage(
+        sprites,
+        0, // aaa
+        0,
+        60, // a
+        100 - (emboss ? (isBottomWater ? 42 : 40) : 0),
+        worldAxisX + x * X - 32.5, // aaa * 2
+        worldAxisY + y * Y - 115 + (isBottomWater ? 0 : 30), // 육지 나무 Y 축 위치
+        X + 0.5 + 60, // a * 2
+        Y + 0.5 + 120 - (emboss ? 72 : 0) - (isBottomWater ? 10 : 0), // 물 위 나무 Y 축 위치
+      );
+    }
+    if (this.name === Tile.RoadTree) {
+      const { CropSizeX, CropSizeY, CropWidth, CropHeight } = TileCrop.GrassTree;
+      ctx.drawImage(
+        sprites,
+        0, // aaa
+        0,
+        60, // a
+        100 - (emboss ? (isBottomWater ? 42 : 40) : 0),
+        worldAxisX + x * X - 32.5, // aaa * 2
+        worldAxisY + y * Y - 115 + (isBottomWater ? 0 : 30), // 육지 나무 Y 축 위치
+        X + 0.5 + 60, // a * 2
+        Y + 0.5 + 120 - (emboss ? 72 : 0) - (isBottomWater ? 10 : 0), // 물 위 나무 Y 축 위치
+      );
+    }
   }
 }

@@ -13,3 +13,4 @@ export const PortalSprites = getImage(`${path}sprites/portal/basic.png`);
 
 export const MapSprites = getImage(`${path}sprites/tileset.png`);
 export const MapSprites2 = getImage(`${path}sprites/tileset2.png`);
+export const ObjectSprites = getImage(`${path}sprites/object.png`);

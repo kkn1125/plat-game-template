@@ -1,11 +1,12 @@
+import GAME_CONF from '@config/game.conf';
 import GameEngine from '@core/GameEngine';
+import { Unit } from '@model/unit';
+import Question from '@model/unit/option/Question';
+import octicons from '@primer/octicons';
 import { $ } from '@util/$';
 import Logger from '@util/Logger';
 import { makeId } from '@util/makeId';
-import octicons from '@primer/octicons';
-import Question from '@model/unit/option/Question';
 import { GameMode } from '@variable/constant';
-import { Unit } from '@model/unit';
 
 export default class UserInterface {
   logger = new Logger<UserInterface>(this);
@@ -21,14 +22,15 @@ export default class UserInterface {
     this.createLayer('layer-map');
     this.createLayer('layer-unit');
     this.createLayer('layer-portal');
+    this.createLayer('layer-map-object');
+    this.createInterface();
     if (engine.gameMode !== GameMode.Test) {
-      this.createInterface();
       this.createLoginDialog();
     } else {
       const user = new Unit('test-user');
       user.setPosition(0, 0);
       this.engine.setControlUnit(user);
-      user.increaseSpeed = 15;
+      user.increaseSpeed = 3;
     }
   }
 
@@ -93,6 +95,23 @@ export default class UserInterface {
     window.addEventListener('resize', this.handleCanvasResize.bind(this, canvas));
 
     this.canvasMap.set(id, { canvas, ctx });
+
+    // // ctx.scale(GAME_CONF.SCALE, GAME_CONF.SCALE);
+
+    // const fields = this.engine.gameMapManager.currentMap?.fields;
+
+    // if (fields) {
+    //   const width = fields[0].length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
+    //   const height = fields.length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y * GAME_CONF.SCALE;
+    //   console.log(innerWidth);
+    //   ctx.translate((innerWidth - width * GAME_CONF.SCALE) / 2, (innerHeight - height * GAME_CONF.SCALE) / 2);
+    //   ctx.transform;
+    // }
+
+    // ctx.translate(
+    //   (innerWidth / 2) * GAME_CONF.SCALE - (GAME_CONF.SCALE * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X) / (1 - GAME_CONF.SCALE),
+    //   (innerHeight / 2) * GAME_CONF.SCALE - (GAME_CONF.SCALE * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y) / (1 - GAME_CONF.SCALE),
+    // );
     return { canvas, ctx };
   }
 
