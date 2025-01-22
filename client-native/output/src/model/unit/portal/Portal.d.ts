@@ -5,6 +5,7 @@ export default class Portal extends Unit implements Forwardable {
     forwardMap: GameMap;
     constructor(name: string, option?: HealthOption, forwardMap?: GameMap);
     setForwardMap(forwardMap: GameMap): void;
+    setForwardPositionByMap(gameMap: GameMap, direction?: 'top' | 'bottom' | 'left' | 'right'): void;
     forward(unit: Unit): void;
     drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void;
 }

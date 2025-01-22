@@ -5,7 +5,7 @@ export const MD2 = new Npc('MD2', {
     mp: Infinity,
 });
 let dir = true;
-MD2.setPosition(150, -150);
+MD2.setPositionByField(3, -3);
 MD2.unitColor = 'green';
 let originPosition = { ...MD2.position };
 let state = 'Idle';

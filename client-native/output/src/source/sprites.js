@@ -6,7 +6,7 @@ function getImage(path) {
     return image;
 }
 const path = mode === 'development' ? '/' : '/plat-game-template/';
-console.log(path);
+// console.log(path);
 export const CharacterSprites = getImage(`${path}sprites/character.png`);
 export const PortalSprites = getImage(`${path}sprites/portal/basic.png`);
 export const MapSprites = getImage(`${path}sprites/tileset.png`);

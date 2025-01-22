@@ -1,4 +1,5 @@
 import { PortalSprites } from '@/source/sprites';
+import GAME_CONF from '@config/game.conf';
 import { makeId } from '@util/makeId';
 import Unit from '../Unit';
 export default class Portal extends Unit {
@@ -19,9 +20,28 @@ export default class Portal extends Unit {
     setForwardMap(forwardMap) {
         this.forwardMap = forwardMap;
     }
+    setForwardPositionByMap(gameMap, direction) {
+        let x = 0;
+        let y = 0;
+        switch (direction) {
+            case 'top':
+                y -= GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+                break;
+            case 'bottom':
+                y += GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+                break;
+            case 'left':
+                x -= GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
+                break;
+            case 'right':
+                x += GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
+                break;
+        }
+        gameMap.setForwardedPosition(this.position.x + x, this.position.y + y);
+    }
     forward(unit) {
         const forwardMap = this.forwardMap;
-        const { x, y } = forwardMap.defaultSpawnPosition;
+        const { x, y } = forwardMap.forwardedPosition;
         unit.location.locate = forwardMap.name;
         unit.setPosition(x, y);
     }

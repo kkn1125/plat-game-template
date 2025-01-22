@@ -1,7 +1,7 @@
 import { makeId } from '@util/makeId';
 import { UnitState } from '@variable/constant';
 import { addConstraint, deleteConstraint } from '@variable/globalControl';
-import Question from '../option/Question';
+import Question from '../../option/Question';
 import Unit from '../Unit';
 export default class Npc extends Unit {
     constructor(name, option) {
@@ -12,6 +12,12 @@ export default class Npc extends Unit {
             writable: true,
             value: void 0
         });
+        Object.defineProperty(this, "quest", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: []
+        });
         Object.defineProperty(this, "question", {
             enumerable: true,
             configurable: true,
@@ -20,7 +26,10 @@ export default class Npc extends Unit {
         });
         this.id = makeId('npc');
     }
-    draw(ctx, { worldAxisX, worldAxisY }) {
+    addQuest(quest) {
+        this.quest.push(quest);
+    }
+    draw(ctx, labelCtx, { worldAxisX, worldAxisY }) {
         if (!this.boundary) {
             this.autoMove();
         }
@@ -41,7 +50,7 @@ export default class Npc extends Unit {
                 this.engine.eventManager.joystickEvent.manualKeyDown(this, 's');
             }
         }
-        super.draw(ctx, { worldAxisX, worldAxisY });
+        super.draw(ctx, labelCtx, { worldAxisX, worldAxisY });
     }
     setRoutine(routine) {
         this.routine = routine;

@@ -1,5 +1,5 @@
 import GameEngine from '@core/GameEngine';
-import Question from '@model/unit/option/Question';
+import Question from '@model/option/Question';
 import Logger from '@util/Logger';
 export default class UserInterface {
     logger: Logger<UserInterface>;
@@ -23,7 +23,7 @@ export default class UserInterface {
         canvas: HTMLCanvasElement;
         ctx: CanvasRenderingContext2D;
     };
-    createLayer(id: Id): {
+    createLayer(id: Id, useScale?: boolean): {
         canvas: HTMLCanvasElement;
         ctx: CanvasRenderingContext2D;
     };

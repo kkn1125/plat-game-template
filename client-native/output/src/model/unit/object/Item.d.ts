@@ -1,4 +1,4 @@
-import Stat from '../option/Stat';
+import Stat from '../../option/Stat';
 export default class Item {
     id: `item-${string}`;
     name: string;

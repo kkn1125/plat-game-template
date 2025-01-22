@@ -5,9 +5,9 @@ import MoveableUnit from './implement/MoveableUnit';
 import TouchableUnit from './implement/TouchableUnit';
 import UseEquipment from './implement/UseEquipment';
 import UseStat from './implement/UseStat';
-import Equipment from './option/Equipment';
-import Location from './option/Location';
-import Stat from './option/Stat';
+import Equipment from '../option/Equipment';
+import Location from '../option/Location';
+import Stat from '../option/Stat';
 import GameEngine from '@core/GameEngine';
 import GameMap from '@model/gamemap/GameMap';
 declare class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, MoveableUnit {
@@ -61,13 +61,14 @@ declare class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipme
     setSprites(sprites: HTMLImageElement): void;
     setGameEngine(engine: GameEngine): void;
     setPosition(x: number, y: number): void;
+    setPositionByField(indexX: number, indexY: number): void;
     setState(state: UnitState): void;
     changeLocation(location: Maps): void;
     move(x: number, y: number): void;
     detect(): void;
     around(): void;
     get closeUnit(): Unit | null;
-    draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void;
+    draw(ctx: CanvasRenderingContext2D, labelCtx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void;
     drawDetect(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void;
     drawName(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void;
     drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void;

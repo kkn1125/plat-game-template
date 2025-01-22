@@ -4,9 +4,9 @@ import Unit from '../Unit';
 export default class Monster extends Unit implements AutoMoveable {
   routine!: (unit: Unit) => void;
 
-  draw(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void {
+  draw(ctx: CanvasRenderingContext2D, labelCtx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis): void {
     this.autoMove();
-    super.draw(ctx, { worldAxisX, worldAxisY });
+    super.draw(ctx, labelCtx, { worldAxisX, worldAxisY });
   }
 
   setRoutine(routine: (unit: Unit) => void) {

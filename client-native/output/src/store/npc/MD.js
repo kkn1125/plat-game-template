@@ -8,7 +8,7 @@ export const MD = new Npc('MD', {
 let dir = true;
 let topBottom = true;
 MD.setLocation(Town2);
-MD.setPosition(-215, -150); // MD.position.x = 100;
+MD.setPositionByField(-3.5, -2.5); // MD.position.x = 100;
 MD.unitColor = 'green';
 let originPosition = { ...MD.position };
 let state = 'Idle';
