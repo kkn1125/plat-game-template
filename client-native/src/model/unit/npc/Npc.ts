@@ -5,6 +5,7 @@ import AutoMoveable from '../implement/AutoMoveable';
 import Question from '../../option/Question';
 import Unit from '../Unit';
 import Quest from '@model/option/Quest';
+import Chatting from '@model/option/Chatting';
 
 export default class Npc extends Unit implements AutoMoveable {
   routine!: (unit: Unit) => void;
@@ -55,7 +56,7 @@ export default class Npc extends Unit implements AutoMoveable {
   autoMove() {
     this.routine?.(this);
   }
-
+  chatting = new Chatting()
   question = new Question(this);
 
   /* NPC 기능 */

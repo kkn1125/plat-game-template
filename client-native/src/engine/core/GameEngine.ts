@@ -2,11 +2,12 @@ import Renderer from '@animation/Renderer';
 import UserInterface from '@animation/UserInterface';
 import EventManager from '@event/EventManager';
 import { Unit } from '@model/unit';
+import Building from '@model/unit/building/Building';
+import Portal from '@model/unit/portal/Portal';
 import Logger from '@util/Logger';
 import { GameMode, GameState } from '@variable/constant';
 import { makeAutoObservable } from 'mobx';
 import GameMapManager from './GameMapManager';
-import Portal from '@model/unit/portal/Portal';
 
 export default class GameEngine {
   logger = new Logger<GameEngine>(this);
@@ -22,6 +23,7 @@ export default class GameEngine {
 
   units: Unit[] = [];
   portals: Portal[] = [];
+  buildings: Building[] = [];
 
   get sameLocationPortals() {
     return this.portals.filter((portal) => this.gameMapManager.currentMap?.name === portal.location.locate);
@@ -29,6 +31,10 @@ export default class GameEngine {
 
   get sameLocationUnits() {
     return this.units.filter((unit) => this.gameMapManager.currentMap?.name === unit.location.locate);
+  }
+
+  get sameLocationBuildings() {
+    return this.buildings.filter((building) => this.gameMapManager.currentMap?.name === building.location.locate);
   }
 
   constructor() {
@@ -59,6 +65,12 @@ export default class GameEngine {
     this.logger.scope('AddPortal').debug('포탈 추가', portal.id);
     this.portals.push(portal);
     portal.setGameEngine(this);
+  }
+
+  addBuilding(building: Building) {
+    this.logger.scope('AddBuilding').debug('빌딩 추가', building.id);
+    this.buildings.push(building);
+    building.setGameEngine(this);
   }
 
   loadUi(ui: UserInterface) {

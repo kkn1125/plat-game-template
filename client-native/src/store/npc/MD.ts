@@ -1,5 +1,5 @@
 import { Npc } from '@model/unit';
-import { Town2 } from '@store/maps';
+import { Taecho } from '@store/maps';
 import { UnitState } from '@variable/constant';
 
 export const MD = new Npc('MD', {
@@ -7,9 +7,8 @@ export const MD = new Npc('MD', {
   mp: Infinity,
 });
 let dir = true;
-let topBottom = true;
-MD.setLocation(Town2);
-MD.setPositionByField(-3.5, -2.5); // MD.position.x = 100;
+MD.setLocation(Taecho);
+MD.setPositionByField(1.5, -0.5); // MD.position.x = 100;
 MD.unitColor = 'green';
 let originPosition = { ...MD.position };
 let state = 'Idle';
@@ -21,7 +20,8 @@ setInterval(() => {
     state = 'Move';
   }
 }, 2000);
-MD.question.addQuestion('보다 나은 게임을 준비 중입니다.', '어서오세요.');
+MD.chatting.addComment('어서오세요.');
+MD.question.addQuestion('초기 버전의 게임보다 나은 환경을 조성 중 입니다.', '다양한 오브젝트와 유닛의 상호작용이 다양해졌어요!', '자세한 업데이트 내역은 추후 공지사항 컨텐츠가 개발되면 볼 수 있어요!');
 MD.routine = (unit) => {
   const { y } = unit.position;
   const { y: originY } = originPosition;

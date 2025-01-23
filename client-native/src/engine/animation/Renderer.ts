@@ -27,6 +27,10 @@ class Renderer {
   get units() {
     return this.engine.units;
   }
+  /* 등록된 빌딩들 */
+  get buildings() {
+    return this.engine.buildings;
+  }
   /* 등록된 포탈들 */
   get portals() {
     return this.engine.portals;
@@ -192,6 +196,10 @@ class Renderer {
     return this.units.filter((unit) => this.currentMap?.name === unit.location.locate);
   }
 
+  get sameLocationBuildings() {
+    return this.buildings.filter((unit) => this.currentMap?.name === unit.location.locate);
+  }
+
   private portalDraw() {
     const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-portal');
     const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
@@ -233,6 +241,44 @@ class Renderer {
     }
   }
 
+  private buildingDraw() {
+    const { ctx: layerUnitCtx } = this.engine.ui.getLayer('layer-unit');
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-map-object');
+    const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
+
+    this.sameLocationBuildings.forEach((building) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
+      // building.detect();
+
+      // building.drawCharacter(layerUnitCtx, {
+      //   worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+      //   worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      // });
+      // building.drawName(layerMapLabelCtx, {
+      //   worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+      //   worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      // });
+      building.draw(layerUnitCtx,layerMapLabelCtx, {
+        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      });
+      {
+        building.drawCharacter(
+          layerMapCtx,
+          {
+            worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+            worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+          },
+          true,
+        );
+      }
+      
+    });
+  }
+
   private draw(time: number = 0) {
     // 화면 초기화
     this.clearDraw();
@@ -244,6 +290,7 @@ class Renderer {
     const { joystick } = this.engine.eventManager.joystickEvent;
 
     this.mapDraw();
+    this.buildingDraw();
     this.unitDraw();
     this.portalDraw();
 

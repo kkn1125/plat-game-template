@@ -13,6 +13,7 @@ import Location from '../option/Location';
 import Stat from '../option/Stat';
 import GameEngine from '@core/GameEngine';
 import GameMap from '@model/gamemap/GameMap';
+import Building from './building/Building';
 
 class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, MoveableUnit {
   order: string[] = [];
@@ -32,7 +33,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
 
   logger = new Logger<Unit>(this);
 
-  location = new Location('Town1');
+  location = new Location('태초마을');
 
   id: MakeId<string> = makeId('unit');
   name: string;
@@ -134,7 +135,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     }
   }
 
-  setLocation(gameMap: GameMap) {
+  setLocation(gameMap: GameMap<Maps>) {
     this.location.locate = gameMap.name;
   }
 
@@ -175,6 +176,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     const controlUnit = this.engine.controlUnit;
     if (!currentMap) return;
     if (!controlUnit) return;
+    if (!this.detectable) return;
     // const fields = currentMap.fields;
     const mapSizeX = this.engine.gameMapManager.mapSizeX;
     const mapSizeY = this.engine.gameMapManager.mapSizeY;
@@ -194,7 +196,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
 
   around() {
     const currentMap = this.engine.gameMapManager.currentMap;
-    const units = [...this.engine.sameLocationUnits, ...this.engine.sameLocationPortals];
+    const units = [...this.engine.sameLocationUnits, ...this.engine.sameLocationPortals, ...this.engine.sameLocationBuildings];
     if (!currentMap) return;
     if (units.length === 0) return;
     // const fields = currentMap.fields;
@@ -241,7 +243,9 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
   draw(ctx: CanvasRenderingContext2D, labelCtx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
     if (!this.isControlUnit && this.detectable) {
       this.detect();
-      this.drawDetect(ctx, { worldAxisX, worldAxisY });
+      if (GAME_CONF.MAP_CONF.DISPLAY.DETECT[this.constructor.name.toUpperCase() as OptionName]) {
+        this.drawDetect(ctx, { worldAxisX, worldAxisY });
+      }
     }
 
     // if (this.isControlUnit && this.aroundUnits.length > 0 && this.closeUnit) {
@@ -249,11 +253,18 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, UseEquipment, Move
     // } else {
     //   this.boundary = null;
     // }
+    // const moveScreenX = this.position.x;
+    // const moveScreenY = this.position.y;
+
+    // const positionX = worldAxisX + moveScreenX;
+    // const positionY = worldAxisY + moveScreenY;
 
     // 색상 표시
     // ctx.fillRect(positionX, positionY, this.size.x, this.size.y);
 
-    this.drawName(labelCtx, { worldAxisX, worldAxisY });
+    if(GAME_CONF.MAP_CONF.DISPLAY.NAME[this.constructor.name.toUpperCase() as OptionName]){
+      this.drawName(labelCtx, { worldAxisX, worldAxisY });
+    }
     this.drawCharacter(ctx, { worldAxisX, worldAxisY });
   }
 

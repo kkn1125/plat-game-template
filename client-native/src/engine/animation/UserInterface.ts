@@ -32,7 +32,7 @@ export default class UserInterface {
       const position = this.engine.gameMapManager.currentMap?.defaultSpawnPosition;
       user.setPosition(position?.x ?? 0, position?.y ?? 0);
       this.engine.setControlUnit(user);
-      // user.increaseSpeed = 2;
+      user.increaseSpeed = 5;
     }
   }
 

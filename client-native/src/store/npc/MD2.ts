@@ -1,4 +1,5 @@
 import { Npc } from '@model/unit';
+import { TaechoFront } from '@store/maps';
 import { UnitState } from '@variable/constant';
 
 export const MD2 = new Npc('MD2', {
@@ -6,7 +7,8 @@ export const MD2 = new Npc('MD2', {
   mp: Infinity,
 });
 let dir = true;
-MD2.setPositionByField(3, -3);
+MD2.setLocation(TaechoFront);
+MD2.setPositionByField(-3.5, -2.5);
 MD2.unitColor = 'green';
 let originPosition = { ...MD2.position };
 let state = 'Idle';

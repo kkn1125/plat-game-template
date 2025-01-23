@@ -1,5 +1,6 @@
 import GameEngine from '@core/GameEngine';
 import { Npc, Unit } from '@model/unit';
+import Building from '@model/unit/building/Building';
 import Portal from '@model/unit/portal/Portal';
 import { QuestionState } from '@variable/constant';
 import { isBlockedAll, isBlockedMove } from '@variable/globalControl';
@@ -160,7 +161,14 @@ export default class JoystickEvent {
       const closeUnit = controlUnit.closeUnit as Npc;
       if (!closeUnit) return;
 
-      if (closeUnit instanceof Portal) {
+      if (closeUnit instanceof Building) {
+        if (closeUnit.forward) {
+          this.engine.gameMapManager.changeMap(closeUnit.forwardMap);
+          closeUnit.forward(controlUnit);
+          controlUnit.aroundUnits = [];
+          this.clearMove();
+        }
+      } else if (closeUnit instanceof Portal) {
         if (closeUnit.forward) {
           this.engine.gameMapManager.changeMap(closeUnit.forwardMap);
           closeUnit.forward(controlUnit);

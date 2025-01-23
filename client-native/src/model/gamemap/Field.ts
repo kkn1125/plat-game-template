@@ -1,9 +1,8 @@
-import { MapSprites, MapSprites2, ObjectSprites } from '@/source/sprites';
+import { DecorateSprites, MapSprites, MapSprites2, MapSprites3, ObjectSprites } from '@/source/sprites';
 import GAME_CONF from '@config/game.conf';
-import GameMapManager from '@core/GameMapManager';
 import { makeId } from '@util/makeId';
+import { Tile } from '@variable/constant';
 import GameMap from './GameMap';
-import { Tile, TileCrop } from '@variable/constant';
 
 export default class Field {
   id = makeId('field');
@@ -27,15 +26,25 @@ export default class Field {
 
   get isPassable() {
     switch (this.name) {
-      case Tile.Water:
-        return false;
-      case Tile.Grass:
-        return true;
-      case Tile.GrassTree:
-        return false;
+      case Tile.WoodFloor:
       case Tile.Road:
+      case Tile.Grass:
+      case Tile.RoadBush:
+      case Tile.GrassBush:
+      case Tile.RoadFlower:
+      case Tile.GrassFlower:
         return true;
+      case Tile.Water:
+      case Tile.GrassTree:
       case Tile.RoadTree:
+      case Tile.RoadStackH:
+      case Tile.GrassStackH:
+      case Tile.RoadStack:
+      case Tile.GrassStack:
+      case Tile.RoadBoard:
+      case Tile.GrassBoard:
+      case Tile.RoadBlock:
+      case Tile.GrassBlock:
         return false;
       default:
         return true;
@@ -314,6 +323,8 @@ export default class Field {
     const sprites = MapSprites;
     const tile = this.name[0];
     switch (tile) {
+      case Tile.WoodFloor:
+        return [MapSprites3, 0, 0];
       case Tile.Grass:
         return this.validateGrass();
       case Tile.Water:
@@ -328,8 +339,11 @@ export default class Field {
   get objectSpriteTile() {
     const objectSprites = ObjectSprites;
     switch (this.name) {
+      case Tile.GrassStack:
+      case Tile.RoadStack:
+      case Tile.GrassBoard:
+      case Tile.RoadBoard:
       case Tile.GrassTree:
-        return objectSprites;
       case Tile.RoadTree:
         return objectSprites;
       default:
@@ -445,60 +459,113 @@ export default class Field {
 
     const { bottom } = this.roundFields;
     const isBottomWater = bottom?.name[0] === Tile.Water;
-    if (this.name === Tile.GrassTree) {
+    if (this.name === Tile.GrassTree || this.name === Tile.RoadTree) {
+      // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
       // const { CropSizeX, CropSizeY, CropWidth, CropHeight } = TileCrop.GrassTree;
       ctx.drawImage(
         sprites,
         0, // aaa
         0,
         60, // a
-        100 - (emboss ? (isBottomWater ? 36 : 40) : 0),
-        worldAxisX + x * X - 32.5, // aaa * 2
-        worldAxisY + y * Y - 115 + (isBottomWater ? (emboss ? 0 : 1) : emboss ? 28 : 30), // 육지 나무 Y 축 위치
-        X + 0.5 + 60, // a * 2
-        Y + 0.5 + 120 - (emboss ? 69 : 0) - (isBottomWater ? (emboss ? 0 : 10) : 0), // 물 위 나무 Y 축 위치
+        100,
+        worldAxisX + x * X - 30, // aaa * 2
+        worldAxisY + y * Y - 95 + (isBottomWater ? -10 : 0), // 육지 나무 Y 축 위치
+        X + 60, // a * 2
+        Y + 100, // 물 위 나무 Y 축 위치
       );
     }
 
-    if (this.name === Tile.RoadTree) {
-      // const { CropSizeX, CropSizeY, CropWidth, CropHeight } = TileCrop.GrassTree;
-      ctx.drawImage(
-        sprites,
-        0, // aaa
-        0,
-        60, // a
-        100 - (emboss ? (isBottomWater ? 42 : 40) : 0),
-        worldAxisX + x * X - 32.5, // aaa * 2
-        worldAxisY + y * Y - 115 + (isBottomWater ? 0 : 30), // 육지 나무 Y 축 위치
-        X + 0.5 + 60, // a * 2
-        Y + 0.5 + 120 - (emboss ? 72 : 0) - (isBottomWater ? 10 : 0), // 물 위 나무 Y 축 위치
-      );
-    }
-
-    if (this.name === Tile.GrassBush) {
+    if (this.name === Tile.GrassBush || this.name === Tile.RoadBush) {
       ctx.drawImage(
         sprites,
         0, // aaa
         100,
         40, // a
         40,
-        worldAxisX + x * X, // aaa * 2
+        worldAxisX + x * X - 10, // aaa * 2
         worldAxisY + y * Y + (isBottomWater ? -30 : 0), // 육지 나무 Y 축 위치
-        X + 0.5 + 20, // a * 2
-        Y + 0.5 + 20, // 물 위 나무 Y 축 위치
+        X + 20, // a * 2
+        Y + 20, // 물 위 나무 Y 축 위치
       );
     }
-    if (this.name === Tile.RoadBush) {
+
+    if (this.name === Tile.GrassBoard || this.name === Tile.RoadBoard) {
+      // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
+
+      if (!emboss) {
+        ctx.drawImage(
+          sprites,
+          168, // aaa
+          130,
+          40, // a
+          40,
+          worldAxisX + x * X - 10, // aaa * 2
+          worldAxisY + y * Y + (isBottomWater ? -30 : 0), // 육지 나무 Y 축 위치
+          X + 20, // a * 2
+          Y + 20, // 물 위 나무 Y 축 위치
+        );
+      }
+    }
+
+    if (this.name === Tile.GrassStack || this.name === Tile.RoadStack) {
+      // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
+
+      if (!emboss) {
+        ctx.drawImage(
+          sprites,
+          210, // aaa
+          230,
+          50, // a
+          50,
+          worldAxisX + x * X - 3.5, // aaa * 2
+          worldAxisY + y * Y + (isBottomWater ? -30 : 0) - 10, // 육지 나무 Y 축 위치
+          X + 20, // a * 2
+          Y + 20, // 물 위 나무 Y 축 위치
+        );
+      }
+    }
+
+    if (this.name === Tile.GrassStackH || this.name === Tile.RoadStackH) {
+      // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
+
+      if (!emboss) {
+        ctx.drawImage(
+          sprites,
+          152, // aaa
+          230,
+          50, // a
+          50,
+          worldAxisX + x * X - 3.5 - 5, // aaa * 2
+          worldAxisY + y * Y + (isBottomWater ? -30 : 0) - 30, // 육지 나무 Y 축 위치
+          X + 20, // a * 2
+          Y + 20, // 물 위 나무 Y 축 위치
+        );
+        ctx.drawImage(
+          sprites,
+          152, // aaa
+          230,
+          50, // a
+          50,
+          worldAxisX + x * X - 3.5 + 2, // aaa * 2
+          worldAxisY + y * Y + (isBottomWater ? -30 : 0), // 육지 나무 Y 축 위치
+          X + 20, // a * 2
+          Y + 20, // 물 위 나무 Y 축 위치
+        );
+      }
+    }
+
+    if (this.name === Tile.RoadFlower || this.name === Tile.GrassFlower) {
+      // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
       ctx.drawImage(
-        sprites,
-        0, // aaa
-        100,
-        40, // a
-        40,
-        worldAxisX + x * X, // aaa * 2
-        worldAxisY + y * Y + (isBottomWater ? -30 : 0), // 육지 나무 Y 축 위치
-        X + 0.5 + 20, // a * 2
-        Y + 0.5 + 20, // 물 위 나무 Y 축 위치
+        DecorateSprites,
+        3, // aaa
+        8,
+        18, // a
+        20,
+        worldAxisX + x * X - 3.5+15, // aaa * 2
+        worldAxisY + y * Y + (isBottomWater ? -30 : 0) +15, // 육지 나무 Y 축 위치
+        X-25, // a * 2
+        Y-25, // 물 위 나무 Y 축 위치
       );
     }
   }

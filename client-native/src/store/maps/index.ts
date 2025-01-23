@@ -1,2 +1,5 @@
-export { Town1 } from "./Town1";
-export { Town2 } from "./Town2";
+export { EmptyHouse1 } from './EmptyHouse1';
+export { Osolgil1 } from './Osolgil1';
+export { Taecho } from './Taecho';
+export { TaechoFront } from './TaechoFront';
+export { MDHouse } from './MDHouse';

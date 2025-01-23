@@ -1,3 +1,4 @@
+import MAP_CONF from '@config/map/map.conf';
 import * as maps from '@store/maps';
 
 export declare global {
@@ -11,10 +12,11 @@ export declare global {
     x: number;
     y: number;
   };
-  type Maps = keyof typeof maps;
+  type Maps = (typeof maps)[keyof typeof maps]['name'];
   type Gaze = 'top' | 'left' | 'right' | 'bottom';
   type HealthOption = {
     hp?: number;
     mp?: number;
   };
+  type OptionName = keyof (typeof MAP_CONF)['DISPLAY'][keyof (typeof MAP_CONF)['DISPLAY']];
 }

@@ -20,7 +20,7 @@ body,
 }
 
 #app {
-  /* background: #000; */
+  background: #000;
   canvas {
     position: absolute;
     top: 0;

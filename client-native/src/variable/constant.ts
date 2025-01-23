@@ -49,9 +49,21 @@ export const Tile = {
   RoadRock: 'rR',
   RoadTree: 'rT',
   RoadBush: 'rB',
+  RoadBlock: 'rX',
   GrassRock: 'gR',
   GrassTree: 'gT',
   GrassBush: 'gB',
+  GrassBlock: 'gX',
+  WoodFloor: 'W',
+  WoodFloorTree: 'WT',
+  RoadBoard: 'rO',
+  GrassBoard: 'gO',
+  RoadStack: 'gS',
+  GrassStack: 'rS',
+  GrassStackH: 'gS1',
+  RoadStackH: 'rS1',
+  GrassFlower: 'gF',
+  RoadFlower: 'rF',
 } as const;
 export type Tile = (typeof Tile)[keyof typeof Tile];
 

@@ -1,31 +1,21 @@
-import { PortalSprites } from '@/source/sprites';
-import GAME_CONF from '@config/game.conf';
 import GameMap from '@model/gamemap/GameMap';
-import { makeId } from '@util/makeId';
 import Forwardable from '../implement/Forwardable';
 import Unit from '../Unit';
+import GAME_CONF from '@config/game.conf';
+import { makeId } from '@util/makeId';
 
-export default class Portal extends Unit implements Forwardable {
+export default class Building extends Unit implements Forwardable {
   forwardMap!: GameMap<Maps>;
+  // forwardPositionMap: Map<string, XY> = new Map();
   forwardPosition: XY = { x: 0, y: 0 };
 
   constructor(name: string, option?: HealthOption, forwardMap?: GameMap<Maps>) {
     super(name, option);
-    this.id = makeId('portal');
-    this.setSprites(PortalSprites);
+    this.id = makeId('building');
     if (forwardMap) {
       this.forwardMap = forwardMap;
     }
   }
-
-  // setForwardMap(forwardMap: GameMap<Maps>) {
-  //   this.forwardMap = forwardMap;
-  // }
-
-  // setForwardMap(forwardMap: GameMap<Maps>, forwardPosition: XY) {
-  //   this.forwardMap = forwardMap;
-  //   this.forwardPositionMap.set(forwardMap.id, forwardPosition);
-  // }
 
   setForwardMap(forwardMap: GameMap<Maps>, forwardPosition: XY, direction?: 'top' | 'bottom' | 'left' | 'right') {
     this.forwardMap = forwardMap;
@@ -47,6 +37,7 @@ export default class Portal extends Unit implements Forwardable {
         break;
     }
 
+    // this.forwardPositionMap.set(forwardMap.id, { x: forwardPosition.x + x, y: forwardPosition.y + y });
     this.forwardPosition = {
       x: forwardPosition.x * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X + x,
       y: forwardPosition.y * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y + y,
@@ -71,15 +62,9 @@ export default class Portal extends Unit implements Forwardable {
   //       break;
   //   }
   //   console.log(this.name, '->', gameMap.name, x, y);
-  //   gameMap.setForwardedPosition(this.position.x + x, this.position.y + y);
+  //   // gameMap.setForwardedPosition(this.position.x + x, this.position.y + y);
   // }
 
-  // forward(unit: Unit): void {
-  //   const forwardMap = this.forwardMap;
-  //   const { x, y } = forwardMap.forwardedPosition;
-  //   unit.location.locate = forwardMap.name;
-  //   unit.setPosition(x, y);
-  // }
   forward(unit: Unit): void {
     const forwardMap = this.forwardMap;
     // const { x, y } = forwardMap.forwardedPosition.get(forwardMap);
@@ -91,30 +76,7 @@ export default class Portal extends Unit implements Forwardable {
     unit.setPosition(x, y);
   }
 
-  drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
-    // ctx.fillStyle = this.unitColor;
-    const moveScreenX = this.position.x;
-    const moveScreenY = this.position.y;
-    const positionX = worldAxisX + moveScreenX;
-    const positionY = worldAxisY + moveScreenY;
-
-    const frame = Math.floor((this.frame / (this.FPS * 0.15)) % this.limitFrame);
-    const cropPositionX = this.cropPadX + frame * this.cropPadX; // next frame
-    const cropPositionY = this.cropPadY + this.gazeValue; // gaze
-    const cropSizeX = this.cropSizeX - this.cropPadX * 2;
-    const cropSizeY = this.cropSizeY - this.cropPadY * 2;
-    // 스프라이츠 표시
-    ctx.drawImage(
-      this.sprites,
-      cropPositionX,
-      cropPositionY,
-      cropSizeX,
-      cropSizeY,
-      positionX - 5,
-      positionY - 10,
-      this.size.x + 10,
-      this.size.y + 10,
-    );
-    this.frame = this.frame + 1;
+  drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis, emboss: boolean = false) {
+    super.drawCharacter(ctx, { worldAxisX, worldAxisY });
   }
 }
