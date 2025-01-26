@@ -1,15 +1,14 @@
-import { path } from '@/source/sprites';
 import GameEngine from '@core/GameEngine';
 import { Unit } from '@model/unit';
 import Player from '@model/unit/player/Player';
 import Logger from '@util/Logger';
 import { makeId } from '@util/makeId';
-import { mode } from '@variable/globalControl';
+import { SOCKET_URL } from '@variable/variable';
 import Pako from 'pako';
 
 export default class Socket {
   id = makeId('socket');
-  url: string = mode === 'development' ? 'ws://localhost:9001' : 'wss://port-0-plat-game-template-28f9s2blr1oy4j2.sel5.cloudtype.app';
+  url: string = SOCKET_URL;
   logger = new Logger<Socket>(this);
   socket!: WebSocket;
   engine!: GameEngine;

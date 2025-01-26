@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
   const host = process.env.HOST;
   const port = +(process.env.PORT || 5000);
   const playMode = process.env.PLAY_MODE || 'single';
+  const SOCKET_URL = MODE === 'production' ? process.env.SOCKET_URL : 'ws://localhost:9001';
 
   return {
     // vite config
@@ -27,6 +28,7 @@ export default defineConfig(({ mode }) => {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
       'process.env': {
         MODE,
+        SOCKET_URL,
       },
     },
     server: {
