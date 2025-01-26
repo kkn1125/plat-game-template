@@ -1,9 +1,16 @@
-import { GameCore } from "@model/index";
+import { gameStart, initializeGameMap } from "@/setting/gameStart";
+import GameEngine from "@core/GameEngine";
 import { atom } from "recoil";
+
+const gameEngine = new GameEngine();
+
+gameStart(gameEngine);
+initializeGameMap(gameEngine);
+
 
 const gameMapAtom = atom({
   key: "gameMapAtom",
-  default: new GameCore(),
+  default: gameEngine,
   dangerouslyAllowMutability: true,
 });
 

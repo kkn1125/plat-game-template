@@ -1,2 +1,1 @@
-export { default as GameCore } from "@core/GameCore";
-export * as Renderer from "@core/animations/Renderer";
+export { Monster, Npc, Unit } from './unit/index';

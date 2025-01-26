@@ -26,14 +26,22 @@
     "baseUrl": ".",
     "paths": {
       "@assets/*": ["src/assets/*"],
+      "@types/*": ["src/types/*"],
+      "@variable/*": ["src/variable/*"],
+      "@api/*": ["src/api/*"],
+      "@config/*": ["src/config/*"],
+      "@websocket/*": ["src/engine/websocket/*"],
+      "@core/*": ["src/engine/core/*"],
+      "@animation/*": ["src/engine/animation/*"],
+      "@entity/*": ["src/engine/entity/*"],
+      "@event/*": ["src/engine/event/*"],
+      "@engine/*": ["src/engine/*"],
       "@model/*": ["src/model/*"],
-      "@animations/*": ["src/model/core/animations/*"],
-      "@events/*": ["src/model/core/events/*"],
-      "@intractions/*": ["src/model/core/intractions/*"],
-      "@core/*": ["src/model/core/*"],
+      "@store/*": ["src/store/*"],
+      "@util/*": ["src/util/*"],
+      "@test/*": ["test/*"],
+
       "@recoil/*": ["src/recoil/*"],
-      "@units/*": ["src/entities/units/*"],
-      "@entities/*": ["src/entities/*"],
       "@/*": ["src/*"]
     }
   },

@@ -16,13 +16,22 @@ export default defineConfig(({ mode }) => {
   // `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), "");
 
+  const MODE = process.env.NODE_ENV || "production";
+
   const host = process.env.HOST;
   const port = +(process.env.PORT || 5000);
+
+  const SOCKET_URL =
+    MODE === "production" ? process.env.SOCKET_URL : "ws://localhost:9001";
 
   return {
     // vite config
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
+      "process.env": {
+        MODE,
+        SOCKET_URL,
+      },
     },
     server: {
       host,
