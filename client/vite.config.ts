@@ -37,6 +37,14 @@ export default defineConfig(({ mode }) => {
       host,
       port,
     },
+    base: mode === 'development' ? '/' : '/plat-game-template/',
+    build: {
+      outDir: 'dist',
+      minify: 'terser',
+      terserOptions: {
+        keep_classnames: true,
+      },
+    },
     plugins: [react(), tsconfigPaths()],
   };
 });

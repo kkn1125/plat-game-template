@@ -1,4 +1,4 @@
-import { mode } from "@variable/globalControl";
+import { mode } from "@variable/variable";
 
 const UNIT_CONF = {
   DEFAULT: {
