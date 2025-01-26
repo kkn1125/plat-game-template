@@ -17,6 +17,7 @@ import UseEquipment from './implement/UseEquipment';
 import UseInventory from './implement/UseInventory';
 import Equipment from '@model/option/Equipment';
 import Inventory from '@model/option/Inventory';
+import { Taecho } from '@store/maps';
 
 class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseEquipment, UseInventory {
   initPosition!: XY;
@@ -39,7 +40,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   };
   engine!: GameEngine;
   logger = new Logger<Unit>(this);
-  location = new Location('태초마을');
+  location = new Location(Taecho.name);
   id: MakeId<string> = makeId('unit');
   name: string;
   position: XY = {

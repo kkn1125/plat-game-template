@@ -1,10 +1,9 @@
 /* A quite detailed WebSockets example */
 
+import Pako from "pako";
 import uWS from "uWebSockets.js";
-import zlib from "zlib";
 import { globalChannel } from "./global";
 import SocketManager from "./model/SocketManager";
-import Pako from "pako";
 
 const port = 9001;
 

@@ -124,7 +124,7 @@ export default class GameEngine {
 
   addPlayer(player: Player) {
     this.logger.scope('AddPlayer').debug('플레이어 추가', player.id);
-    this.units.push(player);
+    this.players.push(player);
     player.setGameEngine(this);
   }
 

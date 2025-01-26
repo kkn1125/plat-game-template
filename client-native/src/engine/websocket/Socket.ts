@@ -34,12 +34,13 @@ export default class Socket {
     const compressedData = new Uint8Array(message.data);
 
     const compressMessage = JSON.parse(Pako.inflate(compressedData, { to: 'string' }));
+    // console.log(compressMessage)
     switch (compressMessage.type) {
       case 'init': {
         compressMessage.users.forEach((user: any) => {
-          const unit = new Unit(user.id);
+          const unit = new Player(user.id);
           unit.setPosition(user.position.x, user.position.y);
-          this.engine.addUnit(unit);
+          this.engine.addPlayer(unit);
         });
         break;
       }
@@ -54,7 +55,7 @@ export default class Socket {
         break;
       }
       case 'stop':
-        for (const unit of this.engine.units) {
+        for (const unit of this.engine.players) {
           if (unit.name == compressMessage.id) {
             unit.state = 'Idle';
             if (compressMessage.g === 0) {
@@ -110,7 +111,7 @@ export default class Socket {
         this.engine.addPlayer(newPlayer);
         break;
       default:
-        for (const unit of this.engine.units) {
+        for (const unit of this.engine.players) {
           if (unit.name == compressMessage.id) {
             const speed = unit.increaseSpeed;
             if (compressMessage.xy === 0) {
