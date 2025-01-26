@@ -69,7 +69,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   inventory: Inventory = new Inventory(this);
 
   unitColor: string = 'black';
-
+  hitColor: string = '#00ff00';
   cropSizeX = 150;
   cropSizeY = 200;
   cropPadX = 10;
@@ -85,7 +85,8 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   // GameEngine 제어 유닛 등록 부분 참조
   detectable: boolean = true;
   boundary: Unit | null = null;
-
+  attackRange: number = GAME_CONF.UNIT_CONF.DEFAULT.ATTACK_RANGE;
+  detectRange: number = GAME_CONF.UNIT_CONF.DEFAULT.DETECT_RANGE;
   aroundUnits: Unit[] = [];
 
   constructor(name: string, option?: HealthOption) {
@@ -139,6 +140,10 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     }
   }
 
+  get totalAttackRange() {
+    return this.attackRange;
+  }
+
   get isDead() {
     return this.hp <= 0;
   }
@@ -158,7 +163,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   addExp(exp: number) {
     this.exp += exp;
     if (this.canLevelup) {
-      this.exp = this.maxExp - this.exp;
+      this.exp = this.exp - this.maxExp;
       this.levelUp(1);
     }
   }
@@ -215,18 +220,10 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     if (!currentMap) return;
     if (!controlUnit) return;
     if (!this.detectable) return;
-    // const fields = currentMap.fields;
-    const mapSizeX = this.engine.gameMapManager.mapSizeX;
-    const mapSizeY = this.engine.gameMapManager.mapSizeY;
 
-    const { x, y } = this.position;
-    const fieldX = Math.floor(x / mapSizeX);
-    const fieldY = Math.floor(y / mapSizeY);
+    const range = this.getDistance(controlUnit);
 
-    const cUnitX = Math.floor(controlUnit.position.x / mapSizeX);
-    const cUnitY = Math.floor(controlUnit.position.y / mapSizeY);
-    const isInDetectableZone = fieldX - 1 <= cUnitX && cUnitX <= fieldX + 1 && fieldY - 1 <= cUnitY && cUnitY <= fieldY + 1;
-    if (isInDetectableZone && controlUnit.isAlive) {
+    if (range < this.detectRange && controlUnit.isAlive) {
       this.boundary = controlUnit;
     } else {
       this.boundary = null;
@@ -243,19 +240,14 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     ];
     if (!currentMap) return;
     if (units.length === 0) return;
-    // const fields = currentMap.fields;
     const mapSizeX = this.engine.gameMapManager.mapSizeX;
     const mapSizeY = this.engine.gameMapManager.mapSizeY;
 
     const { x, y } = this.position;
-    const fieldX = Math.floor(x / mapSizeX);
-    const fieldY = Math.floor(y / mapSizeY);
 
     for (const unit of units) {
-      const cUnitX = Math.floor(unit.position.x / mapSizeX);
-      const cUnitY = Math.floor(unit.position.y / mapSizeY);
-      const isInAttackZone = fieldX - 1 <= cUnitX && cUnitX <= fieldX + 1 && fieldY - 1 <= cUnitY && cUnitY <= fieldY + 1;
-      if (isInAttackZone) {
+      const range = this.getDistance(unit);
+      if (range < this.attackRange) {
         /* 공격 가능 범위 유닛 넣기 */
         if (!this.aroundUnits.includes(unit)) {
           this.aroundUnits.push(unit);
@@ -269,17 +261,22 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     this.aroundUnits = this.aroundUnits.filter((u) => !u.isDead);
   }
 
+  getDistance(unit: Unit) {
+    const x1 = this.position.x;
+    const y1 = this.position.y;
+    const x2 = unit.position.x;
+    const y2 = unit.position.y;
+    return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+  }
+
   get closeUnit(): Unit | null {
     let closeUnit = null;
-    const getDistance = (x1: number, y1: number, x2: number, y2: number) => Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-    const { x, y } = this.position;
     for (const unit of this.aroundUnits) {
-      const { x: uX, y: uY } = unit.position;
-      const distance = getDistance(x, y, uX, uY);
+      const distance = this.getDistance(unit);
       if (!closeUnit) {
         closeUnit = unit;
       } else {
-        if (distance < getDistance(x, y, closeUnit.position.x, closeUnit.position.y)) {
+        if (distance < this.getDistance(closeUnit)) {
           closeUnit = unit;
         }
       }
@@ -340,7 +337,8 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     const offset = 30;
     const height = 10;
 
-    const text = `${(this.exp / this.maxExp) * 100}% (${this.exp}/${this.maxExp})`;
+    const calcExp = this.exp / this.maxExp;
+    const text = `${(calcExp * 100).toFixed(2)}% (${this.exp}/${this.maxExp})`;
 
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 8;
@@ -358,7 +356,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     ctx.fillRect(innerWidth * 0.05, innerHeight - offset, innerWidth * 0.9, height);
 
     ctx.fillStyle = '#f5ff8e';
-    ctx.fillRect(innerWidth * 0.05, innerHeight - offset, (this.exp / this.maxExp) * innerWidth * 0.9, height);
+    ctx.fillRect(innerWidth * 0.05, innerHeight - offset, calcExp * innerWidth * 0.9, height);
 
     ctx.fillStyle = '#000000';
     /* font */
@@ -485,8 +483,14 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     this.taskQueue = this.taskQueue.filter((task) => task !== constraint);
   }
 
+  rangeInAttack(unit: Unit) {
+    const range = this.getDistance(unit);
+    return range < this.totalAttackRange;
+  }
+
   attack(monster: Unit & Monster): void {
     if (this.isAttacking()) return;
+    if (!this.rangeInAttack(monster)) return;
     const damage = this.damage;
     monster.decreaseHp(damage);
     if (monster.isDead) {
@@ -535,7 +539,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
       };
     };
 
-    const fx = hitCountEffect(damage.toString(), monster, getPosition.bind(this), 1, ['#ff0000', '#ffffff']);
+    const fx = hitCountEffect(damage.toString(), monster, getPosition.bind(this), 1, [this.hitColor, '#ffffff']);
     fx.run();
   }
 

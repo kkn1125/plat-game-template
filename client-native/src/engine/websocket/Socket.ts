@@ -1,3 +1,4 @@
+import { path } from '@/source/sprites';
 import GameEngine from '@core/GameEngine';
 import { Unit } from '@model/unit';
 import Player from '@model/unit/player/player';
@@ -23,7 +24,7 @@ import Pako from 'pako';
 
 export default class Socket {
   id = makeId('socket');
-  url: string = mode === 'development' ? 'ws://localhost:9001' : 'ws://localhost:9001';
+  url: string = mode === 'development' ? 'ws://localhost:9001' : `ws://${location.hostname}${path}:9001`;
   logger = new Logger<Socket>(this);
   socket!: WebSocket;
   engine!: GameEngine;
@@ -48,15 +49,6 @@ export default class Socket {
     websocket.onclose = this.close.bind(this);
 
     this.socket = websocket;
-
-    /* 로그인 리스너 */
-    this.engine.eventManager.listen('loginUser', (eventManager, data) => {
-      // console.log('data:', data);
-      const user = new Player(data.id);
-      user.setPosition(data.x ?? 0, data.y ?? 0);
-      this.engine.setControlUnit(user);
-      // this.eventManager.emit(`loginUser`, { id, pw });
-    });
   }
 
   open(e: Event) {

@@ -2,7 +2,7 @@ import { mode } from '@variable/globalControl';
 
 const UNIT_CONF = {
   DEFAULT: {
-    DAMAGE: 50,
+    DAMAGE: mode === 'development' ? 100 : 10,
     STR: 5,
     DEX: 5,
     INT: 5,
@@ -22,7 +22,8 @@ const UNIT_CONF = {
       X: 5,
       Y: 6,
     },
-    ATTACK_RANGE: 50,
+    DETECT_RANGE: 100,
+    ATTACK_RANGE: 80,
     CONTROL_UNIT: {
       INCREASE_SPEED: mode === 'development' ? 5 : 2,
     },

@@ -140,7 +140,7 @@ export default class UserInterface {
         };
         this.engine.socket.send(payload);
       } else if (this.engine.gameMode === GameMode.Single) {
-        console.log(this.engine.gameMode);
+        // console.log(this.engine.gameMode);
         this.engine.eventManager.emit(`loginUser`, { id: 'Single', x: position?.x ?? 0, y: position?.y ?? 0 });
       }
 

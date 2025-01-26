@@ -18,7 +18,7 @@ export default class Monster extends Unit implements AutoMoveable, UseReward {
 
   constructor(name: string, option?: HealthOption) {
     super(name, option);
-
+    this.hitColor = '#ff0000';
     setInterval(() => {
       const zeroBack = Math.floor(Math.random() * (100 + 1));
       // console.log(state, zeroBack);
@@ -26,6 +26,9 @@ export default class Monster extends Unit implements AutoMoveable, UseReward {
         this.state = 'Move';
       }
     }, 2000);
+
+    this.detectRange = GAME_CONF.MONSTER_CONF.DEFAULT.DETECT_RANGE;
+    this.attackRange = GAME_CONF.MONSTER_CONF.DEFAULT.ATTACK_RANGE;
 
     this.increaseSpeed = GAME_CONF.MONSTER_CONF.DEFAULT.INCREASE_SPEED;
     this.attackSpeed = GAME_CONF.MONSTER_CONF.DEFAULT.ATTACK_SPEED;

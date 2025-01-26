@@ -94,6 +94,7 @@ export default class GameEngine {
           closeUnit.deleteConstraint('die');
           closeUnit.hp = closeUnit.maxHp;
           closeUnit.mp = closeUnit.maxMp;
+          this.gameMapManager.changeMap(Taecho);
           closeUnit.location.locate = Taecho.name;
           closeUnit.setPosition(Taecho.defaultSpawnPosition.x, Taecho.defaultSpawnPosition.y);
         }, GAME_CONF.UNIT_CONF.RESPAWN_TIME * 1000);
@@ -179,6 +180,14 @@ export default class GameEngine {
   loadEventManager(eventManager: EventManager) {
     this.logger.scope('LoadEventManager').debug('이벤트매니저 로드');
     this.eventManager = eventManager;
+    /* 로그인 리스너 */
+    this.eventManager.listen('loginUser', (eventManager, data) => {
+      // console.log('data:', data);
+      const user = new Player(data.id);
+      user.setPosition(data.x ?? 0, data.y ?? 0);
+      this.setControlUnit(user);
+      // this.eventManager.emit(`loginUser`, { id, pw });
+    });
   }
 
   loadGameMapManager(gameMapManager: GameMapManager) {

@@ -1,5 +1,6 @@
 import Renderer from '@animation/Renderer';
 import UserInterface from '@animation/UserInterface';
+import GAME_CONF from '@config/game.conf';
 import GameEngine from '@core/GameEngine';
 import GameMapManager from '@core/GameMapManager';
 import EventManager from '@event/EventManager';
@@ -18,7 +19,7 @@ import { PortalOsolgil1ToTaecho } from '@store/portal/PortalOsolgil1ToTaecho';
 import { PortalTaechoToFront } from '@store/portal/PortalTaechoToFront';
 import { PortalTaechoToOsolgil1 } from '@store/portal/PortalTaechoToOsolgil1';
 import Logger from '@util/Logger';
-import { GameState } from '@variable/constant';
+import { GameMode, GameState } from '@variable/constant';
 import Socket from '@websocket/Socket';
 
 const logger = new Logger('GameStart');
@@ -39,8 +40,10 @@ export function gameStart(gameEngine: GameEngine) {
   gameEngine.loadEventManager(eventManager);
   emitEvent(gameEngine);
 
-  const socket = new Socket(gameEngine);
-  gameEngine.loadSocket(socket);
+  if (GAME_CONF.MODE === GameMode.Multiple) {
+    const socket = new Socket(gameEngine);
+    gameEngine.loadSocket(socket);
+  }
 
   const ui = new UserInterface(gameEngine);
   gameEngine.loadUi(ui);
