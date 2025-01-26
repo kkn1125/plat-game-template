@@ -1,19 +1,19 @@
 import Renderer from '@animation/Renderer';
 import UserInterface from '@animation/UserInterface';
+import GAME_CONF from '@config/game.conf';
 import EventManager from '@event/EventManager';
 import { Monster, Npc, Unit } from '@model/unit';
 import Building from '@model/unit/building/Building';
+import Item from '@model/unit/object/Item';
+import Player from '@model/unit/player/Player';
 import Portal from '@model/unit/portal/Portal';
+import { Taecho } from '@store/maps';
 import Logger from '@util/Logger';
 import { GameMode, GameState, ItemState } from '@variable/constant';
+import { globalChannel } from '@variable/globalControl';
 import Socket from '@websocket/Socket';
 import { makeAutoObservable } from 'mobx';
 import GameMapManager from './GameMapManager';
-import { globalChannel } from '@variable/globalControl';
-import Item from '@model/unit/object/Item';
-import GAME_CONF from '@config/game.conf';
-import { Taecho } from '@store/maps';
-import Player from '@model/unit/player/player';
 
 export default class GameEngine {
   logger = new Logger<GameEngine>(this);

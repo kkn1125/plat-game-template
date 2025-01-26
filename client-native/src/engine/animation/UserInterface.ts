@@ -1,9 +1,8 @@
 import GAME_CONF from '@config/game.conf';
 import GameEngine from '@core/GameEngine';
 import Question from '@model/option/Question';
-import { Unit } from '@model/unit';
 import Item from '@model/unit/object/Item';
-import Player from '@model/unit/player/player';
+import Player from '@model/unit/player/Player';
 import octicons from '@primer/octicons';
 import { $ } from '@util/$';
 import Logger from '@util/Logger';
