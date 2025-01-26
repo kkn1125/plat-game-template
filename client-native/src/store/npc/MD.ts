@@ -32,17 +32,19 @@ MD.routine = (unit) => {
     originPosition = { ...unit.position };
     unit.engine.eventManager.joystickEvent.manualKeyUp(unit, 'a');
     unit.engine.eventManager.joystickEvent.manualKeyUp(unit, 'd');
+    // unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 's');
+    unit.engine.eventManager.joystickEvent.manualKeyUp(unit, 'w');
     unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 's');
     unit.engine.eventManager.joystickEvent.manualKeyUp(unit, 's');
     unit.state = UnitState.Idle;
   }
   if (state === 'Move') {
     if (dir) {
-      unit.move(0, -1);
+      unit.move(0, -unit.increaseSpeed);
       unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'w');
       unit.state = UnitState.Move;
     } else {
-      unit.move(0, 1);
+      unit.move(0, unit.increaseSpeed);
       unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 's');
       unit.state = UnitState.Move;
     }

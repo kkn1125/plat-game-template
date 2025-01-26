@@ -1,9 +1,10 @@
+import { MapSprites3 } from '@/source/sprites';
 import { ForwardPosition } from '@config/map/map.conf';
 import AreaPortal from '@model/unit/portal/AreaPotal';
 import { EmptyHouse1, Taecho } from '@store/maps';
 
 export const AreaPortalEmptyHouse1ToTaecho = new AreaPortal(Taecho.name);
-
+AreaPortalEmptyHouse1ToTaecho.sprites = MapSprites3;
 AreaPortalEmptyHouse1ToTaecho.setLocation(EmptyHouse1);
 AreaPortalEmptyHouse1ToTaecho.setPositionByField(0, 2);
 // AreaPortalEmptyHouse1ToTaecho.setForwardPositionByMap(EmptyHouse1, 'bottom');

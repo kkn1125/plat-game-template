@@ -1,6 +1,8 @@
-export const UNIT_CONF = {
+import { mode } from '@variable/globalControl';
+
+const UNIT_CONF = {
   DEFAULT: {
-    DAMAGE: 10,
+    DAMAGE: 50,
     STR: 5,
     DEX: 5,
     INT: 5,
@@ -8,6 +10,7 @@ export const UNIT_CONF = {
     HP: 100,
     MP: 50,
     SPEED: 2,
+    ATTACK_SPEED: 1,
     INCREASE_SPEED: 2,
     DECREASE_SPEED: 1,
     GAZE: 'bottom',
@@ -15,8 +18,17 @@ export const UNIT_CONF = {
       X: 40,
       Y: 40,
     },
+    INVENTORY: {
+      X: 5,
+      Y: 6,
+    },
+    ATTACK_RANGE: 50,
+    CONTROL_UNIT: {
+      INCREASE_SPEED: mode === 'development' ? 5 : 2,
+    },
   },
+  RESPAWN_TIME: 5,
   INCREASE_DAMAGE_RATIO: 0.07,
 } as const;
-
+export type UNIT_CONF = (typeof UNIT_CONF)[keyof typeof UNIT_CONF];
 export default UNIT_CONF;

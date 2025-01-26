@@ -1,4 +1,10 @@
+import Channel from '@util/GlobalChannel';
+
 export const taskQueue: string[] = [];
+
+export function isAttacking() {
+  return taskQueue.includes('attack');
+}
 
 export function isBusy() {
   return taskQueue.length > 0;
@@ -24,3 +30,5 @@ export function deleteConstraint(type: string) {
 }
 
 export const mode = process.env.MODE || 'production';
+
+export const globalChannel = new Channel();

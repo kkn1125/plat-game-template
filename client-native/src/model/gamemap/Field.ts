@@ -27,6 +27,7 @@ export default class Field {
   get isPassable() {
     switch (this.name) {
       case Tile.WoodFloor:
+      case Tile.WoodFloorCarpet:
       case Tile.Road:
       case Tile.Grass:
       case Tile.RoadBush:
@@ -459,6 +460,21 @@ export default class Field {
 
     const { bottom } = this.roundFields;
     const isBottomWater = bottom?.name[0] === Tile.Water;
+
+    // if (this.name === Tile.WoodFloorCarpet && !emboss) {
+    //   ctx.drawImage(
+    //     MapSprites3,
+    //     33, // aaa
+    //     0,
+    //     33, // a
+    //     33,
+    //     worldAxisX + x * X, // aaa * 2
+    //     worldAxisY + y * Y, // 육지 나무 Y 축 위치
+    //     X, // a * 2
+    //     Y, // 물 위 나무 Y 축 위치
+    //   );
+    // }
+
     if (this.name === Tile.GrassTree || this.name === Tile.RoadTree) {
       // ctx.fillRect(worldAxisX + x * X, worldAxisY + y * Y, X + 0.5, Y + 0.5);
       // const { CropSizeX, CropSizeY, CropWidth, CropHeight } = TileCrop.GrassTree;
@@ -562,10 +578,10 @@ export default class Field {
         8,
         18, // a
         20,
-        worldAxisX + x * X - 3.5+15, // aaa * 2
-        worldAxisY + y * Y + (isBottomWater ? -30 : 0) +15, // 육지 나무 Y 축 위치
-        X-25, // a * 2
-        Y-25, // 물 위 나무 Y 축 위치
+        worldAxisX + x * X - 3.5 + 15, // aaa * 2
+        worldAxisY + y * Y + (isBottomWater ? -30 : 0) + 15, // 육지 나무 Y 축 위치
+        X - 25, // a * 2
+        Y - 25, // 물 위 나무 Y 축 위치
       );
     }
   }

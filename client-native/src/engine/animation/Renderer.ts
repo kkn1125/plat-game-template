@@ -1,7 +1,9 @@
 import GAME_CONF from '@config/game.conf';
 import GameEngine from '@core/GameEngine';
+import AreaPortal from '@model/unit/portal/AreaPotal';
+import Portal from '@model/unit/portal/Portal';
 import Logger from '@util/Logger';
-import { GameState, UnitState } from '@variable/constant';
+import { GameMode, ItemState, UnitState } from '@variable/constant';
 
 class Renderer {
   prevTime: number = 0;
@@ -26,6 +28,22 @@ class Renderer {
   /* 등록된 유닛들 */
   get units() {
     return this.engine.units;
+  }
+  /* 등록된 플레이어들 */
+  get players() {
+    return this.engine.players;
+  }
+  /* 등록된 몬스터들 */
+  get monsters() {
+    return this.engine.monsters;
+  }
+  /* 등록된 아이템들 */
+  get items() {
+    return this.engine.items;
+  }
+  /* 등록된 NPC들 */
+  get npcs() {
+    return this.engine.npcs;
   }
   /* 등록된 빌딩들 */
   get buildings() {
@@ -188,8 +206,34 @@ class Renderer {
     }
   }
 
+  get sameLocationAreaPortals() {
+    return this.portals.filter((portal) => this.currentMap?.name === portal.location.locate && portal instanceof AreaPortal);
+  }
+
+  get sameLocationOriginPortals() {
+    return this.portals.filter(
+      (portal) => this.currentMap?.name === portal.location.locate && !(portal instanceof AreaPortal) && portal instanceof Portal,
+    );
+  }
+
   get sameLocationPortals() {
     return this.portals.filter((portal) => this.currentMap?.name === portal.location.locate);
+  }
+
+  get sameLocationPlayers() {
+    return this.players.filter((player) => this.currentMap?.name === player.location.locate);
+  }
+
+  get sameLocationMonsters() {
+    return this.monsters.filter((monster) => this.currentMap?.name === monster.location.locate);
+  }
+
+  get sameLocationItems() {
+    return this.items.filter((item) => this.currentMap?.name === item.location.locate && item.state === ItemState.Drop);
+  }
+
+  get sameLocationNpcs() {
+    return this.npcs.filter((npc) => this.currentMap?.name === npc.location.locate);
   }
 
   get sameLocationUnits() {
@@ -200,11 +244,27 @@ class Renderer {
     return this.buildings.filter((unit) => this.currentMap?.name === unit.location.locate);
   }
 
+  private areaPortalDraw() {
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-map');
+    const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
+
+    this.sameLocationAreaPortals.forEach((portal) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
+      portal.draw(layerMapCtx, layerMapLabelCtx, {
+        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      });
+    });
+  }
+
   private portalDraw() {
     const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-portal');
     const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
 
-    this.sameLocationPortals.forEach((portal) => {
+    this.sameLocationOriginPortals.forEach((portal) => {
       const positionX = this.controlUnit?.position.x || 0;
       const positionY = this.controlUnit?.position.y || 0;
       const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
@@ -219,18 +279,8 @@ class Renderer {
   private unitDraw() {
     const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
     const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
-    this.sameLocationUnits.forEach((unit) => {
-      const positionX = this.controlUnit?.position.x || 0;
-      const positionY = this.controlUnit?.position.y || 0;
-      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
 
-      unit.draw(layerMapCtx, layerMapLabelCtx, {
-        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
-        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
-      });
-    });
-
-    if (this.controlUnit && this.currentMap) {
+    if (this.controlUnit && this.controlUnit.isAlive && this.currentMap) {
       const { worldAxisX, worldAxisY } = this.worldPosition;
 
       this.controlUnit.draw(layerMapCtx, layerMapLabelCtx, {
@@ -239,6 +289,69 @@ class Renderer {
       });
       this.controlUnit.around();
     }
+    if (this.controlUnit && this.controlUnit.isDead) {
+      this.controlUnit.aroundUnits = [];
+    }
+  }
+
+  private npcDraw() {
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
+    const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
+    this.sameLocationNpcs.forEach((npc) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
+      npc.draw(layerMapCtx, layerMapLabelCtx, {
+        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      });
+    });
+  }
+
+  private playerDraw() {
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
+    const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
+    this.sameLocationPlayers.forEach((player) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
+      player.draw(layerMapCtx, layerMapLabelCtx, {
+        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      });
+    });
+  }
+
+  private monsterDraw() {
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
+    const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
+    this.sameLocationMonsters.forEach((monster) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
+      monster.draw(layerMapCtx, layerMapLabelCtx, {
+        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      });
+    });
+  }
+
+  private itemDraw() {
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer('layer-unit');
+    const { ctx: layerMapLabelCtx } = this.engine.ui.getLayer('layer-unit-label');
+    this.sameLocationItems.forEach((item) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
+
+      item.draw(layerMapCtx, layerMapLabelCtx, {
+        worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
+        worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
+      });
+    });
   }
 
   private buildingDraw() {
@@ -251,17 +364,7 @@ class Renderer {
       const positionY = this.controlUnit?.position.y || 0;
       const { rangeX, rangeY } = this.getCameraMoveableRange(positionX, positionY);
 
-      // building.detect();
-
-      // building.drawCharacter(layerUnitCtx, {
-      //   worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
-      //   worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
-      // });
-      // building.drawName(layerMapLabelCtx, {
-      //   worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
-      //   worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
-      // });
-      building.draw(layerUnitCtx,layerMapLabelCtx, {
+      building.draw(layerUnitCtx, layerMapLabelCtx, {
         worldAxisX: this.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - positionX + rangeX,
         worldAxisY: this.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - positionY + rangeY,
       });
@@ -275,7 +378,6 @@ class Renderer {
           true,
         );
       }
-      
     });
   }
 
@@ -290,12 +392,17 @@ class Renderer {
     const { joystick } = this.engine.eventManager.joystickEvent;
 
     this.mapDraw();
+    this.areaPortalDraw();
     this.buildingDraw();
+    this.npcDraw();
+    this.monsterDraw();
+    this.playerDraw();
     this.unitDraw();
+    this.itemDraw();
     this.portalDraw();
 
     if (this.currentMap && this.controlUnit) {
-      if (this.controlUnit.state !== UnitState.Die) {
+      if (this.controlUnit.isAlive) {
         const velocity = this.controlUnit.increaseSpeed;
         if (joystick.w || joystick.s || joystick.a || joystick.d) {
           this.controlUnit.setState(UnitState.Move);
@@ -308,21 +415,33 @@ class Renderer {
         if (joystick.w) {
           if (!this.engine.gameMapManager.collisionTop(this.currentMap, this.controlUnit)) {
             this.controlUnit.move(0, -velocity);
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket.send({ xy: 0 });
+            }
           }
         }
         if (joystick.s) {
           if (!this.engine.gameMapManager.collisionBottom(this.currentMap, this.controlUnit)) {
             this.controlUnit.move(0, velocity);
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket.send({ xy: 1 });
+            }
           }
         }
         if (joystick.a) {
           if (!this.engine.gameMapManager.collisionLeft(this.currentMap, this.controlUnit)) {
             this.controlUnit.move(-velocity, 0);
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket.send({ xy: 2 });
+            }
           }
         }
         if (joystick.d) {
           if (!this.engine.gameMapManager.collisionRight(this.currentMap, this.controlUnit)) {
             this.controlUnit.move(velocity, 0);
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket.send({ xy: 3 });
+            }
           }
         }
       }

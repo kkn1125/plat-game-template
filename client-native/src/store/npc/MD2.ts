@@ -2,7 +2,7 @@ import { Npc } from '@model/unit';
 import { TaechoFront } from '@store/maps';
 import { UnitState } from '@variable/constant';
 
-export const MD2 = new Npc('MD2', {
+export const MD2 = new Npc('짐꾼', {
   hp: Infinity,
   mp: Infinity,
 });
@@ -15,12 +15,11 @@ let state = 'Idle';
 
 setInterval(() => {
   const zeroBack = Math.floor(Math.random() * (100 + 1));
-  // console.log(state, zeroBack);
   if (zeroBack < 50) {
     state = 'Move';
   }
 }, 2000);
-MD2.question.addQuestion('Hello', 'World');
+MD2.question.addQuestion('어디갔지...', '어.. 혹시 나 좀 도와줄래?', '중요한 물건을 잃어버렸어. 여기 근처였던거 같은데...');
 MD2.routine = (unit) => {
   const { x } = unit.position;
   const { x: originX } = originPosition;
@@ -37,11 +36,11 @@ MD2.routine = (unit) => {
   }
   if (state === 'Move') {
     if (dir) {
-      unit.move(1, 0);
+      unit.move(unit.increaseSpeed, 0);
       unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'd');
       unit.state = UnitState.Move;
     } else {
-      unit.move(-1, 0);
+      unit.move(-unit.increaseSpeed, 0);
       unit.engine.eventManager.joystickEvent.manualKeyDown(unit, 'a');
       unit.state = UnitState.Move;
     }

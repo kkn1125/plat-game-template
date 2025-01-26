@@ -1,6 +1,6 @@
 import GameMap from '@model/gamemap/GameMap';
 
-export const MDHouse = new GameMap('관리자의 집', [
+export const MDHouse = new GameMap('촌장의 집', [
   ['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
   ['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
   ['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],

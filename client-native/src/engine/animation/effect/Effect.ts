@@ -8,9 +8,10 @@ import { makeId } from '@util/makeId';
 import { addConstraint, deleteConstraint, isBlockedMove } from '@variable/globalControl';
 
 export default class Effect {
+  static effectList: [number, Effect][] = [];
   readonly logger: Logger<Effect>;
 
-  private isProcessed!: (value: boolean) => void;
+  protected isProcessed!: (value: boolean) => void;
 
   events: Function[] = [];
   onDestroy(cb: () => void) {
@@ -100,6 +101,7 @@ export default class Effect {
     }
     if (elapsedTime < this.duration) {
       this.effect = requestAnimationFrame(this.draw.bind(this));
+      Effect.effectList.push([this.effect, this]);
     } else {
       cancelAnimationFrame(this.effect as number);
       this.startTime = 0;
@@ -108,7 +110,6 @@ export default class Effect {
       this.fadeOutDuration = 1;
       this.duration = 3;
       this.effect = undefined;
-      this.canvas.remove?.();
       this.destroy();
       this.logger.log('이펙터 렌더링 완료');
     }
@@ -128,10 +129,18 @@ export default class Effect {
 
   run() {
     return new Promise((resolve) => {
+      while (Effect.effectList.length > 0) {
+        const effect = Effect.effectList.shift();
+        if (effect) {
+          cancelAnimationFrame(effect[0]);
+          effect[1].destroy();
+        }
+      }
       this.isProcessed = resolve;
       addConstraint('changeMap');
       this.setupCanvas();
       this.effect = requestAnimationFrame(this.draw.bind(this));
+      Effect.effectList.push([this.effect, this]);
     });
   }
 }

@@ -1,5 +1,5 @@
 import GameEngine from '@core/GameEngine';
-import { Npc, Unit } from '@model/unit';
+import { Monster, Npc, Unit } from '@model/unit';
 import Building from '@model/unit/building/Building';
 import Portal from '@model/unit/portal/Portal';
 import { QuestionState } from '@variable/constant';
@@ -13,12 +13,16 @@ export default class JoystickEvent {
     d: boolean;
     s: boolean;
     space: boolean;
+    i: boolean;
+    q: boolean;
   } = {
     w: false,
     a: false,
     d: false,
     s: false,
     space: false,
+    i: false,
+    q: false,
   };
   order: Gaze[] = [];
 
@@ -111,6 +115,7 @@ export default class JoystickEvent {
     if (!this.controlUnit) return;
 
     const key = e.key;
+
     if (!isBlockedMove()) {
       if (key === 'w') {
         if (!this.joystick.w) {
@@ -149,6 +154,14 @@ export default class JoystickEvent {
         }
       }
     }
+    if (key === 'i') {
+      if (this.joystick.i) {
+        this.engine.ui.closeInventory();
+      } else {
+        this.engine.ui.openInventory();
+      }
+      this.joystick.i = !this.joystick.i;
+    }
     if (key === ' ') {
       if (isBlockedAll()) return;
       if (this.joystick.space) return;
@@ -158,7 +171,7 @@ export default class JoystickEvent {
       const controlUnit = this.engine.controlUnit;
       if (!controlUnit) return;
 
-      const closeUnit = controlUnit.closeUnit as Npc;
+      const closeUnit = controlUnit.closeUnit as Unit;
       if (!closeUnit) return;
 
       if (closeUnit instanceof Building) {
@@ -167,6 +180,12 @@ export default class JoystickEvent {
           closeUnit.forward(controlUnit);
           controlUnit.aroundUnits = [];
           this.clearMove();
+          this.engine.socket?.send({
+            type: 'forward',
+            mapName: this.engine.gameMapManager.currentMap?.name || '',
+            x: controlUnit.position.x,
+            y: controlUnit.position.y,
+          });
         }
       } else if (closeUnit instanceof Portal) {
         if (closeUnit.forward) {
@@ -174,14 +193,34 @@ export default class JoystickEvent {
           closeUnit.forward(controlUnit);
           controlUnit.aroundUnits = [];
           this.clearMove();
+          this.engine.socket?.send({
+            type: 'forward',
+            mapName: this.engine.gameMapManager.currentMap?.name || '',
+            x: controlUnit.position.x,
+            y: controlUnit.position.y,
+          });
         }
-      } else {
+      } else if (closeUnit instanceof Npc) {
         if (closeUnit.question.state === QuestionState.Idle) {
           const question = closeUnit.startConversation();
           this.engine.ui.conversation(question);
           this.clearMove();
+          this.engine.socket?.send({
+            type: 'forward',
+            mapName: this.engine.gameMapManager.currentMap?.name || '',
+            x: controlUnit.position.x,
+            y: controlUnit.position.y,
+          });
         } else {
           this.engine.eventManager.emit('conversationNext');
+        }
+      } else if (closeUnit instanceof Monster) {
+        controlUnit.attack(closeUnit);
+        if (closeUnit.isDead) {
+          this.engine.removeUnit(closeUnit);
+          if (this.joystick.i) {
+            this.engine.ui.updateInventory();
+          }
         }
       }
     }
@@ -202,36 +241,48 @@ export default class JoystickEvent {
       if (key === 'w') {
         this.joystick.w = false;
         this.order.splice(this.order.indexOf('top'), 1);
+        this.engine.socket?.send({ type: 'stop', g: 0 });
+        // console.log('top');
       }
       if (key === 's') {
         this.joystick.s = false;
         this.order.splice(this.order.indexOf('bottom'), 1);
+        this.engine.socket?.send({ type: 'stop', g: 1 });
+        // console.log('bottom');
       }
       if (key === 'a') {
         this.joystick.a = false;
         this.order.splice(this.order.indexOf('left'), 1);
+        this.engine.socket?.send({ type: 'stop', g: 2 });
+        // console.log('left');
       }
       if (key === 'd') {
         this.joystick.d = false;
         this.order.splice(this.order.indexOf('right'), 1);
+        this.engine.socket?.send({ type: 'stop', g: 3 });
+        // console.log('right');
       }
       const lastKey = this.order.at(-1);
       if (lastKey) {
         switch (lastKey) {
           case 'top': {
             this.controlUnit.gaze = 'top';
+            this.engine.socket?.send({ type: 'stop', g: 0 });
             break;
           }
           case 'bottom': {
             this.controlUnit.gaze = 'bottom';
+            this.engine.socket?.send({ type: 'stop', g: 1 });
             break;
           }
           case 'left': {
             this.controlUnit.gaze = 'left';
+            this.engine.socket?.send({ type: 'stop', g: 2 });
             break;
           }
           case 'right': {
             this.controlUnit.gaze = 'right';
+            this.engine.socket?.send({ type: 'stop', g: 3 });
             break;
           }
         }

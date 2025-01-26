@@ -2,7 +2,7 @@ import GameEngine from '@core/GameEngine';
 import Logger from '@util/Logger';
 import JoystickEvent from './JoystickEvent';
 
-type Handler = (manager: EventManager) => void;
+type Handler = (eventManager: EventManager, data?: any) => void;
 
 interface Subject {
   watch(observer: Observer): void;
@@ -31,10 +31,10 @@ class EventManager implements Subject {
     this.initialize();
   }
 
-  emit(name: Id) {
+  emit(name: Id, data?: any) {
     const listener = this.listeners.get(name);
     if (!listener) return;
-    listener.forEach((handler) => handler(this));
+    listener.forEach((handler) => handler(this, data));
   }
 
   private initialize() {

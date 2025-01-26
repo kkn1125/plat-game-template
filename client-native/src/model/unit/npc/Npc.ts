@@ -6,15 +6,20 @@ import Question from '../../option/Question';
 import Unit from '../Unit';
 import Quest from '@model/option/Quest';
 import Chatting from '@model/option/Chatting';
+import GAME_CONF from '@config/game.conf';
 
 export default class Npc extends Unit implements AutoMoveable {
   routine!: (unit: Unit) => void;
-
+  
+  chatting = new Chatting()
+  question = new Question(this);
   quest: Quest[] = [];
 
   constructor(name: string, option?: HealthOption) {
     super(name, option);
     this.id = makeId('npc');
+
+    this.increaseSpeed = GAME_CONF.NPC_CONF.DEFAULT.INCREASE_SPEED;
   }
 
   addQuest(quest: Quest) {
@@ -56,8 +61,6 @@ export default class Npc extends Unit implements AutoMoveable {
   autoMove() {
     this.routine?.(this);
   }
-  chatting = new Chatting()
-  question = new Question(this);
 
   /* NPC 기능 */
   startConversation() {

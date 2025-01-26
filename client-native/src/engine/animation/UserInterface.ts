@@ -2,6 +2,8 @@ import GAME_CONF from '@config/game.conf';
 import GameEngine from '@core/GameEngine';
 import Question from '@model/option/Question';
 import { Unit } from '@model/unit';
+import Item from '@model/unit/object/Item';
+import Player from '@model/unit/player/player';
 import octicons from '@primer/octicons';
 import { $ } from '@util/$';
 import Logger from '@util/Logger';
@@ -25,14 +27,23 @@ export default class UserInterface {
     this.createLayer('layer-map-object', true);
     this.createLayer('layer-unit-label', true);
     this.createInterface();
-    if (engine.gameMode !== GameMode.Test) {
-      this.createLoginDialog();
-    } else {
-      const user = new Unit('test-user');
-      const position = this.engine.gameMapManager.currentMap?.defaultSpawnPosition;
-      user.setPosition(position?.x ?? 0, position?.y ?? 0);
-      this.engine.setControlUnit(user);
-      user.increaseSpeed = 5;
+
+    switch (engine.gameMode) {
+      case GameMode.Test:
+        const user = new Player('test-user');
+        const position = this.engine.gameMapManager.currentMap?.defaultSpawnPosition;
+        user.setPosition(position?.x ?? 0, position?.y ?? 0);
+        this.engine.setControlUnit(user);
+        user.increaseSpeed = GAME_CONF.UNIT_CONF.DEFAULT.CONTROL_UNIT.INCREASE_SPEED;
+        break;
+      case GameMode.Single:
+        this.createSinglePlayLoginDialog();
+        break;
+      case GameMode.Multiple:
+        this.createMultiPlayLoginDialog();
+        break;
+      default:
+        break;
     }
   }
 
@@ -112,10 +123,29 @@ export default class UserInterface {
 
   login(e: MouseEvent) {
     const button = e.target as HTMLElement;
-    if (button.tagName === 'BUTTON') {
-      this.eventManager.emit(`loginUser`);
-      (e.target as HTMLElement)?.remove();
-      $('#login-dialog')?.remove();
+    if (button && button.tagName === 'BUTTON') {
+      const id = (button.closest('#login-dialog')?.querySelector('#id') as HTMLInputElement)?.value;
+      const pw = (button.closest('#login-dialog')?.querySelector('#pw') as HTMLInputElement)?.value;
+      // this.eventManager.emit(`loginUser`, { id, pw });
+
+      const position = this.engine.gameMapManager.currentMap?.defaultSpawnPosition;
+      if (this.engine.gameMode === GameMode.Multiple) {
+        const payload = {
+          type: 'login',
+          id: id,
+          pw,
+          mode: this.engine.gameMode,
+          x: position?.x ?? 0,
+          y: position?.y ?? 0,
+        };
+        this.engine.socket.send(payload);
+      } else if (this.engine.gameMode === GameMode.Single) {
+        console.log(this.engine.gameMode);
+        this.engine.eventManager.emit(`loginUser`, { id: 'Single', x: position?.x ?? 0, y: position?.y ?? 0 });
+      }
+
+      (button as HTMLElement)?.remove();
+      this.closeLoginDialog();
       const handler = this.eventMap.get('login');
       if (handler) {
         window.removeEventListener('click', handler);
@@ -124,14 +154,35 @@ export default class UserInterface {
     }
   }
 
-  createLoginDialog() {
+  closeLoginDialog() {
+    $('#login-dialog')?.remove();
+  }
+
+  createSinglePlayLoginDialog() {
     const loginDialog = document.createElement('div');
     loginDialog.id = 'login-dialog';
     loginDialog.classList.add('rounded', 'centered');
     loginDialog.innerHTML = `
-        <h2>Login</h2>
-        <button class="btn btn-primary">로그인</button>
-    `.trim();
+          <h2>Login</h2>
+          <button class="btn btn-primary">로그인</button>
+      `.trim();
+    const handler = this.login.bind(this);
+    this.eventMap.set('login', handler);
+    loginDialog.addEventListener('click', handler);
+    this.INTERFACE.appendChild(loginDialog);
+  }
+
+  createMultiPlayLoginDialog() {
+    const loginDialog = document.createElement('div');
+    loginDialog.id = 'login-dialog';
+    loginDialog.classList.add('rounded', 'centered');
+    loginDialog.innerHTML = `
+          <h2>Login</h2>
+          <input id="id" placeholder="ID" type="text"></input>
+          <input id="pw" placeholder="PASSWORD" type="password"></input>
+          <button class="btn btn-primary">로그인</button>
+      `.trim();
+
     const handler = this.login.bind(this);
     this.eventMap.set('login', handler);
     loginDialog.addEventListener('click', handler);
@@ -176,5 +227,56 @@ export default class UserInterface {
     } else {
       conversation.classList.add('hide');
     }
+  }
+
+  itemCell(item: Item | null, x: number, y: number) {
+    if (item === null) {
+      return `<td class="item" data-index-x="${x}" data-index-y="${y}">no item</td>`;
+    }
+    return `<td class="item" data-index-x="${x}" data-index-y="${y}">${item.name}</td>`;
+  }
+
+  openInventory() {
+    if (!this.engine.controlUnit) return;
+    const inventoryDialog = document.createElement('div');
+    inventoryDialog.id = 'inventory';
+    inventoryDialog.classList.add('rounded', 'centered');
+    // console.log(this.engine.controlUnit);
+    // console.log(this.engine.controlUnit.inventory);
+    inventoryDialog.innerHTML = `
+              <h2>Inventory</h2>
+              <div id="inventory-wrap">
+                <table>
+                  <tbody>
+                  ${this.engine.controlUnit.inventory.slots
+                    .map((row, y) => {
+                      return `<tr>
+                    ${row
+                      .map((cell, x) => {
+                        return this.itemCell(cell, x, y);
+                      })
+                      .join('')}</tr>`;
+                    })
+                    .join('')}
+                  </tbody>
+                </table>
+              </div>
+              <hr>
+              <div class="gold">${this.engine.controlUnit.gold}원</div>
+      `.trim();
+
+    // const handler = this.login.bind(this);
+    // this.eventMap.set('inventory', handler);
+    // inventoryDialog.addEventListener('click', handler);
+    this.INTERFACE.appendChild(inventoryDialog);
+  }
+
+  closeInventory() {
+    $('#inventory')?.remove();
+  }
+
+  updateInventory() {
+    this.closeInventory();
+    this.openInventory();
   }
 }

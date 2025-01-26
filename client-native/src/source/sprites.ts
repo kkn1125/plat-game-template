@@ -17,3 +17,5 @@ export const MapSprites3 = getImage(`${path}sprites/tileset3.png`);
 export const DecorateSprites = getImage(`${path}sprites/decorate.png`);
 export const ObjectSprites = getImage(`${path}sprites/object.png`);
 export const OpacityObjectSprites = getImage(`${path}sprites/object-opacity.png`);
+
+export const SlimeSprite = getImage(`${path}sprites/monster/slime-front.png`);

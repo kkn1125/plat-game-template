@@ -15,6 +15,12 @@ export const UnitState = {
 };
 export type UnitState = (typeof UnitState)[keyof typeof UnitState];
 
+export const ItemState = {
+  None: 'None',
+  Drop: 'Drop',
+};
+export type ItemState = (typeof ItemState)[keyof typeof ItemState];
+
 export const QuestionState = {
   Talk: 'Talk',
   Idle: 'Idle',
@@ -56,6 +62,7 @@ export const Tile = {
   GrassBlock: 'gX',
   WoodFloor: 'W',
   WoodFloorTree: 'WT',
+  WoodFloorCarpet: 'WC',
   RoadBoard: 'rO',
   GrassBoard: 'gO',
   RoadStack: 'gS',

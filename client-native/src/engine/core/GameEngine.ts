@@ -1,36 +1,64 @@
 import Renderer from '@animation/Renderer';
 import UserInterface from '@animation/UserInterface';
 import EventManager from '@event/EventManager';
-import { Unit } from '@model/unit';
+import { Monster, Npc, Unit } from '@model/unit';
 import Building from '@model/unit/building/Building';
 import Portal from '@model/unit/portal/Portal';
 import Logger from '@util/Logger';
-import { GameMode, GameState } from '@variable/constant';
+import { GameMode, GameState, ItemState } from '@variable/constant';
+import Socket from '@websocket/Socket';
 import { makeAutoObservable } from 'mobx';
 import GameMapManager from './GameMapManager';
+import { globalChannel } from '@variable/globalControl';
+import Item from '@model/unit/object/Item';
+import GAME_CONF from '@config/game.conf';
+import { Taecho } from '@store/maps';
+import Player from '@model/unit/player/player';
 
 export default class GameEngine {
   logger = new Logger<GameEngine>(this);
 
   state: GameState = GameState.Init;
 
-  gameMode: GameMode = GameMode.Single;
+  gameMode: GameMode = GAME_CONF.MODE;
   ui!: UserInterface;
   renderer!: Renderer;
   eventManager!: EventManager;
   gameMapManager!: GameMapManager;
-  controlUnit: Unit | null = null;
+  socket!: Socket;
+
+  controlUnit: Player | null = null;
 
   units: Unit[] = [];
+  players: Player[] = [];
+  items: Item[] = [];
+  monsters: Monster[] = [];
+  npcs: Npc[] = [];
   portals: Portal[] = [];
   buildings: Building[] = [];
 
-  get sameLocationPortals() {
-    return this.portals.filter((portal) => this.gameMapManager.currentMap?.name === portal.location.locate);
-  }
-
   get sameLocationUnits() {
     return this.units.filter((unit) => this.gameMapManager.currentMap?.name === unit.location.locate);
+  }
+
+  get sameLocationPlayers() {
+    return this.players.filter((player) => this.gameMapManager.currentMap?.name === player.location.locate);
+  }
+
+  get sameLocationMonsters() {
+    return this.monsters.filter((monster) => this.gameMapManager.currentMap?.name === monster.location.locate);
+  }
+
+  get sameLocationItems() {
+    return this.items.filter((item) => this.gameMapManager.currentMap?.name === item.location.locate && item.state === ItemState.Drop);
+  }
+
+  get sameLocationNpcs() {
+    return this.npcs.filter((npc) => this.gameMapManager.currentMap?.name === npc.location.locate);
+  }
+
+  get sameLocationPortals() {
+    return this.portals.filter((portal) => this.gameMapManager.currentMap?.name === portal.location.locate);
   }
 
   get sameLocationBuildings() {
@@ -42,11 +70,43 @@ export default class GameEngine {
     makeAutoObservable(this);
   }
 
-  setControlUnit(unit: Unit) {
+  removePlayerByName(id: any) {
+    this.units = this.units.filter((unit) => unit.id !== id);
+  }
+
+  removeUnit(closeUnit: Unit | Item) {
+    if (closeUnit instanceof Monster) {
+      this.monsters = this.monsters.filter((monster) => monster.id !== closeUnit.id);
+    } else if (closeUnit instanceof Npc) {
+      this.players = this.players.filter((player) => player.id !== closeUnit.id);
+    } else if (closeUnit instanceof Npc) {
+      this.npcs = this.npcs.filter((npc) => npc.id !== closeUnit.id);
+    } else if (closeUnit instanceof Building) {
+      this.buildings = this.buildings.filter((building) => building.id !== closeUnit.id);
+    } else if (closeUnit instanceof Portal) {
+      this.portals = this.portals.filter((portal) => portal.id !== closeUnit.id);
+    } else if (closeUnit instanceof Item) {
+      this.items = this.items.filter((item) => item.id !== closeUnit.id);
+    } else {
+      if (closeUnit.isControlUnit) {
+        closeUnit.addConstraint('die');
+        setTimeout(() => {
+          closeUnit.deleteConstraint('die');
+          closeUnit.hp = closeUnit.maxHp;
+          closeUnit.mp = closeUnit.maxMp;
+          closeUnit.location.locate = Taecho.name;
+          closeUnit.setPosition(Taecho.defaultSpawnPosition.x, Taecho.defaultSpawnPosition.y);
+        }, GAME_CONF.UNIT_CONF.RESPAWN_TIME * 1000);
+      }
+      // this.units = this.units.filter((unit) => unit.id !== closeUnit.id);
+    }
+  }
+
+  setControlUnit(unit: Player) {
     unit.unitColor = 'red';
     this.controlUnit = unit;
     unit.setGameEngine(this);
-    // unit.detectable = false;
+    globalChannel.addUser(unit);
   }
 
   setState(state: GameState) {
@@ -61,6 +121,30 @@ export default class GameEngine {
     unit.setGameEngine(this);
   }
 
+  addPlayer(player: Player) {
+    this.logger.scope('AddPlayer').debug('플레이어 추가', player.id);
+    this.units.push(player);
+    player.setGameEngine(this);
+  }
+
+  addItem(item: Item) {
+    this.logger.scope('AddItem').debug('아이템 추가', item.id);
+    this.items.push(item);
+    item.setGameEngine(this);
+  }
+
+  addMonster(monster: Monster) {
+    this.logger.scope('AddMonster').debug('몬스터 추가', monster.id);
+    this.monsters.push(monster);
+    monster.setGameEngine(this);
+  }
+
+  addNpc(npc: Npc) {
+    this.logger.scope('AddNpc').debug('Npc 추가', npc.id);
+    this.npcs.push(npc);
+    npc.setGameEngine(this);
+  }
+
   addPortal(portal: Portal) {
     this.logger.scope('AddPortal').debug('포탈 추가', portal.id);
     this.portals.push(portal);
@@ -71,6 +155,15 @@ export default class GameEngine {
     this.logger.scope('AddBuilding').debug('빌딩 추가', building.id);
     this.buildings.push(building);
     building.setGameEngine(this);
+  }
+
+  loadSocket(socket: Socket) {
+    if (this.gameMode === GameMode.Multiple) {
+      this.logger.scope('LoadSocket').debug('소켓 로드');
+      this.socket = socket;
+    } else {
+      this.logger.scope('LoadSocket').debug('게임모드가 멀티가 아니므로 소켓 취소');
+    }
   }
 
   loadUi(ui: UserInterface) {
@@ -86,12 +179,6 @@ export default class GameEngine {
   loadEventManager(eventManager: EventManager) {
     this.logger.scope('LoadEventManager').debug('이벤트매니저 로드');
     this.eventManager = eventManager;
-
-    this.eventManager.listen('loginUser', () => {
-      const user = new Unit('test-user');
-      user.setPosition(0, 0);
-      this.setControlUnit(user);
-    });
   }
 
   loadGameMapManager(gameMapManager: GameMapManager) {

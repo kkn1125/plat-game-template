@@ -35,6 +35,7 @@
       "@variable/*": ["src/variable/*"],
       "@api/*": ["src/api/*"],
       "@config/*": ["src/config/*"],
+      "@websocket/*": ["src/engine/websocket/*"],
       "@core/*": ["src/engine/core/*"],
       "@animation/*": ["src/engine/animation/*"],
       "@entity/*": ["src/engine/entity/*"],
