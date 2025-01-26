@@ -9,7 +9,7 @@ import Pako from 'pako';
 
 export default class Socket {
   id = makeId('socket');
-  url: string = mode === 'development' ? 'ws://localhost:9001' : `ws://${location.hostname}${path}:9001`;
+  url: string = mode === 'development' ? 'ws://localhost:9001' : 'wss://port-0-plat-game-template-28f9s2blr1oy4j2.sel5.cloudtype.app';
   logger = new Logger<Socket>(this);
   socket!: WebSocket;
   engine!: GameEngine;
