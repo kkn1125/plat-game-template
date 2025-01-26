@@ -1,0 +1,13 @@
+{
+  "name": "plat-game-template",
+  "version": "1.0.0",
+  "description": "게임 코어를 라이브러리 없이 순수하게 제작하고 소켓 메세지 압축만을 서드파티 라이브러리를 사용하여 제작하는 2D 게임입니다.",
+  "main": "index.js",
+  "scripts": {
+    "build:socket": "echo done",
+    "dev:socket": "cd socket && npm run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
