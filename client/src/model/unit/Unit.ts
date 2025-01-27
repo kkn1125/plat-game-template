@@ -1,25 +1,34 @@
-import { CharacterSprites } from '@/source/sprites';
-import hitCountEffect from '@animation/effect/hitCountEffect';
-import GAME_CONF from '@config/game.conf';
-import GameEngine from '@core/GameEngine';
-import GameMap from '@model/gamemap/GameMap';
-import Logger from '@util/Logger';
-import { makeId } from '@util/makeId';
-import { UnitState } from '@variable/constant';
-import Location from '../option/Location';
-import Stat from '../option/Stat';
-import { AttackableUnit } from './implement/AttackableUnit';
-import MoveableUnit from './implement/MoveableUnit';
-import TouchableUnit from './implement/TouchableUnit';
-import UseStat from './implement/UseStat';
-import Monster from './monster/Monster';
-import UseEquipment from './implement/UseEquipment';
-import UseInventory from './implement/UseInventory';
-import Equipment from '@model/option/Equipment';
-import Inventory from '@model/option/Inventory';
-import { Taecho } from '@store/maps';
+import { CharacterSprites } from "@/source/sprites";
+import hitCountEffect from "@animation/effect/hitCountEffect";
+import levelupEffect from "@animation/effect/levelupEffect";
+import GAME_CONF from "@config/game.conf";
+import GameEngine from "@core/GameEngine";
+import GameMap from "@model/gamemap/GameMap";
+import Equipment from "@model/option/Equipment";
+import Inventory from "@model/option/Inventory";
+import { Taecho } from "@store/maps";
+import Logger from "@util/Logger";
+import { makeId } from "@util/makeId";
+import { UnitState } from "@variable/constant";
+import Location from "../option/Location";
+import Stat from "../option/Stat";
+import { AttackableUnit } from "./implement/AttackableUnit";
+import MoveableUnit from "./implement/MoveableUnit";
+import TouchableUnit from "./implement/TouchableUnit";
+import UseEquipment from "./implement/UseEquipment";
+import UseInventory from "./implement/UseInventory";
+import UseStat from "./implement/UseStat";
+import Monster from "./monster/Monster";
 
-class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseEquipment, UseInventory {
+class Unit
+  implements
+    TouchableUnit,
+    AttackableUnit,
+    UseStat,
+    MoveableUnit,
+    UseEquipment,
+    UseInventory
+{
   initPosition!: XY;
   originPosition!: XY;
   taskQueue: string[] = [];
@@ -41,7 +50,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   engine!: GameEngine;
   logger = new Logger<Unit>(this);
   location = new Location(Taecho.name);
-  id: MakeId<string> = makeId('unit');
+  id: MakeId<string> = makeId("unit");
   name: string;
   position: XY = {
     x: 0,
@@ -69,8 +78,8 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   equipment: Equipment = new Equipment(this);
   inventory: Inventory = new Inventory(this);
 
-  unitColor: string = 'black';
-  hitColor: string = '#00ff00';
+  unitColor: string = "black";
+  hitColor: string = "#00ff00";
   cropSizeX = 150;
   cropSizeY = 200;
   cropPadX = 10;
@@ -108,7 +117,12 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   }
 
   get maxDamage() {
-    return +Math.floor((this.defaultDamage + this.stat.str + this.stat.dex * GAME_CONF.UNIT_CONF.INCREASE_DAMAGE_RATIO) * 10).toFixed(1);
+    return +Math.floor(
+      (this.defaultDamage +
+        this.stat.str +
+        this.stat.dex * GAME_CONF.UNIT_CONF.INCREASE_DAMAGE_RATIO) *
+        10
+    ).toFixed(1);
   }
 
   get damageGap() {
@@ -128,13 +142,13 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
 
   get gazeValue() {
     switch (this.gaze) {
-      case 'bottom':
+      case "bottom":
         return this.cropSizeY * 0;
-      case 'top':
+      case "top":
         return this.cropSizeY * 1;
-      case 'left':
+      case "left":
         return this.cropSizeY * 2;
-      case 'right':
+      case "right":
         return this.cropSizeY * 3;
       default:
         return 0;
@@ -165,14 +179,51 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     this.exp += exp;
     if (this.canLevelup) {
       this.exp = this.exp - this.maxExp;
-      this.levelUp(1);
+      setTimeout(() => {
+        this.levelUp();
+      }, 1);
     }
   }
 
-  levelUp(level: number) {
+  levelUp(level: number = 1) {
     this.level += level;
     this.maxHp = this.maxHp + Math.floor((this.level + 1) ** 1.5);
     this.maxMp = this.maxMp + Math.floor((this.level + 1) ** 1.5);
+
+    const getPosition = (): XY => {
+      const posX = this.engine.renderer.controlUnit?.position.x || 0;
+      const posY = this.engine.renderer.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.engine.renderer.getCameraMoveableRange(
+        posX,
+        posY
+      );
+
+      const worldAxisX =
+        this.engine.renderer.worldAxisX -
+        GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 -
+        posX +
+        rangeX;
+      const worldAxisY =
+        this.engine.renderer.worldAxisY -
+        GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 -
+        posY +
+        rangeY;
+
+      const moveScreenX = this.position.x;
+      const moveScreenY = this.position.y;
+      const positionX = worldAxisX + moveScreenX;
+      const positionY = worldAxisY + moveScreenY;
+      return {
+        x: positionX,
+        y: positionY,
+      };
+    };
+
+    const fx = levelupEffect("Level Up!", this, getPosition.bind(this), 1, [
+      "#0000ff",
+      "#ffffff",
+    ]);
+    fx.run();
   }
 
   setLocation(gameMap: GameMap<Maps>) {
@@ -197,8 +248,14 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   setPositionByField(indexX: number, indexY: number) {
     this.position.x = indexX * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
     this.position.y = indexY * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
-    this.initPosition = { x: indexX * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X, y: indexY * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y };
-    this.originPosition = { x: indexX * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X, y: indexY * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y };
+    this.initPosition = {
+      x: indexX * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X,
+      y: indexY * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y,
+    };
+    this.originPosition = {
+      x: indexX * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X,
+      y: indexY * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y,
+    };
   }
 
   setState(state: UnitState) {
@@ -206,7 +263,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   }
 
   changeLocation(location: Maps) {
-    this.logger.debug('위치 변경:', location);
+    this.logger.debug("위치 변경:", location);
     this.location.locate = location;
   }
 
@@ -285,15 +342,27 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     return closeUnit;
   }
 
-  draw(ctx: CanvasRenderingContext2D, labelCtx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  draw(
+    ctx: CanvasRenderingContext2D,
+    labelCtx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis
+  ) {
     if (!this.isControlUnit && this.detectable) {
       this.detect();
-      if (GAME_CONF.MAP_CONF.DISPLAY.DETECT[this.constructor.name.toUpperCase() as OptionName]) {
+      if (
+        GAME_CONF.MAP_CONF.DISPLAY.DETECT[
+          this.constructor.name.toUpperCase() as OptionName
+        ]
+      ) {
         this.drawDetect(ctx, { worldAxisX, worldAxisY });
       }
     }
 
-    if (GAME_CONF.MAP_CONF.DISPLAY.HEALTH[this.constructor.name.toUpperCase() as OptionName]) {
+    if (
+      GAME_CONF.MAP_CONF.DISPLAY.HEALTH[
+        this.constructor.name.toUpperCase() as OptionName
+      ]
+    ) {
       this.drawHealth(labelCtx, { worldAxisX, worldAxisY });
     }
 
@@ -301,13 +370,20 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
       this.drawExp(labelCtx);
     }
 
-    if (GAME_CONF.MAP_CONF.DISPLAY.NAME[this.constructor.name.toUpperCase() as OptionName]) {
+    if (
+      GAME_CONF.MAP_CONF.DISPLAY.NAME[
+        this.constructor.name.toUpperCase() as OptionName
+      ]
+    ) {
       this.drawName(labelCtx, { worldAxisX, worldAxisY });
     }
     this.drawCharacter(ctx, { worldAxisX, worldAxisY });
   }
 
-  drawDetect(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  drawDetect(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis
+  ) {
     if (this.boundary) {
       const moveScreenX = this.position.x;
       const moveScreenY = this.position.y;
@@ -315,25 +391,33 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
       const positionX = worldAxisX + moveScreenX;
       const positionY = worldAxisY + moveScreenY;
 
-      ctx.font = 'bold 30px auto';
+      ctx.font = "bold 30px Galmuri9";
 
       /* stroke */
-      ctx.strokeStyle = '#ffffff';
+      ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 3;
 
-      ctx.strokeText(this.constructor.name === 'Npc' ? '?' : '!', positionX + (this.size.x + 3 / 2) / 2, positionY - offset);
+      ctx.strokeText(
+        this.constructor.name === "Npc" ? "?" : "!",
+        positionX + (this.size.x + 3 / 2) / 2,
+        positionY - offset
+      );
 
       /* font */
-      ctx.fillStyle = 'red';
-      ctx.textAlign = 'center';
-      ctx.fillText(this.constructor.name === 'Npc' ? '?' : '!', positionX + this.size.x / 2, positionY - offset);
+      ctx.fillStyle = "red";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        this.constructor.name === "Npc" ? "?" : "!",
+        positionX + this.size.x / 2,
+        positionY - offset
+      );
     }
   }
 
   drawExp(ctx: CanvasRenderingContext2D) {
-    ctx.font = 'bold 10px auto';
+    ctx.font = "bold 9px Galmuri9";
     /* stroke */
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 3;
     const offset = 30;
     const height = 10;
@@ -341,105 +425,185 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     const calcExp = this.exp / this.maxExp;
     const text = `${(calcExp * 100).toFixed(2)}% (${this.exp}/${this.maxExp})`;
 
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 8;
-    ctx.strokeRect(innerWidth * 0.05, innerHeight - offset, innerWidth * 0.9, height);
+    ctx.strokeRect(
+      innerWidth * 0.05,
+      innerHeight - offset,
+      innerWidth * 0.9,
+      height
+    );
 
-    ctx.strokeStyle = '#aaa';
+    ctx.strokeStyle = "#aaa";
     ctx.lineWidth = 6;
-    ctx.strokeRect(innerWidth * 0.05, innerHeight - offset, innerWidth * 0.9, height);
+    ctx.strokeRect(
+      innerWidth * 0.05,
+      innerHeight - offset,
+      innerWidth * 0.9,
+      height
+    );
 
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 3;
-    ctx.strokeRect(innerWidth * 0.05, innerHeight - offset, innerWidth * 0.9, height);
+    ctx.strokeRect(
+      innerWidth * 0.05,
+      innerHeight - offset,
+      innerWidth * 0.9,
+      height
+    );
 
-    ctx.fillStyle = 'gray';
-    ctx.fillRect(innerWidth * 0.05, innerHeight - offset, innerWidth * 0.9, height);
+    ctx.fillStyle = "gray";
+    ctx.fillRect(
+      innerWidth * 0.05,
+      innerHeight - offset,
+      innerWidth * 0.9,
+      height
+    );
 
-    ctx.fillStyle = '#f5ff8e';
-    ctx.fillRect(innerWidth * 0.05, innerHeight - offset, calcExp * innerWidth * 0.9, height);
+    ctx.fillStyle = "#f5ff8e";
+    ctx.fillRect(
+      innerWidth * 0.05,
+      innerHeight - offset,
+      calcExp * innerWidth * 0.9,
+      height
+    );
 
-    ctx.fillStyle = '#000000';
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 3;
+    ctx.strokeText(text, innerWidth / 2, innerHeight - height * 2 - 1);
+    ctx.fillStyle = "#ffffff";
     /* font */
-    ctx.textAlign = 'center';
-    ctx.fillText(text, innerWidth / 2, innerHeight - height * 2 - 2);
+    ctx.textAlign = "center";
+    ctx.fillText(text, innerWidth / 2, innerHeight - height * 2 - 1);
   }
 
-  drawName(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  drawName(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis
+  ) {
     ctx.fillStyle = this.unitColor;
     const moveScreenX = this.position.x;
     const moveScreenY = this.position.y;
     const positionX = worldAxisX + moveScreenX;
     const positionY = worldAxisY + moveScreenY;
-    ctx.font = 'bold 16px auto';
+    ctx.font = "bold 14px Galmuri9";
 
     /* stroke */
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 3;
     const offset = 30;
 
-    const useLevel = ['Monster', 'Player'].includes(this.constructor.name);
+    const useLevel = ["Monster", "Player"].includes(this.constructor.name);
     const text = useLevel ? `Lv.${this.level} ${this.name}` : this.name;
 
     ctx.strokeText(text, positionX + this.size.x / 2, positionY - offset);
 
     /* font */
-    ctx.textAlign = 'center';
+    ctx.textAlign = "center";
     ctx.fillText(text, positionX + this.size.x / 2, positionY - offset);
   }
 
-  drawHealth(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  drawHealth(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis
+  ) {
     ctx.fillStyle = this.unitColor;
     const moveScreenX = this.position.x;
     const moveScreenY = this.position.y;
     const positionX = worldAxisX + moveScreenX;
     const positionY = worldAxisY + moveScreenY;
-    ctx.font = 'bold 16px auto';
+    ctx.font = "bold 16px Galmuri9";
 
     /* stroke */
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 3;
     const offset = 10;
 
     if (this.isControlUnit) {
-      ctx.fillStyle = 'gray';
-      ctx.fillRect((innerWidth * 0.1) / 2, innerHeight - 20 - offset - 30, 150, 20);
+      ctx.fillStyle = "gray";
+      ctx.fillRect(
+        (innerWidth * 0.1) / 2,
+        innerHeight - 20 - offset - 30,
+        150,
+        20
+      );
 
-      ctx.fillRect((innerWidth * 0.1) / 2, innerHeight - 20 - offset - 52, 150, 20);
+      ctx.fillRect(
+        (innerWidth * 0.1) / 2,
+        innerHeight - 20 - offset - 52,
+        150,
+        20
+      );
 
-      ctx.fillStyle = 'blue';
-      ctx.fillRect((innerWidth * 0.1) / 2, innerHeight - 20 - offset - 30, (this.mp / this.maxMp) * 150, 20);
+      ctx.fillStyle = "blue";
+      ctx.fillRect(
+        (innerWidth * 0.1) / 2,
+        innerHeight - 20 - offset - 30,
+        (this.mp / this.maxMp) * 150,
+        20
+      );
 
-      ctx.fillStyle = 'red';
-      ctx.fillRect((innerWidth * 0.1) / 2, innerHeight - 20 - offset - 52, (this.hp / this.maxHp) * 150, 20);
+      ctx.fillStyle = "red";
+      ctx.fillRect(
+        (innerWidth * 0.1) / 2,
+        innerHeight - 20 - offset - 52,
+        (this.hp / this.maxHp) * 150,
+        20
+      );
 
-      ctx.font = 'bold 12px auto';
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.fillText(`${this.hp} / ${this.maxHp}`, (innerWidth * 0.1) / 2 + 150 / 2, innerHeight - 20 - offset - 52 + 14);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(`${this.mp} / ${this.maxMp}`, (innerWidth * 0.1) / 2 + 150 / 2, innerHeight - 20 - offset - 32 + 16);
+      ctx.font = "bold 12px Galmuri9";
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        `${this.hp} / ${this.maxHp}`,
+        (innerWidth * 0.1) / 2 + 150 / 2,
+        innerHeight - 20 - offset - 52 + 14
+      );
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(
+        `${this.mp} / ${this.maxMp}`,
+        (innerWidth * 0.1) / 2 + 150 / 2,
+        innerHeight - 20 - offset - 32 + 16
+      );
     } else {
-      ctx.fillStyle = 'gray';
+      ctx.fillStyle = "gray";
       ctx.fillRect(positionX, positionY - 22, this.size.x, 5);
       ctx.fillRect(positionX, positionY - 22 + 5, this.size.x, 5);
 
-      ctx.fillStyle = 'red';
-      ctx.fillRect(positionX, positionY - 22, (this.hp / this.maxHp) * this.size.x, 5);
+      ctx.fillStyle = "red";
+      ctx.fillRect(
+        positionX,
+        positionY - 22,
+        (this.hp / this.maxHp) * this.size.x,
+        5
+      );
 
-      ctx.fillStyle = 'blue';
-      ctx.fillRect(positionX, positionY - 22 + 5, (this.maxMp === 0 ? 1 : this.mp / this.maxMp) * this.size.x, 5);
+      ctx.fillStyle = "blue";
+      ctx.fillRect(
+        positionX,
+        positionY - 22 + 5,
+        (this.maxMp === 0 ? 1 : this.mp / this.maxMp) * this.size.x,
+        5
+      );
     }
   }
 
-  drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  drawCharacter(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis
+  ) {
     // ctx.fillStyle = this.unitColor;
     const moveScreenX = this.position.x;
     const moveScreenY = this.position.y;
     const positionX = worldAxisX + moveScreenX;
     const positionY = worldAxisY + moveScreenY;
 
-    const frame = this.state === UnitState.Idle ? 0 : Math.floor((this.frame / (this.FPS * this.frameLate)) % this.limitFrame);
+    const frame =
+      this.state === UnitState.Idle
+        ? 0
+        : Math.floor(
+            (this.frame / (this.FPS * this.frameLate)) % this.limitFrame
+          );
     const cropPositionX = this.cropPadX + frame * this.cropSizeX; // next frame
     const cropPositionY = this.cropPadY + this.gazeValue; // gaze
     const cropSizeX = this.cropSizeX - this.cropPadX * 2;
@@ -455,7 +619,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
       positionX - 5,
       positionY - 10,
       this.size.x + 10,
-      this.size.y + 10,
+      this.size.y + 10
     );
     if (this.state === UnitState.Move) {
       this.frame = this.frame + 1;
@@ -465,15 +629,15 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
   }
 
   isBlockedMove() {
-    return this.taskQueue.some((task) => ['move', 'changeMap'].includes(task));
+    return this.taskQueue.some((task) => ["move", "changeMap"].includes(task));
   }
 
   isBlockedAll() {
-    return this.taskQueue.includes('changeMap');
+    return this.taskQueue.includes("changeMap");
   }
 
   isAttacking() {
-    return this.taskQueue.includes('attack');
+    return this.taskQueue.includes("attack");
   }
 
   addConstraint(constraint: string) {
@@ -496,7 +660,7 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
     monster.decreaseHp(damage);
     if (monster.isDead) {
       this.engine.removeUnit(monster);
-      if (monster.constructor.name === 'Monster') {
+      if (monster.constructor.name === "Monster") {
         const exp = (monster as Monster).reward.getExp();
         const gold = (monster as Monster).reward.getGold();
         const item = (monster as Monster).reward.getItem();
@@ -517,18 +681,29 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
         }, monster.respawnTime * 1000);
       }
     }
-    this.addConstraint('attack');
+    this.addConstraint("attack");
     setTimeout(() => {
-      this.deleteConstraint('attack');
+      this.deleteConstraint("attack");
     }, this.attackSpeed * 1000);
 
     const getPosition = (): XY => {
       const posX = this.engine.renderer.controlUnit?.position.x || 0;
       const posY = this.engine.renderer.controlUnit?.position.y || 0;
-      const { rangeX, rangeY } = this.engine.renderer.getCameraMoveableRange(posX, posY);
+      const { rangeX, rangeY } = this.engine.renderer.getCameraMoveableRange(
+        posX,
+        posY
+      );
 
-      const worldAxisX = this.engine.renderer.worldAxisX - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 - posX + rangeX;
-      const worldAxisY = this.engine.renderer.worldAxisY - GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 - posY + rangeY;
+      const worldAxisX =
+        this.engine.renderer.worldAxisX -
+        GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 -
+        posX +
+        rangeX;
+      const worldAxisY =
+        this.engine.renderer.worldAxisY -
+        GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 -
+        posY +
+        rangeY;
 
       const moveScreenX = monster.position.x;
       const moveScreenY = monster.position.y;
@@ -540,7 +715,13 @@ class Unit implements TouchableUnit, AttackableUnit, UseStat, MoveableUnit, UseE
       };
     };
 
-    const fx = hitCountEffect(damage.toString(), monster, getPosition.bind(this), 1, [this.hitColor, '#ffffff']);
+    const fx = hitCountEffect(
+      damage.toString(),
+      monster,
+      getPosition.bind(this),
+      1,
+      [this.hitColor, "#ffffff"]
+    );
     fx.run();
   }
 

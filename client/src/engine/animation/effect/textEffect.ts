@@ -11,7 +11,7 @@ function textEffect({ text, duration }: { text: string; duration: number }) {
     const textMeasure = ctx.measureText(text);
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
-    ctx.font = `bold ${48 * 1}px sans-serif`;
+    ctx.font = `bold ${48 * 1}px Galmuri9`;
     const bgOpacityHex = Math.ceil(opacity * 255 > 50 ? 50 : opacity * 255)
       .toString(16)
       .padStart(2, '0');

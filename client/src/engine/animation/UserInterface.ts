@@ -8,6 +8,7 @@ import { $ } from "@util/$";
 import Logger from "@util/Logger";
 import { makeId } from "@util/makeId";
 import { GameMode, GameState } from "@variable/constant";
+import Socket from "@websocket/Socket";
 import { makeAutoObservable } from "mobx";
 
 export default class UserInterface {
@@ -184,6 +185,7 @@ export default class UserInterface {
     const position =
       this.engine.gameMapManager.currentMap?.defaultSpawnPosition;
     if (mode === GameMode.Multiple && idPw) {
+      this.engine.gameMode = GameMode.Multiple;
       const payload = {
         type: "login",
         id: idPw.id,
@@ -194,6 +196,7 @@ export default class UserInterface {
       };
       this.engine.socket.send(payload);
     } else if (mode === GameMode.Single) {
+      this.engine.gameMode = GameMode.Single;
       // console.log(this.engine.gameMode);
       this.engine.eventManager.emit(`loginUser`, {
         id: "Single",
@@ -201,6 +204,7 @@ export default class UserInterface {
         y: position?.y ?? 0,
       });
     } else if (mode === GameMode.Test) {
+      this.engine.gameMode = GameMode.Test;
       const user = new Player("test-user");
       const position =
         this.engine.gameMapManager.currentMap?.defaultSpawnPosition;

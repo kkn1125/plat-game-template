@@ -1,6 +1,7 @@
 import GAME_CONF from '@config/game.conf';
 import { Unit } from '@model/unit';
 import Item from '@model/unit/object/Item';
+import { makeAutoObservable } from 'mobx';
 
 export default class Inventory {
   unit: Unit;
@@ -11,6 +12,7 @@ export default class Inventory {
 
   constructor(unit: Unit) {
     this.unit = unit;
+    makeAutoObservable(this);
   }
 
   get emptyCellIndex() {

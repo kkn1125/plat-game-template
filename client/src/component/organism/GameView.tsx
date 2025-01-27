@@ -1,12 +1,13 @@
 import { Button, Paper, Stack, TextField } from "@mui/material";
 import gameMapAtom from "@recoil/gameMapAtom";
-import { GameState, QuestionState } from "@variable/constant";
+import { GameMode, GameState, QuestionState } from "@variable/constant";
 import { observer } from "mobx-react";
 import {
   memo,
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -15,6 +16,9 @@ import GameLayer from "../atom/GameLayer";
 import { Npc } from "@model/unit";
 import Question from "@model/option/Question";
 import QuestionBox from "../atom/Question";
+import Socket from "@websocket/Socket";
+import Inventory from "@model/option/Inventory";
+import InventoryBox from "../molecular/InventoryBox";
 
 interface GameViewProps {
   // layers: React.ReactElement[];
@@ -24,7 +28,10 @@ const GameView: React.FC<GameViewProps> = observer(() => {
   const [layers, setLayers] = useState<string[]>([]);
   const [multiMode, setMultiMode] = useState(false);
   const pressSpace = useRef(false);
+  const pressInventory = useRef(false);
   const endConversation = useRef(() => {});
+  const endInventory = useRef(() => {});
+  const [inventory, setInventory] = useState<Inventory | null>(null);
   const [question, setQuestion] = useState<Question | null>(null);
   const addLayer = (id: string) => {
     setLayers((prev) => [...prev, id]);
@@ -43,15 +50,14 @@ const GameView: React.FC<GameViewProps> = observer(() => {
   }, []);
 
   useEffect(() => {
-    // console.log(gameEngine.state);
     if (gameEngine.state === GameState.Prepare) {
       gameEngine.state = GameState.Loading;
       gameEngine.renderer.render();
     }
   }, [gameEngine, gameEngine.state]);
 
-  useEffect(() => {
-    const handleKeyboardDown = (e: KeyboardEvent) => {
+  const handleKeyboardDown = useCallback(
+    (e: KeyboardEvent) => {
       const key = e.key;
       switch (key) {
         case " ": {
@@ -63,7 +69,6 @@ const GameView: React.FC<GameViewProps> = observer(() => {
             endConversation.current = () => closeUnit.endConversation();
             if (closeUnit.question.state === QuestionState.Idle) {
               const question = closeUnit.startConversation();
-              // gameEngine.ui.conversation(question);
               // console.log(question)
               setQuestion(() => question);
               gameEngine.eventManager.joystickEvent.clearMove();
@@ -74,17 +79,35 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           pressSpace.current = true;
           break;
         }
-      }
-    };
-    const handleKeyboardUp = (e: KeyboardEvent) => {
-      const key = e.key;
-      switch (key) {
-        case " ":
-          if (!pressSpace.current) return;
-          pressSpace.current = false;
+        case "i": {
+          if (pressInventory.current) return;
+          const controlUnit = gameEngine.controlUnit;
+          if (!controlUnit) return;
+          setInventory((prev) => (prev ? null : controlUnit.inventory));
+
+          pressInventory.current = true;
           break;
+        }
       }
-    };
+    },
+    [inventory]
+  );
+
+  const handleKeyboardUp = useCallback((e: KeyboardEvent) => {
+    const key = e.key;
+    switch (key) {
+      case " ":
+        if (!pressSpace.current) return;
+        pressSpace.current = false;
+        break;
+      case "i":
+        if (!pressInventory.current) return;
+        pressInventory.current = false;
+        break;
+    }
+  }, []);
+
+  useEffect(() => {
     window.addEventListener("keydown", handleKeyboardDown);
     window.addEventListener("keyup", handleKeyboardUp);
     return () => {
@@ -98,6 +121,14 @@ const GameView: React.FC<GameViewProps> = observer(() => {
     endConversation.current();
     endConversation.current = () => {};
   }
+
+  function closeInventory() {
+    setInventory(() => null);
+  }
+
+  const inventoryValue = useMemo(() => {
+    return inventory;
+  }, [inventory, gameEngine.controlUnit]);
 
   return (
     <div>
@@ -125,7 +156,12 @@ const GameView: React.FC<GameViewProps> = observer(() => {
             <Stack gap={2}>
               <Button
                 variant="contained"
-                onClick={() => gameEngine.ui.login("Test")}
+                onClick={() => {
+                  gameEngine.ui.login("Test");
+                  // setInterval(() => {
+                  //   gameEngine.controlUnit?.levelUp();
+                  // }, 2000);
+                }}
               >
                 테스트
               </Button>
@@ -143,7 +179,11 @@ const GameView: React.FC<GameViewProps> = observer(() => {
               <Button
                 color="inherit"
                 variant="contained"
-                onClick={() => setMultiMode((prev) => !prev)}
+                onClick={() => {
+                  gameEngine.gameMode = GameMode.Single;
+                  setMultiMode((prev) => !prev);
+                  gameEngine.socket.destroy();
+                }}
               >
                 돌아가기
               </Button>
@@ -151,12 +191,20 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           ) : (
             <Button
               variant="contained"
-              onClick={() => setMultiMode((prev) => !prev)}
+              onClick={() => {
+                gameEngine.gameMode = GameMode.Multiple;
+                setMultiMode((prev) => !prev);
+                const socket = new Socket(gameEngine);
+                gameEngine.loadSocket(socket);
+              }}
             >
               멀티플레이
             </Button>
           )}
         </Stack>
+      )}
+      {inventoryValue && (
+        <InventoryBox inventory={inventoryValue} closeInventory={closeInventory} />
       )}
       {question && (
         <QuestionBox

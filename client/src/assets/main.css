@@ -1,5 +1,11 @@
+@font-face {
+  font-family: "Galmuri9";
+  src: url("/font/Galmuri9.ttf");
+}
+
 :root {
   box-sizing: border-box;
+  font-family: "Galmuri9";
 }
 
 html,
@@ -8,6 +14,7 @@ body,
   height: 100%;
   margin: 0;
   overflow: hidden;
+  font-family: "Galmuri9";
 
   /* h1,
   h2,
@@ -189,7 +196,7 @@ body,
       font-size: 14px;
       padding: 0.3rem;
       &::before {
-        content: '💰';
+        content: "💰";
       }
     }
   }

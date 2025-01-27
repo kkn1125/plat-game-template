@@ -2,7 +2,7 @@ import GameEngine from "@core/GameEngine";
 import { Monster, Npc, Unit } from "@model/unit";
 import Building from "@model/unit/building/Building";
 import Portal from "@model/unit/portal/Portal";
-import { QuestionState } from "@variable/constant";
+import { GameMode, QuestionState } from "@variable/constant";
 import { isBlockedAll, isBlockedMove } from "@variable/globalControl";
 import { makeAutoObservable } from "mobx";
 
@@ -156,6 +156,7 @@ export default class JoystickEvent {
         }
       }
     }
+
     // if (key === 'i') {
     //   if (this.joystick.i) {
     //     this.engine.ui.closeInventory();
@@ -182,12 +183,14 @@ export default class JoystickEvent {
           closeUnit.forward(controlUnit);
           controlUnit.aroundUnits = [];
           this.clearMove();
-          this.engine.socket?.send({
-            type: "forward",
-            mapName: this.engine.gameMapManager.currentMap?.name || "",
-            x: controlUnit.position.x,
-            y: controlUnit.position.y,
-          });
+          if (this.engine.gameMode === GameMode.Multiple) {
+            this.engine.socket?.send({
+              type: "forward",
+              mapName: this.engine.gameMapManager.currentMap?.name || "",
+              x: controlUnit.position.x,
+              y: controlUnit.position.y,
+            });
+          }
         }
       } else if (closeUnit instanceof Portal) {
         if (closeUnit.forward) {
@@ -195,12 +198,14 @@ export default class JoystickEvent {
           closeUnit.forward(controlUnit);
           controlUnit.aroundUnits = [];
           this.clearMove();
-          this.engine.socket?.send({
-            type: "forward",
-            mapName: this.engine.gameMapManager.currentMap?.name || "",
-            x: controlUnit.position.x,
-            y: controlUnit.position.y,
-          });
+          if (this.engine.gameMode === GameMode.Multiple) {
+            this.engine.socket?.send({
+              type: "forward",
+              mapName: this.engine.gameMapManager.currentMap?.name || "",
+              x: controlUnit.position.x,
+              y: controlUnit.position.y,
+            });
+          }
         }
       } else if (closeUnit instanceof Npc) {
         // if (closeUnit.question.state === QuestionState.Idle) {
@@ -237,25 +242,33 @@ export default class JoystickEvent {
       if (key === "w") {
         this.joystick.w = false;
         this.order.splice(this.order.indexOf("top"), 1);
-        this.engine.socket?.send({ type: "stop", g: 0 });
+        if (this.engine.gameMode === GameMode.Multiple) {
+          this.engine.socket?.send({ type: "stop", g: 0 });
+        }
         // console.log('top');
       }
       if (key === "s") {
         this.joystick.s = false;
         this.order.splice(this.order.indexOf("bottom"), 1);
-        this.engine.socket?.send({ type: "stop", g: 1 });
+        if (this.engine.gameMode === GameMode.Multiple) {
+          this.engine.socket?.send({ type: "stop", g: 1 });
+        }
         // console.log('bottom');
       }
       if (key === "a") {
         this.joystick.a = false;
         this.order.splice(this.order.indexOf("left"), 1);
-        this.engine.socket?.send({ type: "stop", g: 2 });
+        if (this.engine.gameMode === GameMode.Multiple) {
+          this.engine.socket?.send({ type: "stop", g: 2 });
+        }
         // console.log('left');
       }
       if (key === "d") {
         this.joystick.d = false;
         this.order.splice(this.order.indexOf("right"), 1);
-        this.engine.socket?.send({ type: "stop", g: 3 });
+        if (this.engine.gameMode === GameMode.Multiple) {
+          this.engine.socket?.send({ type: "stop", g: 3 });
+        }
         // console.log('right');
       }
       const lastKey = this.order.at(-1);
@@ -263,22 +276,30 @@ export default class JoystickEvent {
         switch (lastKey) {
           case "top": {
             this.controlUnit.gaze = "top";
-            this.engine.socket?.send({ type: "stop", g: 0 });
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket?.send({ type: "stop", g: 0 });
+            }
             break;
           }
           case "bottom": {
             this.controlUnit.gaze = "bottom";
-            this.engine.socket?.send({ type: "stop", g: 1 });
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket?.send({ type: "stop", g: 1 });
+            }
             break;
           }
           case "left": {
             this.controlUnit.gaze = "left";
-            this.engine.socket?.send({ type: "stop", g: 2 });
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket?.send({ type: "stop", g: 2 });
+            }
             break;
           }
           case "right": {
             this.controlUnit.gaze = "right";
-            this.engine.socket?.send({ type: "stop", g: 3 });
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket?.send({ type: "stop", g: 3 });
+            }
             break;
           }
         }

@@ -197,7 +197,13 @@ export default class GameEngine {
       this.logger
         .scope("LoadSocket")
         .debug("게임모드가 멀티가 아니므로 소켓 취소");
+      socket.destroy();
     }
+  }
+
+  destroySocket() {
+    this.logger.scope("DestroySocket").debug("소켓 취소");
+    this.socket.destroy();
   }
 
   loadUi(ui: UserInterface) {

@@ -40,10 +40,10 @@ export function gameStart(gameEngine: GameEngine) {
   gameEngine.loadEventManager(eventManager);
   emitEvent(gameEngine);
 
-  if (GAME_CONF.MODE === GameMode.Multiple) {
-    const socket = new Socket(gameEngine);
-    gameEngine.loadSocket(socket);
-  }
+  // if (GAME_CONF.MODE === GameMode.Multiple) {
+  //   const socket = new Socket(gameEngine);
+  //   gameEngine.loadSocket(socket);
+  // }
 
   const ui = new UserInterface(gameEngine);
   gameEngine.loadUi(ui);

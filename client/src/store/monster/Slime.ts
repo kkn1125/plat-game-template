@@ -17,7 +17,7 @@ export function SlimeFactory(gameMap: GameMap<Maps>, position: XY) {
   Slime.setLocation(gameMap);
   Slime.setPositionByField(position.x, position.y);
   // console.log('슬라임 생성:', position.x * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X, position.y * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y);
-  Slime.reward.setExp(10);
+  Slime.reward.setExp(50);
   Slime.reward.setGold(10);
   // Slime.reward.setItem(Gun);
   return Slime;

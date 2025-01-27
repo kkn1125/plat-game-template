@@ -32,7 +32,7 @@ export default class StackableEffect extends Effect {
 
     time += 0.1;
 
-    this.ctx.font = 'bold 32px sans-serif';
+    this.ctx.font = 'bold 32px Galmuri9';
     this.renderFx?.(this.ctx, this.canvas.width / 2, this.canvas.height / 2, opacity);
 
     const now = Math.floor(time);

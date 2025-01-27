@@ -1,4 +1,5 @@
 import { makeId } from "@util/makeId";
+import { makeAutoObservable } from "mobx";
 
 export default class Location {
   id = makeId("location");
@@ -7,5 +8,6 @@ export default class Location {
 
   constructor(locate: Maps) {
     this.locate = locate;
+    makeAutoObservable(this);
   }
 }

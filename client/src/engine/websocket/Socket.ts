@@ -158,6 +158,10 @@ export default class Socket {
     console.log(e);
   }
 
+  destroy() {
+    this.socket.close(1000);
+  }
+
   send(data: any, isBinary: boolean = true) {
     if (isBinary) {
       const compressed = Pako.deflate(JSON.stringify(data));

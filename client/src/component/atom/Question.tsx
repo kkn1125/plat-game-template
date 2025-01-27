@@ -23,16 +23,28 @@ const QuestionBox: React.FC<QuestionProps> = ({
     setCurrent(() => content.value || "");
   }, []);
 
+  const cancel = useCallback(() => {
+    closeConversation();
+    setCurrent(() => "");
+  }, []);
+
   useEffect(() => {
     next();
-    function handleNext() {
-      if (pressSpace.current) return;
-      pressSpace.current = true;
-      next();
+    function handleNext(e: KeyboardEvent) {
+      if (e.key === " ") {
+        if (pressSpace.current) return;
+        pressSpace.current = true;
+        next();
+      }
+      if (e.key === "Escape") {
+        cancel();
+      }
     }
-    function handleNextUp() {
-      if (!pressSpace.current) return;
-      pressSpace.current = false;
+    function handleNextUp(e: KeyboardEvent) {
+      if (e.key === " ") {
+        if (!pressSpace.current) return;
+        pressSpace.current = false;
+      }
     }
     window.addEventListener("keydown", handleNext);
     window.addEventListener("keyup", handleNextUp);
@@ -42,20 +54,29 @@ const QuestionBox: React.FC<QuestionProps> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  
   return (
     <Stack
       component={Paper}
+      borderRadius={0}
       p={3}
       position="fixed"
-      bottom={15}
+      bottom="10%"
       left="50%"
       sx={{
         transform: "translateX(-50%)",
       }}
     >
       <Typography>{current}</Typography>
-      <Button onClick={next}>다음</Button>
+      <Stack direction="row" gap={1}>
+        <Button onClick={cancel}>취소</Button>
+        <Button onClick={next}>
+          {question.scripts.indexOf(current) ===
+          question.scripts.length - 1
+            ? "확인"
+            : "다음"}
+        </Button>
+      </Stack>
     </Stack>
   );
 };

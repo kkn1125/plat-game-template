@@ -18,7 +18,7 @@ function hitCountEffect(text: string, mob: Unit, axis: () => XY, duration: numbe
     ctx.textAlign = 'center';
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#ffffff';
-    ctx.font = `bold ${32 * 1}px sans-serif`;
+    ctx.font = `bold ${32 * 1}px Galmuri9`;
     // console.log(textSize.fontBoundingBoxDescent)
     if (Array.isArray(color)) {
       // Create gradient
