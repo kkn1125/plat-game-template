@@ -4,6 +4,7 @@ import GameMap from '@model/gamemap/GameMap';
 import { makeId } from '@util/makeId';
 import Forwardable from '../implement/Forwardable';
 import Unit from '../Unit';
+import { makeAutoObservable } from 'mobx';
 
 export default class Portal extends Unit implements Forwardable {
   forwardMap!: GameMap<Maps>;

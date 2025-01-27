@@ -1,11 +1,11 @@
-import GAME_CONF from '@config/game.conf';
-import GameMap from '@model/gamemap/GameMap';
-import { Unit } from '@model/unit';
-import Logger from '@util/Logger';
-import GameEngine from './GameEngine';
-import { Tile } from '@variable/constant';
-import { textChangeFx } from '@store/effects/textChangeFx';
-import { makeAutoObservable } from 'mobx';
+import GAME_CONF from "@config/game.conf";
+import GameMap from "@model/gamemap/GameMap";
+import { Unit } from "@model/unit";
+import { textChangeFx } from "@store/effects/textChangeFx";
+import Logger from "@util/Logger";
+import { Tile } from "@variable/constant";
+import { makeAutoObservable } from "mobx";
+import GameEngine from "./GameEngine";
 
 const WATER_COLLISION_GAP = 15;
 
@@ -34,14 +34,14 @@ export default class GameMapManager {
   }
 
   setCurrentMap(gameMap: GameMap) {
-    this.logger.scope('AddGameMap').info('맵 설정:', gameMap.name);
+    this.logger.scope("AddGameMap").info("맵 설정:", gameMap.name);
     this.currentMap = gameMap;
   }
 
   addGameMap(gameMap: GameMap) {
-    this.logger.scope('AddGameMap').info('맵 추가:', gameMap.name);
+    this.logger.scope("AddGameMap").info("맵 추가:", gameMap.name);
     if (this.gameMaps.size === 0) {
-      this.logger.scope('AddGameMap').info('기본 게임 맵:', gameMap.name);
+      this.logger.scope("AddGameMap").info("기본 게임 맵:", gameMap.name);
       this.currentMap = gameMap;
     }
     this.gameMaps.set(gameMap.name, gameMap);
@@ -49,12 +49,12 @@ export default class GameMapManager {
 
   changeMap(forwardMap: GameMap) {
     if (this.gameMaps.has(forwardMap.name)) {
-      this.logger.scope('AddGameMap').info('맵 변경:', forwardMap.name);
-      this.logger.scope('AddGameMap').info('기본 게임 맵:', forwardMap.name);
+      this.logger.scope("AddGameMap").info("맵 변경:", forwardMap.name);
+      this.logger.scope("AddGameMap").info("기본 게임 맵:", forwardMap.name);
       this.currentMap = forwardMap;
       textChangeFx(forwardMap.name);
     } else {
-      this.logger.scope('ChangeMap').error('존재하지 않는 맵입니다.');
+      this.logger.scope("ChangeMap").error("존재하지 않는 맵입니다.");
     }
   }
 
@@ -80,7 +80,9 @@ export default class GameMapManager {
     const cellLeftX = Math.floor((x - unitHalfSizeX) / this.mapSizeX);
     const cellX = Math.floor(x / this.mapSizeX);
     const cellRightX = Math.floor((x + unitHalfSizeX) / this.mapSizeX);
-    const cellTopY = Math.floor((y - unitHalfSizeY - controlUnit.increaseSpeed) / this.mapSizeY);
+    const cellTopY = Math.floor(
+      (y - unitHalfSizeY - controlUnit.increaseSpeed) / this.mapSizeY
+    );
 
     /* 필드 계산 */
     const fieldLeft = fields?.[cellTopY]?.[cellLeftX];
@@ -107,7 +109,9 @@ export default class GameMapManager {
     const cellLeftX = Math.floor((x - unitHalfSizeX) / this.mapSizeX);
     const cellX = Math.floor(x / this.mapSizeX);
     const cellRightX = Math.floor((x + unitHalfSizeX) / this.mapSizeX);
-    const cellBottomY = Math.floor((y + unitHalfSizeY + controlUnit.increaseSpeed) / this.mapSizeY);
+    const cellBottomY = Math.floor(
+      (y + unitHalfSizeY + controlUnit.increaseSpeed) / this.mapSizeY
+    );
 
     /* 필드 계산 */
     const fieldLeft = fields?.[cellBottomY]?.[cellLeftX];
@@ -116,14 +120,19 @@ export default class GameMapManager {
 
     // 물 연접 부 컬리젼 범위 조정 - 물로 상단에서 접근
     {
-      const cellBottomY = Math.floor((y + unitHalfSizeY + WATER_COLLISION_GAP + controlUnit.increaseSpeed) / this.mapSizeY);
+      const cellBottomY = Math.floor(
+        (y + unitHalfSizeY + WATER_COLLISION_GAP + controlUnit.increaseSpeed) /
+          this.mapSizeY
+      );
 
       const fieldLeft = fields?.[cellBottomY]?.[cellLeftX];
       const field = fields?.[cellBottomY]?.[cellX];
       const fieldRight = fields?.[cellBottomY]?.[cellRightX];
 
       if (
-        [fieldLeft, field, fieldRight].some((field) => field?.name === Tile.Water) &&
+        [fieldLeft, field, fieldRight].some(
+          (field) => field?.name === Tile.Water
+        ) &&
         [fieldLeft, field, fieldRight].some((field) => !field?.passable)
       ) {
         /* 충돌 */
@@ -148,7 +157,9 @@ export default class GameMapManager {
     const { x, y } = this.getAxis(currentMap, controlUnit);
     const unitHalfSizeX = controlUnit.size.x / 2;
     const unitHalfSizeY = controlUnit.size.y / 2;
-    const cellLeftX = Math.floor((x - unitHalfSizeX - controlUnit.increaseSpeed) / this.mapSizeX);
+    const cellLeftX = Math.floor(
+      (x - unitHalfSizeX - controlUnit.increaseSpeed) / this.mapSizeX
+    );
     const cellTopY = Math.floor((y - unitHalfSizeY) / this.mapSizeY);
     const cellY = Math.floor(y / this.mapSizeY);
     const cellBottomY = Math.floor((y + unitHalfSizeY) / this.mapSizeY);
@@ -160,14 +171,21 @@ export default class GameMapManager {
 
     // 물 연접 부 컬리젼 범위 조정 - 물로 좌측에서 접근
     {
-      const cellLeftX = Math.floor((x - unitHalfSizeX - controlUnit.increaseSpeed) / this.mapSizeX);
-      const cellBottomY = Math.floor((y + WATER_COLLISION_GAP + unitHalfSizeY) / this.mapSizeY);
+      const cellLeftX = Math.floor(
+        (x - unitHalfSizeX - controlUnit.increaseSpeed) / this.mapSizeX
+      );
+      const cellBottomY = Math.floor(
+        (y + WATER_COLLISION_GAP + unitHalfSizeY) / this.mapSizeY
+      );
 
       const fieldTop = fields?.[cellTopY]?.[cellLeftX];
       const field = fields?.[cellY]?.[cellLeftX];
       const fieldBottom = fields?.[cellBottomY]?.[cellLeftX];
 
-      if (fieldBottom?.name === Tile.Water && [fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
+      if (
+        fieldBottom?.name === Tile.Water &&
+        [fieldTop, field, fieldBottom].some((field) => !field?.passable)
+      ) {
         /* 충돌 */
         return true;
       }
@@ -190,7 +208,9 @@ export default class GameMapManager {
     const { x, y } = this.getAxis(currentMap, controlUnit);
     const unitHalfSizeX = controlUnit.size.x / 2;
     const unitHalfSizeY = controlUnit.size.y / 2;
-    const cellRightX = Math.floor((x + unitHalfSizeX + controlUnit.increaseSpeed) / this.mapSizeX);
+    const cellRightX = Math.floor(
+      (x + unitHalfSizeX + controlUnit.increaseSpeed) / this.mapSizeX
+    );
     const cellTopY = Math.floor((y - unitHalfSizeY) / this.mapSizeY);
     const cellY = Math.floor(y / this.mapSizeY);
     const cellBottomY = Math.floor((y + unitHalfSizeY) / this.mapSizeY);
@@ -202,14 +222,21 @@ export default class GameMapManager {
 
     // 물 연접 부 컬리젼 범위 조정 - 물로 우측에서 접근
     {
-      const cellRightX = Math.floor((x + unitHalfSizeX + controlUnit.increaseSpeed) / this.mapSizeX);
-      const cellBottomY = Math.floor((y + WATER_COLLISION_GAP + unitHalfSizeY) / this.mapSizeY);
+      const cellRightX = Math.floor(
+        (x + unitHalfSizeX + controlUnit.increaseSpeed) / this.mapSizeX
+      );
+      const cellBottomY = Math.floor(
+        (y + WATER_COLLISION_GAP + unitHalfSizeY) / this.mapSizeY
+      );
 
       const fieldTop = fields?.[cellTopY]?.[cellRightX];
       const field = fields?.[cellY]?.[cellRightX];
       const fieldBottom = fields?.[cellBottomY]?.[cellRightX];
 
-      if (fieldBottom?.name === Tile.Water && [fieldTop, field, fieldBottom].some((field) => !field?.passable)) {
+      if (
+        fieldBottom?.name === Tile.Water &&
+        [fieldTop, field, fieldBottom].some((field) => !field?.passable)
+      ) {
         /* 충돌 */
         return true;
       }

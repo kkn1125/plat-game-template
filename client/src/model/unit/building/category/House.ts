@@ -1,7 +1,7 @@
-import { makeId } from "@util/makeId";
-import Building from "../Building";
 import { ObjectSprites, OpacityObjectSprites } from "@/source/sprites";
-import GAME_CONF from "@config/game.conf";
+import { makeId } from "@util/makeId";
+import { makeObservable, observable } from "mobx";
+import Building from "../Building";
 
 export default class House extends Building {
   opacitySprites!: HTMLImageElement;
@@ -13,6 +13,9 @@ export default class House extends Building {
     this.sprites = ObjectSprites;
     this.opacitySprites = OpacityObjectSprites;
 
+    makeObservable(this, {
+      opacitySprites: observable,
+    });
     // this.size.x = GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X * 5;
     // this.size.y = GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y * 5;
   }

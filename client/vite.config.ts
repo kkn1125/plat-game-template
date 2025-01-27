@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import * as dotenv from "dotenv";
 import path from "path";
 import tsconfigPaths from "vite-tsconfig-paths";
+import pkg from "./package.json";
 
 dotenv.config({
   path: path.join(path.resolve(), ".env"),
@@ -20,6 +21,7 @@ export default defineConfig(({ mode }) => {
 
   const host = process.env.HOST;
   const port = +(process.env.PORT || 5000);
+  const VERSION = pkg.version;
 
   const SOCKET_URL =
     MODE === "production" ? process.env.SOCKET_URL : "ws://localhost:9001";
@@ -31,16 +33,17 @@ export default defineConfig(({ mode }) => {
       "process.env": {
         MODE,
         SOCKET_URL,
+        VERSION,
       },
     },
     server: {
       host,
       port,
     },
-    base: mode === 'development' ? '/' : '/plat-game-template/',
+    base: mode === "development" ? "/" : "/plat-game-template/",
     build: {
-      outDir: 'dist',
-      minify: 'terser',
+      outDir: "dist",
+      minify: "terser",
       terserOptions: {
         keep_classnames: true,
       },

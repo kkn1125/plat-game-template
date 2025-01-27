@@ -10,14 +10,18 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import gameEngine from "@recoil/gameMapAtom";
+// import gameMapAtom from "@recoil/gameMapAtom";
 import { observer } from "mobx-react";
+import { useRecoilValue } from "recoil";
 
 interface InventoryBoxProps {
-  inventory: Inventory;
   closeInventory: () => void;
 }
 const InventoryBox: React.FC<InventoryBoxProps> = observer(
-  ({ inventory, closeInventory }) => {
+  ({ closeInventory }) => {
+    const inventory = gameEngine.controlUnit?.inventory;
+    if (!inventory) return <></>;
     return (
       <Stack
         component={Paper}

@@ -1,13 +1,14 @@
+import gameEngine from "@recoil/gameMapAtom";
 import gameMapAtom from "@recoil/gameMapAtom";
 import { observer } from "mobx-react";
 import { useEffect, useRef } from "react";
-import { useRecoilValue } from "recoil";
+// import { useRecoilValue } from "recoil";
 
 interface GameLayerProps {
   id: string;
 }
 const GameLayer: React.FC<GameLayerProps> = observer(({ id }) => {
-  const gameEngine = useRecoilValue(gameMapAtom);
+  // const gameEngine = useRecoilValue(gameMapAtom);
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

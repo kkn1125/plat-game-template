@@ -1,7 +1,7 @@
-import GameEngine from '@core/GameEngine';
-import Logger from '@util/Logger';
-import JoystickEvent from './JoystickEvent';
-import { makeAutoObservable } from 'mobx';
+import GameEngine from "@core/GameEngine";
+import Logger from "@util/Logger";
+import { makeAutoObservable } from "mobx";
+import JoystickEvent from "./JoystickEvent";
 
 type Handler = (eventManager: EventManager, data?: any) => void;
 
@@ -43,17 +43,17 @@ class EventManager implements Subject {
     this.joystickEvent.run();
 
     /* Conversation */
-    window.addEventListener('click', (e) => {
+    window.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      const conversation = target.closest('#conversation');
+      const conversation = target.closest("#conversation");
       if (!conversation) return;
       e.preventDefault();
 
-      if (target.classList.contains('next')) {
-        this.emit('conversationNext');
+      if (target.classList.contains("next")) {
+        this.emit("conversationNext");
       }
-      if (target.classList.contains('cancel')) {
-        this.emit('conversationCancel');
+      if (target.classList.contains("cancel")) {
+        this.emit("conversationCancel");
       }
     });
   }
@@ -63,7 +63,7 @@ class EventManager implements Subject {
   }
 
   watch(observer: Observer) {
-    this.logger.scope('Watch').debug('옵저버 등록:', observer);
+    this.logger.scope("Watch").debug("옵저버 등록:", observer);
     this.observers.push(observer);
   }
 

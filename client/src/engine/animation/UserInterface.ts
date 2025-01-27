@@ -8,7 +8,6 @@ import { $ } from "@util/$";
 import Logger from "@util/Logger";
 import { makeId } from "@util/makeId";
 import { GameMode, GameState } from "@variable/constant";
-import Socket from "@websocket/Socket";
 import { makeAutoObservable } from "mobx";
 
 export default class UserInterface {
@@ -27,13 +26,13 @@ export default class UserInterface {
 
   constructor(engine: GameEngine) {
     this.engine = engine;
+    makeAutoObservable(this);
     // this.createLayer("layer-map", true);
     // this.createLayer("layer-unit", true);
     // this.createLayer("layer-portal", true);
     // this.createLayer("layer-map-object", true);
     // this.createLayer("layer-unit-label", true);
     // this.createInterface();
-    makeAutoObservable(this);
 
     // switch (engine.gameMode) {
     //   case GameMode.Test: {

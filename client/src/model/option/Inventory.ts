@@ -1,13 +1,14 @@
-import GAME_CONF from '@config/game.conf';
-import { Unit } from '@model/unit';
-import Item from '@model/unit/object/Item';
-import { makeAutoObservable } from 'mobx';
+import GAME_CONF from "@config/game.conf";
+import { Unit } from "@model/unit";
+import Item from "@model/unit/object/Item";
+import { makeAutoObservable } from "mobx";
 
 export default class Inventory {
   unit: Unit;
 
-  slots: (Item | null)[][] = Array.from(Array(GAME_CONF.UNIT_CONF.DEFAULT.INVENTORY.Y), () =>
-    Array.from(Array(GAME_CONF.UNIT_CONF.DEFAULT.INVENTORY.X), () => null),
+  slots: (Item | null)[][] = Array.from(
+    Array(GAME_CONF.UNIT_CONF.DEFAULT.INVENTORY.Y),
+    () => Array.from(Array(GAME_CONF.UNIT_CONF.DEFAULT.INVENTORY.X), () => null)
   );
 
   constructor(unit: Unit) {

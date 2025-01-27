@@ -1,7 +1,15 @@
-import Portal from './Portal';
+import { makeAutoObservable } from "mobx";
+import Portal from "./Portal";
 
 export default class AreaPortal extends Portal {
-  drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  constructor(name: string, option?: HealthOption) {
+    super(name, option);
+  }
+
+  drawCharacter(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis
+  ) {
     // ctx.fillStyle = this.unitColor;
     const moveScreenX = this.position.x;
     const moveScreenY = this.position.y;
@@ -25,7 +33,7 @@ export default class AreaPortal extends Portal {
       positionX - 10, // aaa * 2
       positionY - 5, // 육지 나무 Y 축 위치
       this.size.x + 20, // a * 2
-      this.size.y + 20, // 물 위 나무 Y 축 위치
+      this.size.y + 20 // 물 위 나무 Y 축 위치
       // this.sprites,
       // 33,
       // 0,

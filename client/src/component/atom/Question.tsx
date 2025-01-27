@@ -54,7 +54,7 @@ const QuestionBox: React.FC<QuestionProps> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   return (
     <Stack
       component={Paper}
@@ -63,16 +63,24 @@ const QuestionBox: React.FC<QuestionProps> = ({
       position="fixed"
       bottom="10%"
       left="50%"
+      minWidth="80%"
+      width="80vmin"
+      maxWidth="90%"
       sx={{
         transform: "translateX(-50%)",
+        wordBreak: "auto-phrase",
       }}
     >
-      <Typography>{current}</Typography>
-      <Stack direction="row" gap={1}>
-        <Button onClick={cancel}>취소</Button>
-        <Button onClick={next}>
-          {question.scripts.indexOf(current) ===
-          question.scripts.length - 1
+      <Typography variant="h5" gutterBottom>
+        {question.npc.name}
+      </Typography>
+      <Typography variant="body1">{current}</Typography>
+      <Stack direction="row" gap={1} justifyContent="flex-end">
+        <Button variant="outlined" onClick={cancel}>
+          취소
+        </Button>
+        <Button variant="contained" onClick={next}>
+          {question.scripts.indexOf(current) === question.scripts.length - 1
             ? "확인"
             : "다음"}
         </Button>

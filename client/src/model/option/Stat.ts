@@ -17,7 +17,6 @@ export default class Stat {
 
   constructor(parent: Unit | Item) {
     this.parent = parent;
-    makeAutoObservable(this);
   }
 
   get damage(): number {

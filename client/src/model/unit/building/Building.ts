@@ -1,8 +1,9 @@
-import GameMap from '@model/gamemap/GameMap';
-import Forwardable from '../implement/Forwardable';
-import Unit from '../Unit';
-import GAME_CONF from '@config/game.conf';
-import { makeId } from '@util/makeId';
+import GAME_CONF from "@config/game.conf";
+import GameMap from "@model/gamemap/GameMap";
+import { makeId } from "@util/makeId";
+import { makeObservable, observable } from "mobx";
+import Forwardable from "../implement/Forwardable";
+import Unit from "../Unit";
 
 export default class Building extends Unit implements Forwardable {
   forwardMap!: GameMap<Maps>;
@@ -11,28 +12,36 @@ export default class Building extends Unit implements Forwardable {
 
   constructor(name: string, option?: HealthOption, forwardMap?: GameMap<Maps>) {
     super(name, option);
-    this.id = makeId('building');
+    this.id = makeId("building");
     if (forwardMap) {
       this.forwardMap = forwardMap;
     }
+    makeObservable(this, {
+      forwardMap: observable,
+      forwardPosition: observable,
+    });
   }
 
-  setForwardMap(forwardMap: GameMap<Maps>, forwardPosition: XY, direction?: 'top' | 'bottom' | 'left' | 'right') {
+  setForwardMap(
+    forwardMap: GameMap<Maps>,
+    forwardPosition: XY,
+    direction?: "top" | "bottom" | "left" | "right"
+  ) {
     this.forwardMap = forwardMap;
 
     let x = 0;
     let y = 0;
     switch (direction) {
-      case 'top':
+      case "top":
         y -= GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
         break;
-      case 'bottom':
+      case "bottom":
         y += GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
         break;
-      case 'left':
+      case "left":
         x -= GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
         break;
-      case 'right':
+      case "right":
         x += GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
         break;
     }
@@ -76,7 +85,11 @@ export default class Building extends Unit implements Forwardable {
     unit.setPosition(x, y);
   }
 
-  drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis, emboss: boolean = false) {
+  drawCharacter(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis,
+    emboss: boolean = false
+  ) {
     super.drawCharacter(ctx, { worldAxisX, worldAxisY });
   }
 }

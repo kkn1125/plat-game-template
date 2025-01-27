@@ -23,9 +23,7 @@ export default class Socket {
     websocket.onmessage = this.message.bind(this);
     websocket.onerror = this.error.bind(this);
     websocket.onclose = this.close.bind(this);
-
     this.socket = websocket;
-    makeAutoObservable(this);
   }
 
   open(e: Event) {

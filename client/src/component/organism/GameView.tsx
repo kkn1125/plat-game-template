@@ -1,6 +1,10 @@
+import Inventory from "@model/option/Inventory";
+import Question from "@model/option/Question";
+import { Npc } from "@model/unit";
 import { Button, Paper, Stack, TextField } from "@mui/material";
-import gameMapAtom from "@recoil/gameMapAtom";
+import gameEngine from "@recoil/gameMapAtom";
 import { GameMode, GameState, QuestionState } from "@variable/constant";
+import Socket from "@websocket/Socket";
 import { observer } from "mobx-react";
 import {
   memo,
@@ -11,26 +15,25 @@ import {
   useRef,
   useState,
 } from "react";
-import { useRecoilValue } from "recoil";
 import GameLayer from "../atom/GameLayer";
-import { Npc } from "@model/unit";
-import Question from "@model/option/Question";
 import QuestionBox from "../atom/Question";
-import Socket from "@websocket/Socket";
-import Inventory from "@model/option/Inventory";
 import InventoryBox from "../molecular/InventoryBox";
+import Equipment from "@model/option/Equipment";
+import EquipmentBox from "../molecular/EquipmentBox";
 
 interface GameViewProps {
   // layers: React.ReactElement[];
 }
 const GameView: React.FC<GameViewProps> = observer(() => {
-  const gameEngine = useRecoilValue(gameMapAtom);
+  // const gameEngine = useRecoilValue(gameMapAtom);
   const [layers, setLayers] = useState<string[]>([]);
   const [multiMode, setMultiMode] = useState(false);
   const pressSpace = useRef(false);
+  const pressEquipment = useRef(false);
   const pressInventory = useRef(false);
   const endConversation = useRef(() => {});
-  const endInventory = useRef(() => {});
+  // const endInventory = useRef(() => {});
+  const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [question, setQuestion] = useState<Question | null>(null);
   const addLayer = (id: string) => {
@@ -69,7 +72,6 @@ const GameView: React.FC<GameViewProps> = observer(() => {
             endConversation.current = () => closeUnit.endConversation();
             if (closeUnit.question.state === QuestionState.Idle) {
               const question = closeUnit.startConversation();
-              // console.log(question)
               setQuestion(() => question);
               gameEngine.eventManager.joystickEvent.clearMove();
             } else {
@@ -88,9 +90,18 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           pressInventory.current = true;
           break;
         }
+        case "e": {
+          if (pressEquipment.current) return;
+          const controlUnit = gameEngine.controlUnit;
+          if (!controlUnit) return;
+          setEquipment((prev) => (prev ? null : controlUnit.equipment));
+
+          pressEquipment.current = true;
+          break;
+        }
       }
     },
-    [inventory]
+    [inventory, equipment]
   );
 
   const handleKeyboardUp = useCallback((e: KeyboardEvent) => {
@@ -103,6 +114,10 @@ const GameView: React.FC<GameViewProps> = observer(() => {
       case "i":
         if (!pressInventory.current) return;
         pressInventory.current = false;
+        break;
+      case "e":
+        if (!pressEquipment.current) return;
+        pressEquipment.current = false;
         break;
     }
   }, []);
@@ -125,10 +140,9 @@ const GameView: React.FC<GameViewProps> = observer(() => {
   function closeInventory() {
     setInventory(() => null);
   }
-
-  const inventoryValue = useMemo(() => {
-    return inventory;
-  }, [inventory, gameEngine.controlUnit]);
+  function closeEquipment() {
+    setEquipment(() => null);
+  }
 
   return (
     <div>
@@ -158,6 +172,12 @@ const GameView: React.FC<GameViewProps> = observer(() => {
                 variant="contained"
                 onClick={() => {
                   gameEngine.ui.login("Test");
+                  // setTimeout(() => {
+                  //   if (gameEngine.controlUnit) {
+                  //     gameEngine.controlUnit.gold += 1000;
+                  //     console.log(gameEngine.controlUnit.gold);
+                  //   }
+                  // }, 3000);
                   // setInterval(() => {
                   //   gameEngine.controlUnit?.levelUp();
                   // }, 2000);
@@ -203,9 +223,8 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           )}
         </Stack>
       )}
-      {inventoryValue && (
-        <InventoryBox inventory={inventoryValue} closeInventory={closeInventory} />
-      )}
+      {equipment && <EquipmentBox closeEquipment={closeEquipment} />}
+      {inventory && <InventoryBox closeInventory={closeInventory} />}
       {question && (
         <QuestionBox
           question={question}

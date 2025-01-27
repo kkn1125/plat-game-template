@@ -8,6 +8,5 @@ export default class Location {
 
   constructor(locate: Maps) {
     this.locate = locate;
-    makeAutoObservable(this);
   }
 }

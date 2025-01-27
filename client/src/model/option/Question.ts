@@ -14,7 +14,6 @@ export default class Question {
 
   constructor(npc: Npc) {
     this.npc = npc;
-    makeAutoObservable(this);
   }
 
   addQuestion(...scripts: string[]) {

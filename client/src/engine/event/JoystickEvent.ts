@@ -2,7 +2,7 @@ import GameEngine from "@core/GameEngine";
 import { Monster, Npc, Unit } from "@model/unit";
 import Building from "@model/unit/building/Building";
 import Portal from "@model/unit/portal/Portal";
-import { GameMode, QuestionState } from "@variable/constant";
+import { GameMode } from "@variable/constant";
 import { isBlockedAll, isBlockedMove } from "@variable/globalControl";
 import { makeAutoObservable } from "mobx";
 
@@ -30,7 +30,7 @@ export default class JoystickEvent {
   constructor(engine: GameEngine) {
     this.engine = engine;
     makeAutoObservable(this);
-  }
+    }
 
   get controlUnit() {
     return this.engine.controlUnit;
