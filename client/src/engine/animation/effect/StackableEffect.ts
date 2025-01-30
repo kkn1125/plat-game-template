@@ -1,10 +1,12 @@
-import Effect from './Effect';
+import { makeId } from "@util/makeId";
+import Effect from "./Effect";
 
 export default class StackableEffect extends Effect {
-  static effectList: [number, Effect][] = [];
-  
+  // static effectList: [number, Effect][] = [];
+
   constructor(name: string) {
     super(name);
+    this.id = makeId("stack");
   }
 
   draw(time: number) {
@@ -13,7 +15,8 @@ export default class StackableEffect extends Effect {
     if (!this.startTime) this.startTime = time;
     const elapsedTime = time - this.startTime;
     let opacity = 0;
-    const holdDuration = this.duration - (this.fadeInDuration + this.fadeOutDuration);
+    const holdDuration =
+      this.duration - (this.fadeInDuration + this.fadeOutDuration);
 
     // 페이드 인
     if (elapsedTime <= this.fadeInDuration) {
@@ -25,20 +28,28 @@ export default class StackableEffect extends Effect {
     }
     // 페이드 아웃
     else if (elapsedTime <= this.duration) {
-      opacity = 1 - (elapsedTime - this.fadeInDuration - holdDuration) / this.fadeOutDuration;
+      opacity =
+        1 -
+        (elapsedTime - this.fadeInDuration - holdDuration) /
+          this.fadeOutDuration;
     }
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     time += 0.1;
 
-    this.ctx.font = 'bold 32px Galmuri9';
-    this.renderFx?.(this.ctx, this.canvas.width / 2, this.canvas.height / 2, opacity);
+    this.ctx.font = "bold 32px Galmuri9";
+    this.renderFx?.(
+      this.ctx,
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      opacity
+    );
 
     const now = Math.floor(time);
 
     this.before = now;
-
+    // this.logger.debug(elapsedTime);
     if (elapsedTime < this.duration) {
       this.effect = requestAnimationFrame(this.draw.bind(this));
     } else {
@@ -50,25 +61,31 @@ export default class StackableEffect extends Effect {
       this.duration = 3;
       this.effect = undefined;
       this.canvas.remove?.();
-      this.logger.log('done');
+      this.logger.log("done");
       this.destroy();
     }
   }
 
   run() {
     return new Promise((resolve) => {
-      while (StackableEffect.effectList.length > 0) {
-        const effect = StackableEffect.effectList.shift();
-        if (effect) {
-          cancelAnimationFrame(effect[0]);
-          // effect[1].destroy();
+      for (const item of StackableEffect.effectList) {
+        const [index, fx] = item;
+        if (fx.state === "end") {
+          const [after] = StackableEffect.effectList.splice(
+            StackableEffect.effectList.indexOf(item),
+            1
+          );
+          if (after) {
+            cancelAnimationFrame(after[0]);
+            // effect[1].destroy();
+          }
         }
       }
       this.isProcessed = resolve;
       // addConstraint('changeMap');
       this.setupCanvas();
       this.effect = requestAnimationFrame(this.draw.bind(this));
-      StackableEffect.effectList.push([this.effect, this]);
+      // StackableEffect.effectList.push([this.effect, this]);
     });
   }
 }

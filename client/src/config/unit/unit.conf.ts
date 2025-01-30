@@ -10,7 +10,7 @@ const UNIT_CONF = {
     HP: 100,
     MP: 50,
     SPEED: 2,
-    ATTACK_SPEED: 0.2,
+    ATTACK_SPEED: 1,
     INCREASE_SPEED: 2,
     DECREASE_SPEED: 1,
     GAZE: "bottom",

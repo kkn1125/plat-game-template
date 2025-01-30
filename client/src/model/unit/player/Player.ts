@@ -9,7 +9,6 @@ export default class Player extends Unit implements UseEquipment {
     super(name, option);
     this.id = makeId("player");
 
-    this.inventory.addItem(Gun);
     makeObservable(this);
   }
 }

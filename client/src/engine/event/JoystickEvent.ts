@@ -30,7 +30,7 @@ export default class JoystickEvent {
   constructor(engine: GameEngine) {
     this.engine = engine;
     makeAutoObservable(this);
-    }
+  }
 
   get controlUnit() {
     return this.engine.controlUnit;
@@ -216,7 +216,12 @@ export default class JoystickEvent {
         //   this.engine.eventManager.emit("conversationNext");
         // }
       } else if (closeUnit instanceof Monster) {
-        controlUnit.attack(closeUnit);
+        if (controlUnit.equipment.weapon) {
+          console.log("공격중");
+          controlUnit.equipment.weapon.attack(closeUnit);
+        } else {
+          controlUnit.attack(closeUnit);
+        }
         if (closeUnit.isDead) {
           this.engine.removeUnit(closeUnit);
           // if (this.joystick.i) {

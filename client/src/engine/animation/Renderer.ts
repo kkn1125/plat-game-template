@@ -31,6 +31,10 @@ class Renderer {
   get units() {
     return this.engine.units;
   }
+  /* 등록된 오브젝트들 */
+  get objects() {
+    return this.engine.objects;
+  }
   /* 등록된 플레이어들 */
   get players() {
     return this.engine.players;
@@ -245,6 +249,12 @@ class Renderer {
     );
   }
 
+  get sameLocationObjects() {
+    return this.objects.filter(
+      (object) => this.currentMap?.name === object.location.locate
+    );
+  }
+
   get sameLocationPlayers() {
     return this.players.filter(
       (player) => this.currentMap?.name === player.location.locate
@@ -356,6 +366,34 @@ class Renderer {
     if (this.controlUnit && this.controlUnit.isDead) {
       this.controlUnit.aroundUnits = [];
     }
+  }
+
+  private objectDraw() {
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer("layer-unit");
+    const { ctx: layerMapLabelCtx } =
+      this.engine.ui.getLayer("layer-unit-label");
+    this.sameLocationObjects.forEach((object) => {
+      const positionX = this.controlUnit?.position.x || 0;
+      const positionY = this.controlUnit?.position.y || 0;
+      const { rangeX, rangeY } = this.getCameraMoveableRange(
+        positionX,
+        positionY
+      );
+
+      object.trace();
+      object.draw(layerMapCtx, layerMapLabelCtx, {
+        worldAxisX:
+          this.worldAxisX -
+          GAME_CONF.UNIT_CONF.DEFAULT.SIZE.X / 2 -
+          positionX +
+          rangeX,
+        worldAxisY:
+          this.worldAxisY -
+          GAME_CONF.UNIT_CONF.DEFAULT.SIZE.Y / 2 -
+          positionY +
+          rangeY,
+      });
+    });
   }
 
   private npcDraw() {
@@ -532,6 +570,7 @@ class Renderer {
     this.unitDraw();
     this.itemDraw();
     this.portalDraw();
+    this.objectDraw();
 
     if (this.currentMap && this.controlUnit) {
       if (this.controlUnit.isAlive) {

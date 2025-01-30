@@ -1,3 +1,4 @@
+import Equipment from "@model/option/Equipment";
 import Inventory from "@model/option/Inventory";
 import Question from "@model/option/Question";
 import { Npc } from "@model/unit";
@@ -11,15 +12,13 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import GameLayer from "../atom/GameLayer";
 import QuestionBox from "../atom/Question";
-import InventoryBox from "../molecular/InventoryBox";
-import Equipment from "@model/option/Equipment";
 import EquipmentBox from "../molecular/EquipmentBox";
+import InventoryBox from "../molecular/InventoryBox";
 
 interface GameViewProps {
   // layers: React.ReactElement[];

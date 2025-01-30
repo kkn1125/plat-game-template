@@ -14,6 +14,7 @@ import { globalChannel } from "@variable/globalControl";
 import Socket from "@websocket/Socket";
 import { makeAutoObservable } from "mobx";
 import GameMapManager from "./GameMapManager";
+import ShootObject from "@model/unit/object/ShootObject";
 
 export default class GameEngine {
   logger = new Logger<GameEngine>(this);
@@ -36,10 +37,18 @@ export default class GameEngine {
   npcs: Npc[] = [];
   portals: Portal[] = [];
   buildings: Building[] = [];
+  objects: ShootObject[] = [];
 
   get sameLocationUnits() {
     return this.units.filter(
       (unit) => this.gameMapManager.currentMap?.name === unit.location.locate
+    );
+  }
+
+  get sameLocationObjects() {
+    return this.objects.filter(
+      (player) =>
+        this.gameMapManager.currentMap?.name === player.location.locate
     );
   }
 
@@ -90,6 +99,10 @@ export default class GameEngine {
     makeAutoObservable(this);
   }
 
+  removeObject(object: ShootObject) {
+    this.objects = this.objects.filter((obj) => obj.id !== object.id);
+  }
+
   removePlayerByName(id: any) {
     this.units = this.units.filter((unit) => unit.id !== id);
   }
@@ -138,6 +151,7 @@ export default class GameEngine {
     unit.unitColor = "red";
     this.controlUnit = unit;
     unit.setGameEngine(this);
+    // console.log(unit.engine);
     globalChannel.addUser(unit);
   }
 
@@ -175,6 +189,12 @@ export default class GameEngine {
     this.logger.scope("AddNpc").debug("Npc 추가", npc.id);
     this.npcs.push(npc);
     npc.setGameEngine(this);
+  }
+
+  addObject(object: ShootObject) {
+    this.logger.scope("AddObject").debug("오브젝트 추가", object.id);
+    this.objects.push(object);
+    object.setGameEngine(this);
   }
 
   addPortal(portal: Portal) {

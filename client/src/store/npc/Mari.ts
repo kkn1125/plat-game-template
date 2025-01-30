@@ -1,15 +1,15 @@
-import { Npc } from '@model/unit';
-import { Taecho } from '@store/maps';
-import { UnitState } from '@variable/constant';
+import { Character3Sprites } from "@/source/sprites";
+import { Npc } from "@model/unit";
+import { Taecho } from "@store/maps";
 
-export const Mari = new Npc('잡화상 마리', {
+export const Mari = new Npc("잡화상 마리", {
   hp: Infinity,
   mp: Infinity,
 });
-let dir = true;
+Mari.setSprites(Character3Sprites);
 Mari.setLocation(Taecho);
 Mari.setPositionByField(-12.5, -0.5); // Mari.position.x = 100;
-Mari.unitColor = 'green';
+Mari.unitColor = "green";
 // let originPosition = { ...Mari.position };
 // let state = 'Idle';
 
@@ -19,12 +19,12 @@ Mari.unitColor = 'green';
 //     state = 'Move';
 //   }
 // }, 2000);
-Mari.chatting.addComment('어서오세요.');
+Mari.chatting.addComment("어서오세요.");
 Mari.question.addQuestion(
-  '처음 보는 얼굴이네? 나는 마리라고 해. 이 마을에서 잡화상을 하고 있어.',
-  '아직 가게가 준비 안되서 보여줄 물건이 없네.',
-  '다음에 오면 내가 좋은 포션 하나 서비스로 줄게!',
-  '친구들도 데려오면 더 좋구!',
+  "처음 보는 얼굴이네? 나는 마리라고 해. 이 마을에서 잡화상을 하고 있어.",
+  "아직 가게가 준비 안되서 보여줄 물건이 없네.",
+  "다음에 오면 내가 좋은 포션 하나 서비스로 줄게!",
+  "친구들도 데려오면 더 좋구!"
 );
 // Mari.routine = (unit) => {
 //   const { x } = unit.position;

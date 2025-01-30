@@ -4,6 +4,7 @@ import Question from "@model/option/Question";
 import Item from "@model/unit/object/Item";
 import Player from "@model/unit/player/Player";
 import octicons from "@primer/octicons";
+import { Gun } from "@store/items/weapon/Gun";
 import { $ } from "@util/$";
 import Logger from "@util/Logger";
 import { makeId } from "@util/makeId";
@@ -211,6 +212,7 @@ export default class UserInterface {
       this.engine.setControlUnit(user);
       user.increaseSpeed =
         GAME_CONF.UNIT_CONF.DEFAULT.CONTROL_UNIT.INCREASE_SPEED;
+      user.inventory.addItem(Gun);
     }
   }
 

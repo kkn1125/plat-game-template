@@ -1,7 +1,7 @@
 import GAME_CONF from "@config/game.conf";
+import { makeAutoObservable } from "mobx";
 import Unit from "../unit/Unit";
 import Item from "../unit/object/Item";
-import { makeAutoObservable } from "mobx";
 
 type StatKey = Extract<keyof Stat, "str" | "dex" | "int" | "luk">;
 
@@ -17,6 +17,7 @@ export default class Stat {
 
   constructor(parent: Unit | Item) {
     this.parent = parent;
+    makeAutoObservable(this);
   }
 
   get damage(): number {
@@ -29,7 +30,10 @@ export default class Stat {
   }
 
   statUp(state: StatKey, amount: number): void {
-    this[state] += amount;
+    if (this.statPoint > 0) {
+      this[state] += amount;
+      this.statPoint -= 1;
+    }
   }
 
   statClear(): void {

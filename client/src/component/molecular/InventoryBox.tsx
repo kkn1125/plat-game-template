@@ -1,19 +1,15 @@
-import Inventory from "@model/option/Inventory";
 import {
-  Box,
   Paper,
   Stack,
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableRow,
   Typography,
 } from "@mui/material";
 import gameEngine from "@recoil/gameMapAtom";
 // import gameMapAtom from "@recoil/gameMapAtom";
 import { observer } from "mobx-react";
-import { useRecoilValue } from "recoil";
 
 interface InventoryBoxProps {
   closeInventory: () => void;
@@ -21,6 +17,11 @@ interface InventoryBoxProps {
 const InventoryBox: React.FC<InventoryBoxProps> = observer(
   ({ closeInventory }) => {
     const inventory = gameEngine.controlUnit?.inventory;
+
+    function handleEquipItem(x: number, y: number) {
+      gameEngine.controlUnit?.inventory.equipItem(x, y);
+    }
+
     if (!inventory) return <></>;
     return (
       <Stack
@@ -40,11 +41,17 @@ const InventoryBox: React.FC<InventoryBoxProps> = observer(
                     return (
                       <TableCell
                         key={x}
+                        onClick={() => handleEquipItem(x, y)}
                         sx={{
                           textAlign: "center",
                           p: 1,
                           width: "40px",
                           height: "40px",
+                          cursor: "pointer",
+                          ["&:hover"]: {
+                            boxShadow:
+                              "inset 0 0 0 99999999px rgba(0, 0, 0, 0.1)",
+                          },
                         }}
                       >
                         {item ? item.name : "empty"}

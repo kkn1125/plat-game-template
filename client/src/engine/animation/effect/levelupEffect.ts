@@ -12,9 +12,6 @@ function levelupEffect(
 ) {
   let height = 0;
   const showText = new StackableEffect("levelupEffect");
-  const windowCenterX = innerWidth / 2;
-  const windowCenterY = innerHeight / 2;
-
   showText.fadeInDuration = 0.5;
   showText.fadeOutDuration = 0.5;
   showText.duration = duration || 1;

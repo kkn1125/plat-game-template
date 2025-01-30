@@ -1,5 +1,6 @@
+import { Character4Sprites } from "@/source/sprites";
 import { Npc } from "@model/unit";
-import { MDHouse, Taecho } from "@store/maps";
+import { MDHouse } from "@store/maps";
 import { UnitState } from "@variable/constant";
 
 export const Chonjang = new Npc("촌장", {
@@ -7,6 +8,7 @@ export const Chonjang = new Npc("촌장", {
   mp: Infinity,
 });
 let dir = true;
+Chonjang.setSprites(Character4Sprites);
 Chonjang.setLocation(MDHouse);
 Chonjang.setPositionByField(0, -1); // Chonjang.position.x = 100;
 Chonjang.unitColor = "green";

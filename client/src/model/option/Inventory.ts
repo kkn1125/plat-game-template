@@ -31,7 +31,33 @@ export default class Inventory {
     if (index) {
       const [col, row] = index;
       this.slots[row][col] = item;
+      item.setUnit(this.unit);
+      item.setGameEngine(this.unit.engine);
     }
+  }
+
+  findItemById(id: string): Item | null {
+    for (const row of this.slots) {
+      for (const item of row) {
+        if (item?.id === id) {
+          return item;
+        }
+      }
+    }
+    return null;
+  }
+
+  findItemByIndex(x: number, y: number): Item | null {
+    return this.slots[y][x];
+  }
+
+  pickItem(x: number, y: number) {
+    const slotItem = this.slots[y][x];
+    if (slotItem) {
+      this.slots[y][x] = null;
+      return slotItem;
+    }
+    return null;
   }
 
   dropItem(x: number, y: number) {
@@ -44,5 +70,11 @@ export default class Inventory {
       slotItem.position.y = this.unit.position.y;
       this.unit.engine.addItem(slotItem);
     }
+  }
+
+  equipItem(x: number, y: number) {
+    const slotItem = this.pickItem(x, y);
+    if (!slotItem) return;
+    this.unit.equipment.equip(slotItem);
   }
 }

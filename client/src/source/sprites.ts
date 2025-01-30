@@ -8,6 +8,10 @@ function getImage(path: string) {
 }
 // console.log(path);
 export const CharacterSprites = getImage(`${path}sprites/character.png`);
+export const Character2Sprites = getImage(`${path}sprites/character2.png`);
+export const Character3Sprites = getImage(`${path}sprites/character3.png`);
+export const Character4Sprites = getImage(`${path}sprites/character4.png`);
+export const Character5Sprites = getImage(`${path}sprites/character5.png`);
 export const PortalSprites = getImage(`${path}sprites/portal/basic.png`);
 
 export const MapSprites = getImage(`${path}sprites/tileset.png`);

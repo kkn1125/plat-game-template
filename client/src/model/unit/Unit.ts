@@ -20,6 +20,7 @@ import UseEquipment from "./implement/UseEquipment";
 import UseInventory from "./implement/UseInventory";
 import UseStat from "./implement/UseStat";
 import Monster from "./monster/Monster";
+import ShootObject from "./object/ShootObject";
 
 class Unit
   implements
@@ -80,7 +81,7 @@ class Unit
   inventory: Inventory = new Inventory(this);
 
   unitColor: string = "black";
-  hitColor: string = "#00ff00";
+  hitColor: string = "#0246d1";
   cropSizeX = 150;
   cropSizeY = 200;
   cropPadX = 10;
@@ -197,19 +198,50 @@ class Unit
     });
   }
 
+  get attackLatestSpeed() {
+    if (this.equipment.weapon) {
+      return this.equipment.weapon.attackSpeed;
+    }
+    return this.attackSpeed;
+  }
+
+  get attackTotalRange() {
+    let range = this.attackRange;
+    if (this.equipment.weapon) {
+      range += this.equipment.weapon.range;
+    }
+    return range;
+  }
+
   get isControlUnit() {
     return Object.is(this, this.engine.controlUnit);
   }
 
+  get totalStr() {
+    return this.stat.str + this.equipment.totalStr;
+  }
+
+  get totalDex() {
+    return this.stat.dex + this.equipment.totalDex;
+  }
+
+  get totalInt() {
+    return this.stat.int + this.equipment.totalInt;
+  }
+
+  get totalLuk() {
+    return this.stat.luk + this.equipment.totalLuk;
+  }
+
   get minDamage() {
-    return (this.defaultDamage + this.stat.str) * 10;
+    return (this.defaultDamage + this.totalStr) * 10;
   }
 
   get maxDamage() {
     return +Math.floor(
       (this.defaultDamage +
-        this.stat.str +
-        this.stat.dex * GAME_CONF.UNIT_CONF.INCREASE_DAMAGE_RATIO) *
+        this.totalStr +
+        this.totalDex * GAME_CONF.UNIT_CONF.INCREASE_DAMAGE_RATIO) *
         10
     ).toFixed(1);
   }
@@ -278,6 +310,8 @@ class Unit
     this.level += level;
     this.maxHp = this.maxHp + Math.floor((this.level + 1) ** 1.5);
     this.maxMp = this.maxMp + Math.floor((this.level + 1) ** 1.5);
+
+    this.stat.increaseStatPoint();
 
     const getPosition = (): XY => {
       const posX = this.engine.renderer.controlUnit?.position.x || 0;
@@ -387,21 +421,29 @@ class Unit
     ];
     if (!currentMap) return;
     if (units.length === 0) return;
-    const mapSizeX = this.engine.gameMapManager.mapSizeX;
-    const mapSizeY = this.engine.gameMapManager.mapSizeY;
-
-    const { x, y } = this.position;
 
     for (const unit of units) {
       const range = this.getDistance(unit);
-      if (range < this.attackRange) {
-        /* 공격 가능 범위 유닛 넣기 */
-        if (!this.aroundUnits.includes(unit)) {
-          this.aroundUnits.push(unit);
+      if (!unit.constructor.name.includes("Monster")) {
+        if (range < this.attackRange) {
+          /* 공격 가능 범위 유닛 넣기 */
+          if (!this.aroundUnits.includes(unit)) {
+            this.aroundUnits.push(unit);
+          }
+        } else {
+          /* 공격 가능 범위 벗어난 유닛 빼기 */
+          this.aroundUnits = this.aroundUnits.filter((u) => u !== unit);
         }
       } else {
-        /* 공격 가능 범위 벗어난 유닛 빼기 */
-        this.aroundUnits = this.aroundUnits.filter((u) => u !== unit);
+        if (range < this.attackTotalRange) {
+          /* 공격 가능 범위 유닛 넣기 */
+          if (!this.aroundUnits.includes(unit)) {
+            this.aroundUnits.push(unit);
+          }
+        } else {
+          /* 공격 가능 범위 벗어난 유닛 빼기 */
+          this.aroundUnits = this.aroundUnits.filter((u) => u !== unit);
+        }
       }
     }
     /* 불능 판정 유닛 제거 */
@@ -409,10 +451,10 @@ class Unit
   }
 
   getDistance(unit: Unit) {
-    const x1 = this.position.x;
-    const y1 = this.position.y;
-    const x2 = unit.position.x;
-    const y2 = unit.position.y;
+    const x1 = this.position.x + this.size.x / 2;
+    const y1 = this.position.y + this.size.y / 2;
+    const x2 = unit.position.x + unit.size.x / 2;
+    const y2 = unit.position.y + unit.size.y / 2;
     return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
   }
 
@@ -750,14 +792,18 @@ class Unit
     if (monster.isDead) {
       this.engine.removeUnit(monster);
       if (monster.constructor.name === "Monster") {
+        const isShootingObject = this.constructor.name === "ShootObject";
+        const owner = isShootingObject
+          ? (this as unknown as ShootObject).parent.unit
+          : this;
         const exp = (monster as Monster).reward.getExp();
         const gold = (monster as Monster).reward.getGold();
         const item = (monster as Monster).reward.getItem();
         if (item) {
-          this.inventory.addItem(item);
+          owner.inventory.addItem(item);
         }
-        this.gold += gold;
-        this.addExp(exp);
+        owner.gold += gold;
+        owner.addExp(exp);
         monster.boundary = null;
         monster.state = UnitState.Die;
         setTimeout(() => {
@@ -765,7 +811,7 @@ class Unit
           monster.position.y = monster.initPosition.y;
           monster.hp = monster.maxHp;
           monster.mp = monster.maxMp;
-          this.engine.addMonster(monster);
+          owner.engine.addMonster(monster);
           monster.state = UnitState.Idle;
         }, monster.respawnTime * 1000);
       }

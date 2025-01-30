@@ -6,6 +6,7 @@
 :root {
   box-sizing: border-box;
   font-family: "Galmuri9";
+  user-select: none;
 }
 
 html,
@@ -24,6 +25,10 @@ body,
   h6 {
     margin: 0;
   } */
+}
+
+[id|=effect-stack] {
+  pointer-events: none;
 }
 
 #root {
