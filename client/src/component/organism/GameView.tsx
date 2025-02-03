@@ -19,7 +19,6 @@ import GameLayer from "../atom/GameLayer";
 import QuestionBox from "../atom/Question";
 import EquipmentBox from "../molecular/EquipmentBox";
 import InventoryBox from "../molecular/InventoryBox";
-import Minimap from "../atom/Minimap";
 
 interface GameViewProps {
   // layers: React.ReactElement[];
