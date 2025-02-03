@@ -85,6 +85,15 @@ export default class Building extends Unit implements Forwardable {
     unit.setPosition(x, y);
   }
 
+  drawCharacterByScale(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis,
+    scale: number = 1,
+    emboss: boolean = false
+  ) {
+    super.drawCharacterByScale(ctx, { worldAxisX, worldAxisY }, scale);
+  }
+
   drawCharacter(
     ctx: CanvasRenderingContext2D,
     { worldAxisX, worldAxisY }: WorldAxis,

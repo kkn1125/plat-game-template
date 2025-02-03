@@ -27,7 +27,7 @@ body,
   } */
 }
 
-[id|=effect-stack] {
+[id|="effect-stack"] {
   pointer-events: none;
 }
 
@@ -77,6 +77,11 @@ body,
   -ms-transform: translate(0%, -50%);
   -o-transform: translate(0%, -50%);
 }
+/* 
+#layer-minimap {
+  margin: 1rem 0 0 1rem;
+  box-shadow: 0 0 0 3px #aaa, 0 0 7px 0 #000;
+} */
 
 #interface {
   @media (min-width: 0px) and (max-width: 767px) {

@@ -19,6 +19,7 @@ import GameLayer from "../atom/GameLayer";
 import QuestionBox from "../atom/Question";
 import EquipmentBox from "../molecular/EquipmentBox";
 import InventoryBox from "../molecular/InventoryBox";
+import Minimap from "../atom/Minimap";
 
 interface GameViewProps {
   // layers: React.ReactElement[];
@@ -45,6 +46,7 @@ const GameView: React.FC<GameViewProps> = observer(() => {
     addLayer("layer-portal");
     addLayer("layer-map-object");
     addLayer("layer-unit-label");
+    addLayer("layer-minimap");
 
     return () => {
       setLayers([]);
@@ -87,6 +89,12 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           setInventory((prev) => (prev ? null : controlUnit.inventory));
 
           pressInventory.current = true;
+          break;
+        }
+        case "m": {
+          const controlUnit = gameEngine.controlUnit;
+          if (!controlUnit) return;
+          gameEngine.renderer.useMinimap = !gameEngine.renderer.useMinimap;
           break;
         }
         case "e": {

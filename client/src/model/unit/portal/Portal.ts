@@ -1,10 +1,10 @@
-import { PortalSprites } from '@/source/sprites';
-import GAME_CONF from '@config/game.conf';
-import GameMap from '@model/gamemap/GameMap';
-import { makeId } from '@util/makeId';
-import Forwardable from '../implement/Forwardable';
-import Unit from '../Unit';
-import { makeAutoObservable } from 'mobx';
+import { PortalSprites } from "@/source/sprites";
+import GAME_CONF from "@config/game.conf";
+import GameMap from "@model/gamemap/GameMap";
+import { makeId } from "@util/makeId";
+import Forwardable from "../implement/Forwardable";
+import Unit from "../Unit";
+import { makeAutoObservable } from "mobx";
 
 export default class Portal extends Unit implements Forwardable {
   forwardMap!: GameMap<Maps>;
@@ -12,7 +12,7 @@ export default class Portal extends Unit implements Forwardable {
 
   constructor(name: string, option?: HealthOption, forwardMap?: GameMap<Maps>) {
     super(name, option);
-    this.id = makeId('portal');
+    this.id = makeId("portal");
     this.setSprites(PortalSprites);
     if (forwardMap) {
       this.forwardMap = forwardMap;
@@ -28,22 +28,26 @@ export default class Portal extends Unit implements Forwardable {
   //   this.forwardPositionMap.set(forwardMap.id, forwardPosition);
   // }
 
-  setForwardMap(forwardMap: GameMap<Maps>, forwardPosition: XY, direction?: 'top' | 'bottom' | 'left' | 'right') {
+  setForwardMap(
+    forwardMap: GameMap<Maps>,
+    forwardPosition: XY,
+    direction?: "top" | "bottom" | "left" | "right"
+  ) {
     this.forwardMap = forwardMap;
 
     let x = 0;
     let y = 0;
     switch (direction) {
-      case 'top':
+      case "top":
         y -= GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
         break;
-      case 'bottom':
+      case "bottom":
         y += GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
         break;
-      case 'left':
+      case "left":
         x -= GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
         break;
-      case 'right':
+      case "right":
         x += GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
         break;
     }
@@ -92,30 +96,47 @@ export default class Portal extends Unit implements Forwardable {
     unit.setPosition(x, y);
   }
 
-  drawCharacter(ctx: CanvasRenderingContext2D, { worldAxisX, worldAxisY }: WorldAxis) {
+  drawCharacter(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis,
+    scale: number = 1
+  ) {
     // ctx.fillStyle = this.unitColor;
     const moveScreenX = this.position.x;
     const moveScreenY = this.position.y;
     const positionX = worldAxisX + moveScreenX;
     const positionY = worldAxisY + moveScreenY;
 
-    const frame = Math.floor((this.frame / (this.FPS * 0.15)) % this.limitFrame);
+    const frame = Math.floor(
+      (this.frame / (this.FPS * 0.15)) % this.limitFrame
+    );
     const cropPositionX = this.cropPadX + frame * this.cropPadX; // next frame
     const cropPositionY = this.cropPadY + this.gazeValue; // gaze
     const cropSizeX = this.cropSizeX - this.cropPadX * 2;
     const cropSizeY = this.cropSizeY - this.cropPadY * 2;
-    // 스프라이츠 표시
-    ctx.drawImage(
-      this.sprites,
-      cropPositionX,
-      cropPositionY,
-      cropSizeX,
-      cropSizeY,
-      positionX - 5,
-      positionY - 10,
-      this.size.x + 10,
-      this.size.y + 10,
-    );
+
+    if (scale !== 1) {
+      ctx.fillRect(
+        positionX - 5,
+        positionY - 10,
+        this.size.x + 10,
+        this.size.y + 10
+      );
+    } else {
+      // 스프라이츠 표시
+      ctx.drawImage(
+        this.sprites,
+        cropPositionX,
+        cropPositionY,
+        cropSizeX,
+        cropSizeY,
+        positionX - 5,
+        positionY - 10,
+        this.size.x + 10,
+        this.size.y + 10
+      );
+    }
+
     this.frame = this.frame + 1;
   }
 }

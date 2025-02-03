@@ -473,6 +473,50 @@ class Unit
     return closeUnit;
   }
 
+  drawByScale(
+    ctx: CanvasRenderingContext2D,
+    labelCtx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis,
+    scale: number = 1
+  ) {
+    if (scale === 1) {
+      if (!this.isControlUnit && this.detectable) {
+        this.detect();
+        if (
+          GAME_CONF.MAP_CONF.DISPLAY.DETECT[
+            this.constructor.name.toUpperCase() as OptionName
+          ]
+        ) {
+          this.drawDetect(ctx, { worldAxisX, worldAxisY });
+        }
+      }
+
+      if (
+        GAME_CONF.MAP_CONF.DISPLAY.HEALTH[
+          this.constructor.name.toUpperCase() as OptionName
+        ]
+      ) {
+        this.drawHealth(labelCtx, { worldAxisX, worldAxisY });
+      }
+
+      if (this.isControlUnit && GAME_CONF.MAP_CONF.DISPLAY.EXP) {
+        this.drawExp(labelCtx);
+      }
+    }
+
+    if (
+      scale !== 1 ||
+      GAME_CONF.MAP_CONF.DISPLAY.NAME[
+        this.constructor.name.toUpperCase() as OptionName
+      ]
+    ) {
+      if (!this.isControlUnit) {
+        this.drawNameByScale(labelCtx, { worldAxisX, worldAxisY }, scale);
+      }
+    }
+    this.drawCharacterByScale(ctx, { worldAxisX, worldAxisY }, scale);
+  }
+
   draw(
     ctx: CanvasRenderingContext2D,
     labelCtx: CanvasRenderingContext2D,
@@ -608,6 +652,41 @@ class Unit
     ctx.fillText(text, innerWidth / 2, innerHeight - height * 2 - 1);
   }
 
+  drawNameByScale(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis,
+    scale: number = 1
+  ) {
+    ctx.fillStyle = this.unitColor;
+    const moveScreenX = this.position.x;
+    const moveScreenY = this.position.y;
+    const positionX = worldAxisX + moveScreenX;
+    const positionY = worldAxisY + moveScreenY;
+    ctx.font = `bold ${14 - scale * 10}px Galmuri9`;
+
+    /* stroke */
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 3;
+    const offset = 30;
+
+    const useLevel = ["Monster", "Player"].includes(this.constructor.name);
+    const text = useLevel ? `Lv.${this.level} ${this.name}` : this.name;
+
+    ctx.strokeText(
+      text,
+      (positionX + this.size.x / 2) * scale,
+      (positionY - offset) * scale
+    );
+
+    /* font */
+    ctx.textAlign = "center";
+    ctx.fillText(
+      text,
+      (positionX + this.size.x / 2) * scale,
+      (positionY - offset) * scale
+    );
+  }
+
   drawName(
     ctx: CanvasRenderingContext2D,
     { worldAxisX, worldAxisY }: WorldAxis
@@ -617,7 +696,7 @@ class Unit
     const moveScreenY = this.position.y;
     const positionX = worldAxisX + moveScreenX;
     const positionY = worldAxisY + moveScreenY;
-    ctx.font = "bold 14px Galmuri9";
+    ctx.font = `bold ${14}px Galmuri9`;
 
     /* stroke */
     ctx.strokeStyle = "#ffffff";
@@ -717,6 +796,26 @@ class Unit
         5
       );
     }
+  }
+
+  drawCharacterByScale(
+    ctx: CanvasRenderingContext2D,
+    { worldAxisX, worldAxisY }: WorldAxis,
+    scale: number = 1
+  ) {
+    const moveScreenX = this.position.x;
+    const moveScreenY = this.position.y;
+    const positionX = worldAxisX + moveScreenX;
+    const positionY = worldAxisY + moveScreenY;
+
+    // 미니맵 표시
+    ctx.fillStyle = this.unitColor;
+    ctx.fillRect(
+      (positionX - 5) * scale,
+      (positionY - 10) * scale,
+      (this.size.x + 10) * scale,
+      (this.size.y + 10) * scale
+    );
   }
 
   drawCharacter(

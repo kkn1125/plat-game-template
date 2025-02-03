@@ -1,50 +1,16 @@
-# React + TypeScript + Vite
+# 2D 게임 클라이언트 구현
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+2D 게임 클라이언트 개발을 위해 게임 엔진을 먼저 구성합니다.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- 맵 에디터는 직접 제작한 간트차트를 이용하여 맵 디자인 및 제작
+- 오브젝트 및 스프라이트 직접 제작 (레퍼런스 이용)
+- 무기 및 발사체 궤도, 범위 구현
+- 피격, 레벨업, 맵전환 등 이펙트 구현
+- 기존 순수 타입스크립트 제작에서 빠른 UI 제작을 위한 리액트 마이그레이션
+- 멀티플레이를 위한 소켓서버 제작
+- 소켓 통신 메세지 사이즈 압축
+- 14~20B 좌표 데이터 교환 -> 추후 14B로 최소화 예정
+- 멀티플레이 접속 및 캐릭터 상호작용, 방향 및 이동 싱크 확인
+- 멀티플레이 맵 전환 싱크 진행 중
+- 미니맵 구현
+- 특정 포탈 이용 시 리디렉션 이벤트 추가 예정

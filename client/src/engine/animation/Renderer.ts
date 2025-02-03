@@ -10,6 +10,7 @@ class Renderer {
   prevTime: number = 0;
   logger = new Logger<Renderer>(this);
   engine: GameEngine;
+  useMinimap: boolean = false;
 
   constructor(engine: GameEngine) {
     this.logger.scope().debug("렌더러 초기화");
@@ -191,41 +192,6 @@ class Renderer {
     return { rangeX, rangeY };
   }
 
-  private mapDraw() {
-    const { ctx: layerMapCtx } = this.engine.ui.getLayer("layer-map");
-    if (!this.currentMap) return;
-    const width =
-      this.currentMap.fields[0].length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
-    const height =
-      this.currentMap.fields.length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
-    const positionX = this.controlUnit?.position.x || 0;
-    const positionY = this.controlUnit?.position.y || 0;
-    const { rangeX, rangeY } = this.getCameraMoveableRange(
-      positionX,
-      positionY
-    );
-
-    this.currentMap.drawMap(layerMapCtx, {
-      worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
-      worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
-    });
-    this.currentMap.drawObject(layerMapCtx, {
-      worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
-      worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
-    });
-    {
-      const { ctx: layerMapCtx } = this.engine.ui.getLayer("layer-map-object");
-      this.currentMap.drawObject(
-        layerMapCtx,
-        {
-          worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
-          worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
-        },
-        true
-      );
-    }
-  }
-
   get sameLocationAreaPortals() {
     return this.portals.filter(
       (portal) =>
@@ -291,6 +257,154 @@ class Renderer {
     return this.buildings.filter(
       (unit) => this.currentMap?.name === unit.location.locate
     );
+  }
+
+  private minimapDraw() {
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer("layer-minimap");
+    if (!this.currentMap) return;
+    const fieldSizeX = GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
+    const fieldSizeY = GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+    const fieldXLength = this.currentMap?.fields[0].length || 0;
+    const fieldYLength = this.currentMap?.fields.length || 0;
+    const fieldWidth = fieldXLength * fieldSizeX;
+    const fieldHeight = fieldYLength * fieldSizeY * GAME_CONF.SCALE;
+    const scale = 0.1;
+    const minimapX = 300;
+    const minimapY = 200;
+    const minimapOffsetX = fieldWidth / 2 + minimapX;
+    const minimapOffsetY = fieldHeight / 2 + minimapY;
+
+    this.currentMap.drawMapByScale(
+      layerMapCtx,
+      {
+        worldAxisX: minimapX,
+        worldAxisY: minimapY,
+      },
+      scale
+    );
+    this.currentMap.drawObjectByScale(
+      layerMapCtx,
+      {
+        worldAxisX: minimapX,
+        worldAxisY: minimapY,
+      },
+      false,
+      scale
+    );
+    this.currentMap.drawObjectByScale(
+      layerMapCtx,
+      {
+        worldAxisX: minimapX,
+        worldAxisY: minimapY,
+      },
+      true,
+      scale
+    );
+
+    this.sameLocationAreaPortals.forEach((portal) => {
+      portal.drawByScale(
+        layerMapCtx,
+        layerMapCtx,
+        {
+          worldAxisX: minimapOffsetX,
+          worldAxisY: minimapOffsetY,
+        },
+        scale
+      );
+    });
+    this.sameLocationOriginPortals.forEach((portal) => {
+      portal.drawByScale(
+        layerMapCtx,
+        layerMapCtx,
+        {
+          worldAxisX: minimapOffsetX,
+          worldAxisY: minimapOffsetY,
+        },
+        scale
+      );
+    });
+
+    if (this.controlUnit && this.controlUnit.isAlive && this.currentMap) {
+      this.controlUnit.drawByScale(
+        layerMapCtx,
+        layerMapCtx,
+        {
+          worldAxisX: minimapOffsetX,
+          worldAxisY: minimapOffsetY,
+        },
+        scale
+      );
+    }
+
+    this.sameLocationNpcs.forEach((npc) => {
+      npc.drawByScale(
+        layerMapCtx,
+        layerMapCtx,
+        {
+          worldAxisX: minimapOffsetX,
+          worldAxisY: minimapOffsetY,
+        },
+        scale
+      );
+    });
+
+    this.sameLocationBuildings.forEach((building) => {
+      building.drawByScale(
+        layerMapCtx,
+        layerMapCtx,
+        {
+          worldAxisX: minimapOffsetX,
+          worldAxisY: minimapOffsetY,
+        },
+        scale
+      );
+      {
+        building.drawCharacterByScale(
+          layerMapCtx,
+          {
+            worldAxisX: minimapOffsetX,
+            worldAxisY: minimapOffsetY,
+          },
+          scale,
+          true
+        );
+      }
+    });
+  }
+
+  private mapDraw() {
+    const { ctx: layerMapCtx } = this.engine.ui.getLayer("layer-map");
+    if (!this.currentMap) return;
+    const width =
+      this.currentMap.fields[0].length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.X;
+    const height =
+      this.currentMap.fields.length * GAME_CONF.MAP_CONF.DEFAULT.SIZE.Y;
+    const positionX = this.controlUnit?.position.x || 0;
+    const positionY = this.controlUnit?.position.y || 0;
+    const { rangeX, rangeY } = this.getCameraMoveableRange(
+      positionX,
+      positionY
+    );
+
+    this.currentMap.drawMap(layerMapCtx, {
+      worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
+      worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
+    });
+    this.currentMap.drawObject(layerMapCtx, {
+      worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
+      worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
+    });
+    {
+      const { ctx: layerMapCtx } = this.engine.ui.getLayer("layer-map-object");
+      this.currentMap.drawObject(
+        layerMapCtx,
+        {
+          worldAxisX: this.worldAxisX - positionX - width / 2 + rangeX,
+          worldAxisY: this.worldAxisY - positionY - height / 2 + rangeY,
+        },
+        true
+      );
+    }
   }
 
   private areaPortalDraw() {
@@ -572,6 +686,10 @@ class Renderer {
     this.portalDraw();
     this.objectDraw();
 
+    if (this.useMinimap) {
+      this.minimapDraw();
+    }
+
     if (this.currentMap && this.controlUnit) {
       if (this.controlUnit.isAlive) {
         const velocity = this.controlUnit.increaseSpeed;
@@ -637,6 +755,7 @@ class Renderer {
         }
       }
     }
+
     this.afterDraw();
 
     requestAnimationFrame(this.draw.bind(this));

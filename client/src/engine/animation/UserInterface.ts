@@ -97,9 +97,18 @@ export default class UserInterface {
   }
 
   /* Renderer 전용 */
-  handleCanvasResize(canvas: HTMLCanvasElement) {
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
+  handleCanvasResize(
+    canvas: HTMLCanvasElement,
+    option: {
+      width: number;
+      height: number;
+    } = {
+      width: innerWidth,
+      height: innerHeight,
+    }
+  ) {
+    canvas.width = option.width;
+    canvas.height = option.height;
   }
 
   getLayer(id: Id) {
@@ -118,17 +127,30 @@ export default class UserInterface {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
   }) {
+    // console.log(id, canvas);
+
     ctx.globalAlpha = 1;
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
 
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-
-    window.addEventListener(
-      "resize",
-      this.handleCanvasResize.bind(this, canvas)
-    );
+    if (id === "layer-minimap") {
+      canvas.width = 300;
+      canvas.height = 200;
+      window.addEventListener(
+        "resize",
+        this.handleCanvasResize.bind(this, canvas, { width: 300, height: 200 })
+      );
+    } else {
+      canvas.width = innerWidth;
+      canvas.height = innerHeight;
+      window.addEventListener(
+        "resize",
+        this.handleCanvasResize.bind(this, canvas, {
+          width: innerWidth,
+          height: innerHeight,
+        })
+      );
+    }
 
     this.canvasMap.set(id, { canvas, ctx });
 
@@ -155,13 +177,14 @@ export default class UserInterface {
     ctx.globalAlpha = 1;
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-
     canvas.width = innerWidth;
     canvas.height = innerHeight;
-
     window.addEventListener(
       "resize",
-      this.handleCanvasResize.bind(this, canvas)
+      this.handleCanvasResize.bind(this, canvas, {
+        width: innerWidth,
+        height: innerHeight,
+      })
     );
 
     this.canvasMap.set(id, { canvas, ctx });

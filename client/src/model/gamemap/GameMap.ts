@@ -1,13 +1,18 @@
-import GAME_CONF from '@config/game.conf';
-import { makeId } from '@util/makeId';
-import Field from './Field';
+import GAME_CONF from "@config/game.conf";
+import { makeId } from "@util/makeId";
+import Field from "./Field";
 
 export default class GameMap<MapName extends string = string> {
-  static createMap<Q extends string = string>(fields: string[][], gameMap: GameMap<Q>): Field[][] {
-    return fields.map((row, y) => row.map((field, x) => new Field(field, gameMap).setPosition(x, y)));
+  static createMap<Q extends string = string>(
+    fields: string[][],
+    gameMap: GameMap<Q>
+  ): Field[][] {
+    return fields.map((row, y) =>
+      row.map((field, x) => new Field(field, gameMap).setPosition(x, y))
+    );
   }
 
-  id = makeId('gamemap');
+  id = makeId("gamemap");
   name: MapName;
 
   fields: Field[][] = [];
@@ -55,6 +60,30 @@ export default class GameMap<MapName extends string = string> {
   //   }
   // }
 
+  drawMapByScale(
+    ctx: CanvasRenderingContext2D,
+    worldAxis: WorldAxis,
+    scale: number = 1
+  ) {
+    for (const row of this.fields) {
+      for (const field of row) {
+        field.drawMap(ctx, worldAxis, scale);
+      }
+    }
+  }
+  drawObjectByScale(
+    ctx: CanvasRenderingContext2D,
+    worldAxis: WorldAxis,
+    emboss: boolean = false,
+    scale: number = 1
+  ) {
+    for (const row of this.fields) {
+      for (const field of row) {
+        field.drawObject(ctx, worldAxis, emboss, scale);
+      }
+    }
+  }
+
   drawMap(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis) {
     for (const row of this.fields) {
       for (const field of row) {
@@ -62,7 +91,11 @@ export default class GameMap<MapName extends string = string> {
       }
     }
   }
-  drawObject(ctx: CanvasRenderingContext2D, worldAxis: WorldAxis, emboss?: boolean) {
+  drawObject(
+    ctx: CanvasRenderingContext2D,
+    worldAxis: WorldAxis,
+    emboss: boolean = false
+  ) {
     for (const row of this.fields) {
       for (const field of row) {
         field.drawObject(ctx, worldAxis, emboss);
