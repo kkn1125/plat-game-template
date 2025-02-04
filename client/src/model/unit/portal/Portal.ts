@@ -9,6 +9,7 @@ import { makeAutoObservable } from "mobx";
 export default class Portal extends Unit implements Forwardable {
   forwardMap!: GameMap<Maps>;
   forwardPosition: XY = { x: 0, y: 0 };
+  forwardUrl!: string;
 
   constructor(name: string, option?: HealthOption, forwardMap?: GameMap<Maps>) {
     super(name, option);
@@ -27,6 +28,10 @@ export default class Portal extends Unit implements Forwardable {
   //   this.forwardMap = forwardMap;
   //   this.forwardPositionMap.set(forwardMap.id, forwardPosition);
   // }
+
+  setForwardSite(site: string) {
+    this.forwardUrl = site;
+  }
 
   setForwardMap(
     forwardMap: GameMap<Maps>,
@@ -85,6 +90,18 @@ export default class Portal extends Unit implements Forwardable {
   //   unit.location.locate = forwardMap.name;
   //   unit.setPosition(x, y);
   // }
+
+  forwardSite() {
+    if (confirm("사이트로 이동하시겠습니까?")) {
+      const link = document.createElement("a");
+      link.href = this.forwardUrl;
+      link.target = "_blank";
+      document.body.append(link);
+      link.click();
+      link.remove();
+    }
+  }
+
   forward(unit: Unit): void {
     const forwardMap = this.forwardMap;
     // const { x, y } = forwardMap.forwardedPosition.get(forwardMap);

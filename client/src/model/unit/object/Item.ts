@@ -45,8 +45,30 @@ export default class Item implements UseStat {
   frame = 0;
   sprites = CharacterSprites;
 
+  price: number = 0;
+
   constructor(name: string) {
     this.name = name;
+  }
+
+  get buyPrice() {
+    return this.price;
+  }
+
+  get sellPrice() {
+    const discount = 0.8;
+    const sellPrice = this.price * discount;
+
+    if (sellPrice < 1000) {
+      return sellPrice;
+    }
+
+    const ceilFixedSecondSellPrice = Math.ceil(sellPrice / 100) * 100;
+    return ceilFixedSecondSellPrice;
+  }
+
+  setPrice(price: number) {
+    this.price = price;
   }
 
   setUnit(unit: Unit) {

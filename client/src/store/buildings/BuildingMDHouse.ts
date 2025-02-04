@@ -1,8 +1,0 @@
-import { ForwardPosition } from '@config/map/map.conf';
-import House from '@model/unit/building/category/House';
-import { MDHouse, Taecho } from '@store/maps';
-
-export const BuildingMDHouse = new House(MDHouse.name);
-BuildingMDHouse.setLocation(Taecho);
-BuildingMDHouse.setPositionByField(-4.5, -2.0);
-BuildingMDHouse.setForwardMap(MDHouse, ForwardPosition['태초마을']['촌장의 집'], 'top');

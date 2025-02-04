@@ -1,5 +1,6 @@
+export { PortalToBlog } from "./PortalToBlog";
 export { AreaPortalEmptyHouse1ToTaecho } from "./AreaPortalEmptyHouse1ToTaecho";
-export { AreaPortalMDHouseToTaecho } from "./AreaPortalMDHouseToTaecho";
+export { AreaPortalGMHouseToTaecho } from "./AreaPortalGMHouseToTaecho";
 export { PortalFrontToTaecho } from "./PortalFrontToTaecho";
 export { PortalOsolgil1ToTaecho } from "./PortalOsolgil1ToTaecho";
 export { PortalTaechoToFront } from "./PortalTaechoToFront";

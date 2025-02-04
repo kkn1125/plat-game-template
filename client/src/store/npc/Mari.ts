@@ -1,8 +1,8 @@
 import { Character3Sprites } from "@/source/sprites";
-import { Npc } from "@model/unit";
+import MarketNpc from "@model/unit/npc/MarketNpc";
 import { Taecho } from "@store/maps";
 
-export const Mari = new Npc("잡화상 마리", {
+export const Mari = new MarketNpc("잡화상 마리", {
   hp: Infinity,
   mp: Infinity,
 });
@@ -19,7 +19,11 @@ Mari.unitColor = "green";
 //     state = 'Move';
 //   }
 // }, 2000);
-Mari.chatting.addComment("어서오세요.");
+Mari.chatting.addComment(
+  "처음 보는 얼굴이네?",
+  "이봐! 가게는 언제 지을거야?",
+  "나무를 키워서 오나..."
+);
 Mari.question.addQuestion(
   "처음 보는 얼굴이네? 나는 마리라고 해. 이 마을에서 잡화상을 하고 있어.",
   "아직 가게가 준비 안되서 보여줄 물건이 없네.",

@@ -179,32 +179,40 @@ export default class JoystickEvent {
 
       if (closeUnit instanceof Building) {
         if (closeUnit.forward) {
-          this.engine.gameMapManager.changeMap(closeUnit.forwardMap);
-          closeUnit.forward(controlUnit);
-          controlUnit.aroundUnits = [];
-          this.clearMove();
-          if (this.engine.gameMode === GameMode.Multiple) {
-            this.engine.socket?.send({
-              type: "forward",
-              mapName: this.engine.gameMapManager.currentMap?.name || "",
-              x: controlUnit.position.x,
-              y: controlUnit.position.y,
-            });
+          if (closeUnit.forwardUrl) {
+            closeUnit.forwardSite();
+          } else {
+            this.engine.gameMapManager.changeMap(closeUnit.forwardMap);
+            closeUnit.forward(controlUnit);
+            controlUnit.aroundUnits = [];
+            this.clearMove();
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket?.send({
+                type: "forward",
+                mapName: this.engine.gameMapManager.currentMap?.name || "",
+                x: controlUnit.position.x,
+                y: controlUnit.position.y,
+              });
+            }
           }
         }
       } else if (closeUnit instanceof Portal) {
         if (closeUnit.forward) {
-          this.engine.gameMapManager.changeMap(closeUnit.forwardMap);
-          closeUnit.forward(controlUnit);
-          controlUnit.aroundUnits = [];
-          this.clearMove();
-          if (this.engine.gameMode === GameMode.Multiple) {
-            this.engine.socket?.send({
-              type: "forward",
-              mapName: this.engine.gameMapManager.currentMap?.name || "",
-              x: controlUnit.position.x,
-              y: controlUnit.position.y,
-            });
+          if (closeUnit.forwardUrl) {
+            closeUnit.forwardSite();
+          } else {
+            this.engine.gameMapManager.changeMap(closeUnit.forwardMap);
+            closeUnit.forward(controlUnit);
+            controlUnit.aroundUnits = [];
+            this.clearMove();
+            if (this.engine.gameMode === GameMode.Multiple) {
+              this.engine.socket?.send({
+                type: "forward",
+                mapName: this.engine.gameMapManager.currentMap?.name || "",
+                x: controlUnit.position.x,
+                y: controlUnit.position.y,
+              });
+            }
           }
         }
       } else if (closeUnit instanceof Npc) {

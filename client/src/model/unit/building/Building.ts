@@ -7,8 +7,8 @@ import Unit from "../Unit";
 
 export default class Building extends Unit implements Forwardable {
   forwardMap!: GameMap<Maps>;
-  // forwardPositionMap: Map<string, XY> = new Map();
   forwardPosition: XY = { x: 0, y: 0 };
+  forwardUrl!: string;
 
   constructor(name: string, option?: HealthOption, forwardMap?: GameMap<Maps>) {
     super(name, option);
@@ -20,6 +20,10 @@ export default class Building extends Unit implements Forwardable {
       forwardMap: observable,
       forwardPosition: observable,
     });
+  }
+
+  setForwardSite(site: string) {
+    this.forwardUrl = site;
   }
 
   setForwardMap(
@@ -73,6 +77,17 @@ export default class Building extends Unit implements Forwardable {
   //   console.log(this.name, '->', gameMap.name, x, y);
   //   // gameMap.setForwardedPosition(this.position.x + x, this.position.y + y);
   // }
+
+  forwardSite() {
+    if (confirm("사이트로 이동하시겠습니까?")) {
+      const link = document.createElement("a");
+      link.href = this.forwardUrl;
+      link.target = "_blank";
+      document.body.append(link);
+      link.click();
+      link.remove();
+    }
+  }
 
   forward(unit: Unit): void {
     const forwardMap = this.forwardMap;

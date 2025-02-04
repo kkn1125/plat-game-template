@@ -1,2 +1,2 @@
-export { MD } from './MD';
-export { MD2 } from './MD2';
+export { GM } from './GM';
+export { GM2 } from './GM2';

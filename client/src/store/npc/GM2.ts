@@ -3,16 +3,16 @@ import { TaechoFront } from "@store/maps";
 import { UnitState } from "@variable/constant";
 import { Character2Sprites } from "../../source/sprites";
 
-export const MD2 = new Npc("짐꾼", {
+export const GM2 = new Npc("짐꾼", {
   hp: Infinity,
   mp: Infinity,
 });
 let dir = true;
-MD2.setSprites(Character2Sprites);
-MD2.setLocation(TaechoFront);
-MD2.setPositionByField(-3.5, -2.5);
-MD2.unitColor = "green";
-let originPosition = { ...MD2.position };
+GM2.setSprites(Character2Sprites);
+GM2.setLocation(TaechoFront);
+GM2.setPositionByField(-3.5, -2.5);
+GM2.unitColor = "green";
+let originPosition = { ...GM2.position };
 let state = "Idle";
 
 setInterval(() => {
@@ -21,12 +21,19 @@ setInterval(() => {
     state = "Move";
   }
 }, 2000);
-MD2.question.addQuestion(
+GM2.chatting.addComment(
+  "분명히 여긴데...",
+  "물에 빠졌으면 어쩌지..",
+  "또 혼나겠네..",
+  "이건가?",
+  "..."
+);
+GM2.question.addQuestion(
   "어디갔지...",
   "어.. 혹시 나 좀 도와줄래?",
   "중요한 물건을 잃어버렸어. 여기 근처였던거 같은데..."
 );
-MD2.routine = (unit) => {
+GM2.routine = (unit) => {
   const { x } = unit.position;
   const { x: originX } = originPosition;
   const distance = Math.abs(x - originX);

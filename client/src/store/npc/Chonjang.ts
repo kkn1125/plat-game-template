@@ -1,15 +1,15 @@
 import { Character4Sprites } from "@/source/sprites";
-import { Npc } from "@model/unit";
-import { MDHouse } from "@store/maps";
+import QuestNpc from "@model/unit/npc/QuestNpc";
+import { GMHouse } from "@store/maps";
 import { UnitState } from "@variable/constant";
 
-export const Chonjang = new Npc("촌장", {
+export const Chonjang = new QuestNpc("촌장", {
   hp: Infinity,
   mp: Infinity,
 });
 let dir = true;
 Chonjang.setSprites(Character4Sprites);
-Chonjang.setLocation(MDHouse);
+Chonjang.setLocation(GMHouse);
 Chonjang.setPositionByField(0, -1); // Chonjang.position.x = 100;
 Chonjang.unitColor = "green";
 let originPosition = { ...Chonjang.position };
@@ -22,7 +22,11 @@ setInterval(() => {
     state = "Move";
   }
 }, 2000);
-Chonjang.chatting.addComment("어서오세요.");
+Chonjang.chatting.addComment(
+  "온 김에 전구 좀...",
+  "누...누구더라..?",
+  "에고고.."
+);
 Chonjang.question.addQuestion(
   "에구구... 삭신이야..",
   "마침 잘 왔네. 정말 중요한 일이 생겨서 말이지..!",

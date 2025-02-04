@@ -1,28 +1,26 @@
-import Renderer from '@animation/Renderer';
-import UserInterface from '@animation/UserInterface';
-import GAME_CONF from '@config/game.conf';
-import GameEngine from '@core/GameEngine';
-import GameMapManager from '@core/GameMapManager';
-import EventManager from '@event/EventManager';
-import { BuildingEmptyHouse } from '@store/buildings/BuildingEmptyHouse';
-import { BuildingMDHouse } from '@store/buildings/BuildingMDHouse';
-import { MDHouse, Osolgil1, Taecho, TaechoFront } from '@store/maps';
-import { EmptyHouse1 } from '@store/maps/EmptyHouse1';
-import { SlimeFactory } from '@store/monster/Slime';
-import { MD, MD2 } from '@store/npc';
-import { Chonjang } from '@store/npc/Chonjang';
-import { Mari } from '@store/npc/Mari';
-import { AreaPortalMDHouseToTaecho } from '@store/portal';
-import { AreaPortalEmptyHouse1ToTaecho } from '@store/portal/AreaPortalEmptyHouse1ToTaecho';
-import { PortalFrontToTaecho } from '@store/portal/PortalFrontToTaecho';
-import { PortalOsolgil1ToTaecho } from '@store/portal/PortalOsolgil1ToTaecho';
-import { PortalTaechoToFront } from '@store/portal/PortalTaechoToFront';
-import { PortalTaechoToOsolgil1 } from '@store/portal/PortalTaechoToOsolgil1';
-import Logger from '@util/Logger';
-import { GameMode, GameState } from '@variable/constant';
-import Socket from '@websocket/Socket';
+import Renderer from "@animation/Renderer";
+import UserInterface from "@animation/UserInterface";
+import GameEngine from "@core/GameEngine";
+import GameMapManager from "@core/GameMapManager";
+import EventManager from "@event/EventManager";
+import { BuildingEmptyHouse } from "@store/buildings/BuildingEmptyHouse";
+import { BuildingGMHouse } from "@store/buildings/BuildingGMHouse";
+import { GMHouse, Osolgil1, Taecho, TaechoFront } from "@store/maps";
+import { EmptyHouse1 } from "@store/maps/EmptyHouse1";
+import { SlimeFactory } from "@store/monster/Slime";
+import { GM, GM2 } from "@store/npc";
+import { Chonjang } from "@store/npc/Chonjang";
+import { Mari } from "@store/npc/Mari";
+import { AreaPortalGMHouseToTaecho, PortalToBlog } from "@store/portal";
+import { AreaPortalEmptyHouse1ToTaecho } from "@store/portal/AreaPortalEmptyHouse1ToTaecho";
+import { PortalFrontToTaecho } from "@store/portal/PortalFrontToTaecho";
+import { PortalOsolgil1ToTaecho } from "@store/portal/PortalOsolgil1ToTaecho";
+import { PortalTaechoToFront } from "@store/portal/PortalTaechoToFront";
+import { PortalTaechoToOsolgil1 } from "@store/portal/PortalTaechoToOsolgil1";
+import Logger from "@util/Logger";
+import { GameState } from "@variable/constant";
 
-const logger = new Logger('GameStart');
+const logger = new Logger("GameStart");
 
 export function gameStart(gameEngine: GameEngine) {
   /* init */
@@ -32,7 +30,7 @@ export function gameStart(gameEngine: GameEngine) {
   gameEngine.gameMapManager.addGameMap(TaechoFront);
   gameEngine.gameMapManager.addGameMap(Osolgil1);
   gameEngine.gameMapManager.addGameMap(EmptyHouse1);
-  gameEngine.gameMapManager.addGameMap(MDHouse);
+  gameEngine.gameMapManager.addGameMap(GMHouse);
   gameEngine.gameMapManager.setCurrentMap(Taecho);
 
   /* load */
@@ -67,19 +65,20 @@ export function initializeGameMap(gameEngine: GameEngine) {
   gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -11, y: 1.5 }));
   gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -9, y: -3.5 }));
 
-  gameEngine.addNpc(MD);
-  gameEngine.addNpc(MD2);
+  gameEngine.addNpc(GM);
+  gameEngine.addNpc(GM2);
   gameEngine.addNpc(Chonjang);
   gameEngine.addNpc(Mari);
 
+  gameEngine.addPortal(PortalToBlog);
   gameEngine.addPortal(PortalTaechoToFront);
   gameEngine.addPortal(PortalFrontToTaecho);
   gameEngine.addPortal(PortalTaechoToOsolgil1);
   gameEngine.addPortal(PortalOsolgil1ToTaecho);
   gameEngine.addPortal(AreaPortalEmptyHouse1ToTaecho);
-  gameEngine.addPortal(AreaPortalMDHouseToTaecho);
+  gameEngine.addPortal(AreaPortalGMHouseToTaecho);
 
-  gameEngine.addBuilding(BuildingMDHouse);
+  gameEngine.addBuilding(BuildingGMHouse);
   gameEngine.addBuilding(BuildingEmptyHouse);
 }
 
