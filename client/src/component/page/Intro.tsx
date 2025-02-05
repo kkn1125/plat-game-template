@@ -14,7 +14,7 @@ const Intro: React.FC<IntroProps> = () => {
   function handleStart() {
     setFade(false);
     setTimeout(() => {
-      navigate("_main");
+      navigate("main");
     }, 3000);
   }
 
