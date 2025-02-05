@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+
+mkdir -p dist/{_main,_settings}
+cp dist/index.html dist/_main
+cp dist/index.html dist/_settings
