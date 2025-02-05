@@ -93,15 +93,23 @@ export default class Npc extends Unit implements AutoMoveable {
     const text = this.chatting.currentComment;
     const offset = 70;
     const padding = 10;
+    const lineSpacing = 4; // 줄 간격 추가
 
     ctx.font = `bold 14px Galmuri9`;
-    const info = ctx.measureText(text);
-    const textWidth = info.width;
-    const textHeight = 16; // 대략적인 글자 높이 (폰트에 따라 조정 가능)
 
-    // 동적으로 말풍선 크기 설정
-    const bubbleWidth = textWidth + padding * 2;
-    const bubbleHeight = textHeight + padding * 2;
+    // text가 배열이면 각 줄의 길이를 측정하여 가장 긴 줄을 기준으로 말풍선 크기 결정
+    const lines = Array.isArray(text) ? text : [text]; // string일 경우 배열로 변환
+    const textMetrics = lines.map((line) => ctx.measureText(line));
+    const textWidths = textMetrics.map((info) => info.width);
+    const maxWidth = Math.max(...textWidths); // 가장 긴 줄의 너비를 기준으로 말풍선 크기 결정
+    const textHeight = 16; // 기본 줄 높이
+
+    // 말풍선 크기 계산
+    const bubbleWidth = maxWidth + padding * 2;
+    const bubbleHeight =
+      textHeight * lines.length +
+      padding * 2 +
+      (lines.length - 1) * lineSpacing;
 
     // 말풍선 위치 조정
     const bubbleX = positionX - bubbleWidth / 2;
@@ -125,7 +133,13 @@ export default class Npc extends Unit implements AutoMoveable {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#000000";
-    ctx.fillText(text, positionX + this.size.x / 2, bubbleY + bubbleHeight / 2);
+
+    // 여러 줄 렌더링
+    lines.forEach((line, index) => {
+      const lineY =
+        bubbleY + padding + textHeight / 2 + index * (textHeight + lineSpacing);
+      ctx.fillText(line, positionX + this.size.x / 2, lineY);
+    });
   }
 
   setRoutine(routine: (unit: Unit) => void) {

@@ -71,7 +71,7 @@ const QuestionBox: React.FC<QuestionProps> = ({
         wordBreak: "auto-phrase",
       }}
     >
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h5" gutterBottom fontWeight={700}>
         {question.npc.name}
       </Typography>
       <Typography variant="body1">{current}</Typography>

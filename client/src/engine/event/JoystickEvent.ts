@@ -225,7 +225,7 @@ export default class JoystickEvent {
         // }
       } else if (closeUnit instanceof Monster) {
         if (controlUnit.equipment.weapon) {
-          console.log("공격중");
+          // console.log("공격중");
           controlUnit.equipment.weapon.attack(closeUnit);
         } else {
           controlUnit.attack(closeUnit);

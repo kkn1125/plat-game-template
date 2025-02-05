@@ -5,18 +5,10 @@ import GameMapManager from "@core/GameMapManager";
 import EventManager from "@event/EventManager";
 import { BuildingEmptyHouse } from "@store/buildings/BuildingEmptyHouse";
 import { BuildingGMHouse } from "@store/buildings/BuildingGMHouse";
-import { GMHouse, Osolgil1, Taecho, TaechoFront } from "@store/maps";
-import { EmptyHouse1 } from "@store/maps/EmptyHouse1";
+import maps, { ForestRoad1, Taecho } from "@store/maps";
 import { SlimeFactory } from "@store/monster/Slime";
-import { GM, GM2 } from "@store/npc";
-import { Chonjang } from "@store/npc/Chonjang";
-import { Mari } from "@store/npc/Mari";
-import { AreaPortalGMHouseToTaecho, PortalToBlog } from "@store/portal";
-import { AreaPortalEmptyHouse1ToTaecho } from "@store/portal/AreaPortalEmptyHouse1ToTaecho";
-import { PortalFrontToTaecho } from "@store/portal/PortalFrontToTaecho";
-import { PortalOsolgil1ToTaecho } from "@store/portal/PortalOsolgil1ToTaecho";
-import { PortalTaechoToFront } from "@store/portal/PortalTaechoToFront";
-import { PortalTaechoToOsolgil1 } from "@store/portal/PortalTaechoToOsolgil1";
+import npcs from "@store/npc";
+import portals from "@store/portal";
 import Logger from "@util/Logger";
 import { GameState } from "@variable/constant";
 
@@ -26,11 +18,10 @@ export function gameStart(gameEngine: GameEngine) {
   /* init */
   const gameMapManager = new GameMapManager(gameEngine);
   gameEngine.loadGameMapManager(gameMapManager);
-  gameEngine.gameMapManager.addGameMap(Taecho);
-  gameEngine.gameMapManager.addGameMap(TaechoFront);
-  gameEngine.gameMapManager.addGameMap(Osolgil1);
-  gameEngine.gameMapManager.addGameMap(EmptyHouse1);
-  gameEngine.gameMapManager.addGameMap(GMHouse);
+
+  Object.values(maps).forEach((map) => {
+    gameEngine.gameMapManager.addGameMap(map);
+  });
   gameEngine.gameMapManager.setCurrentMap(Taecho);
 
   /* load */
@@ -38,45 +29,34 @@ export function gameStart(gameEngine: GameEngine) {
   gameEngine.loadEventManager(eventManager);
   emitEvent(gameEngine);
 
-  // if (GAME_CONF.MODE === GameMode.Multiple) {
-  //   const socket = new Socket(gameEngine);
-  //   gameEngine.loadSocket(socket);
-  // }
-
   const ui = new UserInterface(gameEngine);
   gameEngine.loadUi(ui);
   const renderer = new Renderer(gameEngine);
   gameEngine.loadRenderer(renderer);
 
   gameEngine.setState(GameState.Init);
-  // gameEngine.renderer.render();
 }
 
 export function initializeGameMap(gameEngine: GameEngine) {
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: 2, y: 3 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: 7, y: 5 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -2, y: -3 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -0, y: -10 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: 12, y: 4 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: 12, y: 10 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -12, y: 10 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -12, y: -6 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -12, y: 0 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -11, y: 1.5 }));
-  gameEngine.addMonster(SlimeFactory(Osolgil1, { x: -9, y: -3.5 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: 2, y: 3 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: 7, y: 5 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: -2, y: -3 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: -0, y: -10 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: 12, y: 4 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: 12, y: 10 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: -12, y: 10 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: -12, y: -6 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: -12, y: 0 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: -11, y: 1.5 }));
+  gameEngine.addMonster(SlimeFactory(maps.Osolgil1, { x: -9, y: -3.5 }));
 
-  gameEngine.addNpc(GM);
-  gameEngine.addNpc(GM2);
-  gameEngine.addNpc(Chonjang);
-  gameEngine.addNpc(Mari);
+  Object.values(npcs).forEach((npc) => {
+    gameEngine.addNpc(npc);
+  });
 
-  gameEngine.addPortal(PortalToBlog);
-  gameEngine.addPortal(PortalTaechoToFront);
-  gameEngine.addPortal(PortalFrontToTaecho);
-  gameEngine.addPortal(PortalTaechoToOsolgil1);
-  gameEngine.addPortal(PortalOsolgil1ToTaecho);
-  gameEngine.addPortal(AreaPortalEmptyHouse1ToTaecho);
-  gameEngine.addPortal(AreaPortalGMHouseToTaecho);
+  Object.values(portals).forEach((portal) => {
+    gameEngine.addPortal(portal);
+  });
 
   gameEngine.addBuilding(BuildingGMHouse);
   gameEngine.addBuilding(BuildingEmptyHouse);

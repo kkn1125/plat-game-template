@@ -767,13 +767,13 @@ class Unit
       ctx.fillText(
         `${this.hp} / ${this.maxHp}`,
         (innerWidth * 0.1) / 2 + 150 / 2,
-        innerHeight - 20 - offset - 52 + 14
+        innerHeight - 20 - offset - 52 + 14 - 4
       );
       ctx.fillStyle = "#ffffff";
       ctx.fillText(
         `${this.mp} / ${this.maxMp}`,
         (innerWidth * 0.1) / 2 + 150 / 2,
-        innerHeight - 20 - offset - 32 + 16
+        innerHeight - 20 - offset - 32 + 16 - 4
       );
     } else {
       ctx.fillStyle = "gray";

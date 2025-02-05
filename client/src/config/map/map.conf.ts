@@ -4,6 +4,7 @@ export const ForwardPosition = {
     "빈 집": { x: 0, y: 2 },
     오솔길1: { x: 17, y: 1.5 },
     "촌장의 집": { x: 0, y: 4 },
+    '숲 길1': { x: 6, y: -9 },
   },
   "마을 앞": {
     태초마을: { x: 17, y: 1.5 }, //
@@ -16,6 +17,9 @@ export const ForwardPosition = {
   },
   "촌장의 집": {
     태초마을: { x: -4.5, y: -2 },
+  },
+  "숲 길1": {
+    태초마을: { x: 9.5, y: 11 },
   },
 } as { [k in Maps]: { [q in Exclude<Maps, k>]: XY } };
 

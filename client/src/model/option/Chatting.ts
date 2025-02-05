@@ -2,15 +2,16 @@ import { makeId } from "@util/makeId";
 
 export default class Chatting {
   id = makeId("chatting");
-  comment: string[] = [];
+  comment: (string | string[])[] = [];
   index: number = 0;
 
   get currentComment() {
     return this.comment[this.index % this.comment.length];
   }
 
-  addComment(...comments: string[]) {
+  addComment(...comments: (string | string[])[]) {
     this.comment.push(...comments);
+    this.setNextRandom();
   }
 
   getNext() {

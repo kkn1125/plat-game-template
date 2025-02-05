@@ -1,18 +1,18 @@
 import { Character4Sprites } from "@/source/sprites";
 import QuestNpc from "@model/unit/npc/QuestNpc";
-import { GMHouse } from "@store/maps";
+import { Taecho } from "@store/maps";
 import { UnitState } from "@variable/constant";
 
-export const Chonjang = new QuestNpc("촌장 에고사그신", {
+export const Daemoksu = new QuestNpc("대목수 히노키", {
   hp: Infinity,
   mp: Infinity,
 });
 let dir = true;
-Chonjang.setSprites(Character4Sprites);
-Chonjang.setLocation(GMHouse);
-Chonjang.setPositionByField(0, -1); // Chonjang.position.x = 100;
-Chonjang.unitColor = "green";
-let originPosition = { ...Chonjang.position };
+Daemoksu.setSprites(Character4Sprites);
+Daemoksu.setLocation(Taecho);
+Daemoksu.setPositionByField(12, -0.5); // Daemoksu.position.x = 100;
+Daemoksu.unitColor = "green";
+let originPosition = { ...Daemoksu.position };
 let state = "Idle";
 
 setInterval(() => {
@@ -22,23 +22,22 @@ setInterval(() => {
     state = "Move";
   }
 }, 2000);
-Chonjang.chatting.addComment(
-  "온 김에 전구 좀...",
-  "누...누구더라..?",
-  "에고고.."
+Daemoksu.chatting.addComment(
+  "힘 좀 써보라고! 그것 밖에 안돼?!",
+  "내 밑에서 3년만 굴러봐!",
+  "아니 옆에다 놓으라고! 몇 번을 말해!"
 );
-Chonjang.question.addQuestion(
-  "에구구... 삭신이야..",
-  "마침 잘 왔네. 정말 중요한 일이 생겨서 말이지..!",
-  "...",
-  "전구 좀 갈아주겠나? 홀홀",
-  "(...나중에 다시오자)"
+Daemoksu.question.addQuestion(
+  "뭐야 못 보던 얼굴인데? 모험가 양반이신가?",
+  "나는 대목수 히노키야. 이 마을에서 제일 가는 대목수지.",
+  "집 짓는 일이 아니라면 나중에 다시 오도록.",
+  "모험가 양반, 혹시 숲길에서 나무꾼 하나 못 봤어? 만약 놀고 있으면 내가 거꾸로 심어버린다고 전해주게."
 );
-Chonjang.routine = (unit) => {
+Daemoksu.routine = (unit) => {
   const { x } = unit.position;
   const { x: originX } = originPosition;
   const distance = Math.abs(x - originX);
-  if (distance >= 50) {
+  if (distance >= 100) {
     dir = !dir;
     state = "Idle";
     originPosition = { ...unit.position };

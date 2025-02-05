@@ -1,44 +1,42 @@
-import { Character4Sprites } from "@/source/sprites";
+import { Character3Sprites } from "@/source/sprites";
 import QuestNpc from "@model/unit/npc/QuestNpc";
-import { GMHouse } from "@store/maps";
+import { ForestRoad1 } from "@store/maps";
 import { UnitState } from "@variable/constant";
 
-export const Chonjang = new QuestNpc("촌장 에고사그신", {
+export const Druid = new QuestNpc("나무꾼 드루이드", {
   hp: Infinity,
   mp: Infinity,
 });
 let dir = true;
-Chonjang.setSprites(Character4Sprites);
-Chonjang.setLocation(GMHouse);
-Chonjang.setPositionByField(0, -1); // Chonjang.position.x = 100;
-Chonjang.unitColor = "green";
-let originPosition = { ...Chonjang.position };
+Druid.setSprites(Character3Sprites);
+Druid.setLocation(ForestRoad1);
+Druid.setPositionByField(-3, -2.5); // Druid.position.x = 100;
+Druid.unitColor = "green";
+let originPosition = { ...Druid.position };
 let state = "Idle";
 
 setInterval(() => {
   const zeroBack = Math.floor(Math.random() * (100 + 1));
   // console.log(state, zeroBack);
-  if (zeroBack < 50) {
+  if (zeroBack < 200) {
     state = "Move";
   }
 }, 2000);
-Chonjang.chatting.addComment(
-  "온 김에 전구 좀...",
-  "누...누구더라..?",
-  "에고고.."
+Druid.chatting.addComment(
+  "어휴 이걸 언제 다 해...",
+  "3년만 굴러보라더니 이게 몇년 째야.",
+  "아무도 없겠지?"
 );
-Chonjang.question.addQuestion(
-  "에구구... 삭신이야..",
-  "마침 잘 왔네. 정말 중요한 일이 생겨서 말이지..!",
-  "...",
-  "전구 좀 갈아주겠나? 홀홀",
-  "(...나중에 다시오자)"
+Druid.question.addQuestion(
+  "아! 놀래라..",
+  "나는 히노키의 제자 드루이드야. 혹시 히노키를 만났어?",
+  "나에 대해 물으면 열심히 나무 하고 있다고 전해줘! 알았지?"
 );
-Chonjang.routine = (unit) => {
+Druid.routine = (unit) => {
   const { x } = unit.position;
   const { x: originX } = originPosition;
   const distance = Math.abs(x - originX);
-  if (distance >= 50) {
+  if (distance >= 150) {
     dir = !dir;
     state = "Idle";
     originPosition = { ...unit.position };

@@ -3,7 +3,7 @@ import { TaechoFront } from "@store/maps";
 import { UnitState } from "@variable/constant";
 import { Character2Sprites } from "../../source/sprites";
 
-export const GM2 = new Npc("짐꾼", {
+export const GM2 = new Npc("짐꾼 캐리", {
   hp: Infinity,
   mp: Infinity,
 });
@@ -30,7 +30,7 @@ GM2.chatting.addComment(
 );
 GM2.question.addQuestion(
   "어디갔지...",
-  "어.. 혹시 나 좀 도와줄래?",
+  "어.. 혹시 시간 된다면 나 좀 도와줄래?",
   "중요한 물건을 잃어버렸어. 여기 근처였던거 같은데..."
 );
 GM2.routine = (unit) => {
