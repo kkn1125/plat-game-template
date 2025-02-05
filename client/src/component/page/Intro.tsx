@@ -4,6 +4,7 @@ import MenuButton from "../atom/MenuButton";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import FadeOut from "../atom/FadeOut";
+import { path } from "@variable/variable";
 
 interface IntroProps {}
 const Intro: React.FC<IntroProps> = () => {
@@ -27,7 +28,7 @@ const Intro: React.FC<IntroProps> = () => {
         bottom={0}
         right={0}
         sx={{
-          backgroundImage: 'url("/images/bg/intro.jpg")',
+          backgroundImage: `url("${path}images/bg/intro.jpg")`,
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "contain",
