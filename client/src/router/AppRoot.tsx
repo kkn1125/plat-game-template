@@ -3,7 +3,6 @@ import Layout from "@/component/template/Layout";
 import { Route, Routes } from "react-router-dom";
 import Intro from "../component/page/Intro";
 import Settings from "@/component/page/Settings";
-import { path } from "@variable/variable";
 
 interface AppRootProps {}
 const AppRoot: React.FC<AppRootProps> = () => {
@@ -11,8 +10,8 @@ const AppRoot: React.FC<AppRootProps> = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Intro />} />
-        <Route path={`${path}_settings`} element={<Settings />} />
-        <Route path={`${path}_main`} element={<Main />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="main" element={<Main />} />
       </Route>
     </Routes>
   );

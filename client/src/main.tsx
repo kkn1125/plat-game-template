@@ -1,15 +1,16 @@
 import "@assets/main.css";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
-import ThemeModeProvider from "./provider/ThemeModeProvider";
 import AppRoot from "./router/AppRoot";
+import { BrowserRouter } from "react-router-dom";
+import { path } from "@variable/variable";
+import ThemeModeProvider from "./provider/ThemeModeProvider";
 
 const theme = createRoot(document.getElementById("root")!).render(
   <>
     {/* <StrictMode> */}
     <RecoilRoot>
-      <BrowserRouter>
+      <BrowserRouter basename={path}>
         <ThemeModeProvider>
           <AppRoot />
         </ThemeModeProvider>
