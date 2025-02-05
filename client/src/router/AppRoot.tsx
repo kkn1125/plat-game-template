@@ -9,8 +9,8 @@ interface AppRootProps {}
 const AppRoot: React.FC<AppRootProps> = () => {
   return (
     <Routes>
-      <Route element={<Layout />}>
-        <Route path={path} element={<Intro />} />
+      <Route path={path} element={<Layout />}>
+        <Route index element={<Intro />} />
         <Route path="settings" element={<Settings />} />
         <Route path="main" element={<Main />} />
       </Route>
