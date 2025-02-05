@@ -10,7 +10,7 @@ const theme = createRoot(document.getElementById("root")!).render(
   <>
     {/* <StrictMode> */}
     <RecoilRoot>
-      <BrowserRouter>
+      <BrowserRouter basename={path}>
         <ThemeModeProvider>
           <AppRoot />
         </ThemeModeProvider>

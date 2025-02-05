@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "postbuild": "touch dist/.nojekyll",
+    "postbuild": "touch dist/.nojekyll && mkdir dist/{_main,_settings} && cp dist/index.html dist/_main && cp dist/index.html dist/_settings",
     "deploy": "cd dist && git init && git add -A && git commit -m \"gh-pages\" && git push https://github.com/kkn1125/plat-game-template.git master:gh-pages -f",
     "lint": "eslint .",
     "preview": "vite preview",
