@@ -6,7 +6,8 @@ type XY = {
 };
 
 export default class SocketManager<T = any> {
-  id!: string;
+  id!: number;
+  nickname!: string;
   ws: uWS.WebSocket<T>;
   position: XY = {
     x: 0,
@@ -21,12 +22,21 @@ export default class SocketManager<T = any> {
     return this.ws.getUserData();
   }
 
-  setId(id: string) {
+  setId(id: number) {
     this.id = id;
+  }
+
+  setNickname(nickname: string) {
+    this.nickname = nickname;
   }
 
   setPosition(x: number, y: number) {
     this.position.x = x;
     this.position.y = y;
+  }
+
+  updatePosition(x: number, y: number) {
+    this.position.x += x;
+    this.position.y += y;
   }
 }

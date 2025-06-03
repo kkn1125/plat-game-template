@@ -256,7 +256,9 @@ export default class JoystickEvent {
         this.joystick.w = false;
         this.order.splice(this.order.indexOf("top"), 1);
         if (this.engine.gameMode === GameMode.Multiple) {
-          this.engine.socket?.send({ type: "stop", g: 0 });
+          setTimeout(() => {
+            this.engine.socket?.send({ type: "stop", g: 0 });
+          }, 100);
         }
         // console.log('top');
       }
@@ -264,7 +266,9 @@ export default class JoystickEvent {
         this.joystick.s = false;
         this.order.splice(this.order.indexOf("bottom"), 1);
         if (this.engine.gameMode === GameMode.Multiple) {
-          this.engine.socket?.send({ type: "stop", g: 1 });
+          setTimeout(() => {
+            this.engine.socket?.send({ type: "stop", g: 1 });
+          }, 100);
         }
         // console.log('bottom');
       }
@@ -272,7 +276,9 @@ export default class JoystickEvent {
         this.joystick.a = false;
         this.order.splice(this.order.indexOf("left"), 1);
         if (this.engine.gameMode === GameMode.Multiple) {
-          this.engine.socket?.send({ type: "stop", g: 2 });
+          setTimeout(() => {
+            this.engine.socket?.send({ type: "stop", g: 2 });
+          }, 100);
         }
         // console.log('left');
       }
@@ -280,7 +286,9 @@ export default class JoystickEvent {
         this.joystick.d = false;
         this.order.splice(this.order.indexOf("right"), 1);
         if (this.engine.gameMode === GameMode.Multiple) {
-          this.engine.socket?.send({ type: "stop", g: 3 });
+          setTimeout(() => {
+            this.engine.socket?.send({ type: "stop", g: 3 });
+          }, 100);
         }
         // console.log('right');
       }
@@ -290,28 +298,36 @@ export default class JoystickEvent {
           case "top": {
             this.controlUnit.gaze = "top";
             if (this.engine.gameMode === GameMode.Multiple) {
-              this.engine.socket?.send({ type: "stop", g: 0 });
+              setTimeout(() => {
+                this.engine.socket?.send({ type: "stop", g: 0 });
+              }, 100);
             }
             break;
           }
           case "bottom": {
             this.controlUnit.gaze = "bottom";
             if (this.engine.gameMode === GameMode.Multiple) {
-              this.engine.socket?.send({ type: "stop", g: 1 });
+              setTimeout(() => {
+                this.engine.socket?.send({ type: "stop", g: 1 });
+              }, 100);
             }
             break;
           }
           case "left": {
             this.controlUnit.gaze = "left";
             if (this.engine.gameMode === GameMode.Multiple) {
-              this.engine.socket?.send({ type: "stop", g: 2 });
+              setTimeout(() => {
+                this.engine.socket?.send({ type: "stop", g: 2 });
+              }, 100);
             }
             break;
           }
           case "right": {
             this.controlUnit.gaze = "right";
             if (this.engine.gameMode === GameMode.Multiple) {
-              this.engine.socket?.send({ type: "stop", g: 3 });
+              setTimeout(() => {
+                this.engine.socket?.send({ type: "stop", g: 3 });
+              }, 100);
             }
             break;
           }

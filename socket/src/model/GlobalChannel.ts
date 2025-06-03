@@ -73,8 +73,12 @@ export default class GlobalChannel {
     this.findUserBySocket(user)?.setId(data.id);
   }
 
+  setUserNickname(user: uWS.WebSocket<any>, data: any) {
+    this.findUserBySocket(user)?.setNickname(data.nickname);
+  }
+
   updateUserPosition(ws: uWS.WebSocket<any>, x: number, y: number) {
-    this.findUserBySocket(ws)?.setPosition(x, y);
+    this.findUserBySocket(ws)?.updatePosition(x, y);
   }
 
   findChannelByUser(user: uWS.WebSocket<any>) {

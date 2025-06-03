@@ -3,7 +3,7 @@ import QuestNpc from "@model/unit/npc/QuestNpc";
 import { GMHouse } from "@store/maps";
 import { UnitState } from "@variable/constant";
 
-export const Chonjang = new QuestNpc("촌장 에고사그신", {
+export const Chonjang = new QuestNpc("촌장 김촌장", {
   hp: Infinity,
   mp: Infinity,
 });

@@ -710,7 +710,12 @@ class Renderer {
           ) {
             this.controlUnit.move(0, -velocity);
             if (this.engine.gameMode === GameMode.Multiple) {
-              this.engine.socket.send({ xy: 0 });
+              if (
+                this.engine.socket?.socket &&
+                this.controlUnit.state === UnitState.Move
+              ) {
+                this.engine.socket.send({ xy: 0 });
+              }
             }
           }
         }
@@ -723,7 +728,12 @@ class Renderer {
           ) {
             this.controlUnit.move(0, velocity);
             if (this.engine.gameMode === GameMode.Multiple) {
-              this.engine.socket.send({ xy: 1 });
+              if (
+                this.engine.socket?.socket &&
+                this.controlUnit.state === UnitState.Move
+              ) {
+                this.engine.socket.send({ xy: 1 });
+              }
             }
           }
         }
@@ -736,7 +746,12 @@ class Renderer {
           ) {
             this.controlUnit.move(-velocity, 0);
             if (this.engine.gameMode === GameMode.Multiple) {
-              this.engine.socket.send({ xy: 2 });
+              if (
+                this.engine.socket?.socket &&
+                this.controlUnit.state === UnitState.Move
+              ) {
+                this.engine.socket.send({ xy: 2 });
+              }
             }
           }
         }
@@ -749,7 +764,12 @@ class Renderer {
           ) {
             this.controlUnit.move(velocity, 0);
             if (this.engine.gameMode === GameMode.Multiple) {
-              this.engine.socket.send({ xy: 3 });
+              if (
+                this.engine.socket?.socket &&
+                this.controlUnit.state === UnitState.Move
+              ) {
+                this.engine.socket.send({ xy: 3 });
+              }
             }
           }
         }

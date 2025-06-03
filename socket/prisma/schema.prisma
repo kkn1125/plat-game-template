@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Direction {
+  UP
+  DOWN
+  LEFT
+  RIGHT
+}
+
+model Quest {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  reward      Int
+  locationId  Int      @map("location_id")
+  location    Location @relation(fields: [locationId], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("quest")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  // email     String    @unique
+  nickname  String
+  gold      Int       @default(0)
+  level     Int       @default(1)
+  exp       Int       @default(0)
+  hp        Int       @default(100)
+  maxHp     Int       @default(100) @map("max_hp")
+  mp        Int       @default(100)
+  maxMp     Int       @default(100) @map("max_mp")
+  status    String    @default("playing")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  loginAt   DateTime? @map("login_at")
+  x         Int       @default(0)
+  y         Int       @default(0)
+  direction Direction @default(UP)
+
+  userSecret UserSecret?
+
+  @@map("user")
+}
+
+model UserSecret {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique @map("user_id")
+  password  String
+  iteration Int      @default(0)
+  salt      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_secret")
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  quest Quest[]
+
+  @@map("location")
+}

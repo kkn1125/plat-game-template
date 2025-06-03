@@ -2,10 +2,9 @@ import Equipment from "@model/option/Equipment";
 import Inventory from "@model/option/Inventory";
 import Question from "@model/option/Question";
 import { Npc } from "@model/unit";
-import { Button, FormHelperText, Paper, Stack, TextField } from "@mui/material";
+import { Paper } from "@mui/material";
 import gameEngine from "@recoil/gameMapAtom";
 import { GameMode, GameState, QuestionState } from "@variable/constant";
-import Socket from "@websocket/Socket";
 import { observer } from "mobx-react";
 import {
   memo,
@@ -15,12 +14,12 @@ import {
   useRef,
   useState,
 } from "react";
+import FadeIn from "../atom/FadeIn";
 import GameLayer from "../atom/GameLayer";
 import QuestionBox from "../atom/Question";
 import EquipmentBox from "../molecular/EquipmentBox";
 import InventoryBox from "../molecular/InventoryBox";
-import FadeIn from "../atom/FadeIn";
-import MenuButton from "../atom/MenuButton";
+import MenuDialog from "../molecular/MenuDialog";
 
 interface GameViewProps {
   // layers: React.ReactElement[];
@@ -30,6 +29,7 @@ const GameView: React.FC<GameViewProps> = observer(() => {
   const [fade, setFade] = useState(true);
   const [layers, setLayers] = useState<string[]>([]);
   const [multiMode, setMultiMode] = useState(false);
+  const [isMultiModeConnected, setIsMultiModeConnected] = useState(false);
   const pressSpace = useRef(false);
   const pressEquipment = useRef(false);
   const pressInventory = useRef(false);
@@ -38,6 +38,8 @@ const GameView: React.FC<GameViewProps> = observer(() => {
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [question, setQuestion] = useState<Question | null>(null);
+  const idRef = useRef<HTMLInputElement>(null);
+  const pwRef = useRef<HTMLInputElement>(null);
   const addLayer = (id: string) => {
     setLayers((prev) => [...prev, id]);
   };
@@ -153,8 +155,16 @@ const GameView: React.FC<GameViewProps> = observer(() => {
     setEquipment(() => null);
   }
 
-  const isMultiModeConnected =
-    multiMode && gameEngine.socket.socket.readyState === 1;
+  function requestLogin() {
+    if (idRef.current?.value && pwRef.current?.value) {
+      gameEngine.ui.login(GameMode.Multiple, {
+        id: idRef.current?.value,
+        pw: pwRef.current?.value,
+      });
+    } else {
+      alert("아이디와 비밀번호를 입력해주세요.");
+    }
+  }
 
   return (
     <div>
@@ -176,82 +186,7 @@ const GameView: React.FC<GameViewProps> = observer(() => {
             padding: "2rem", // 전체적인 여백 조정
           }}
         >
-          <Stack py={5} px={10} gap={2}>
-            {multiMode ? (
-              <Stack gap={2}>
-                <TextField
-                  size="small"
-                  placeholder="ID"
-                  disabled={!isMultiModeConnected}
-                />
-                <TextField
-                  size="small"
-                  placeholder="PW"
-                  type="password"
-                  disabled={!isMultiModeConnected}
-                />
-                {!isMultiModeConnected && (
-                  <FormHelperText error>
-                    서버가 닫혀있습니다. 싱글플레이를 이용해주세요!
-                  </FormHelperText>
-                )}
-              </Stack>
-            ) : (
-              <Stack gap={2}>
-                <MenuButton
-                  variant="contained"
-                  onClick={() => {
-                    gameEngine.ui.login("Test");
-                    // setTimeout(() => {
-                    //   if (gameEngine.controlUnit) {
-                    //     gameEngine.controlUnit.gold += 1000;
-                    //     console.log(gameEngine.controlUnit.gold);
-                    //   }
-                    // }, 3000);
-                    // setInterval(() => {
-                    //   gameEngine.controlUnit?.levelUp();
-                    // }, 2000);
-                  }}
-                >
-                  테스트
-                </MenuButton>
-                <MenuButton
-                  variant="contained"
-                  onClick={() => gameEngine.ui.login("Single")}
-                >
-                  싱글플레이
-                </MenuButton>
-              </Stack>
-            )}
-            {multiMode ? (
-              <Stack gap={2}>
-                <MenuButton variant="contained">로그인</MenuButton>
-                <MenuButton
-                  color="inherit"
-                  variant="contained"
-                  onClick={() => {
-                    gameEngine.gameMode = GameMode.Single;
-                    setMultiMode((prev) => !prev);
-                    gameEngine.socket.destroy();
-                  }}
-                >
-                  돌아가기
-                </MenuButton>
-              </Stack>
-            ) : (
-              <MenuButton
-                variant="contained"
-                onClick={() => {
-                  gameEngine.gameMode = GameMode.Multiple;
-                  setMultiMode((prev) => !prev);
-                  const socket = new Socket(gameEngine);
-                  gameEngine.loadSocket(socket);
-                }}
-              >
-                멀티플레이
-              </MenuButton>
-            )}
-          </Stack>
+          <MenuDialog />
         </Paper>
       )}
       {equipment && <EquipmentBox closeEquipment={closeEquipment} />}
