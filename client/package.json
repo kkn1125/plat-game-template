@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "rm -rf dist/ && tsc -b && vite build",
     "postbuild": "touch dist/.nojekyll && sh scripts/build",
+    "predeploy": "npm run build",
     "deploy": "cd dist && git init && git add -A && git commit -m \"gh-pages\" && git push https://github.com/kkn1125/plat-game-template.git master:gh-pages -f",
     "lint": "eslint .",
     "preview": "vite preview",
