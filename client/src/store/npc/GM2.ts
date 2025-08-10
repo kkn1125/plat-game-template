@@ -1,11 +1,11 @@
 import Question from "@model/option/Question";
-import { Npc } from "@model/unit";
+import QuestNpc from "@model/unit/npc/QuestNpc";
 import { TaechoFront } from "@store/maps";
 import { CarryQuest } from "@store/quests/CarryQuest";
 import { UnitState } from "@variable/constant";
 import { Character2Sprites } from "../../source/sprites";
 
-export const GM2 = new Npc("짐꾼 캐리", {
+export const GM2 = new QuestNpc("짐꾼 캐리", {
   hp: Infinity,
   mp: Infinity,
 });
