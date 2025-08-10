@@ -1,6 +1,8 @@
 import { Character3Sprites } from "@/source/sprites";
+import Question from "@model/option/Question";
 import QuestNpc from "@model/unit/npc/QuestNpc";
 import { ForestRoad1 } from "@store/maps";
+import { DaemoksuQuest } from "@store/quests/DaemoksuQuest";
 import { UnitState } from "@variable/constant";
 
 export const Druid = new QuestNpc("나무꾼 드루이드", {
@@ -27,11 +29,26 @@ Druid.chatting.addComment(
   "3년만 굴러보라더니 이게 몇년 째야.",
   "아무도 없겠지?"
 );
-Druid.question.addQuestion(
-  "아! 놀래라..",
-  "나는 히노키의 제자 드루이드야. 혹시 히노키를 만났어?",
-  "나에 대해 물으면 열심히 나무 하고 있다고 전해줘! 알았지?"
+
+Druid.addQuestion(
+  new Question(
+    Druid,
+    "아! 놀래라..",
+    "나는 히노키의 제자 드루이드야. 혹시 히노키를 만났어?",
+    "나에 대해 물으면 열심히 나무 하고 있다고 전해줘! 알았지?"
+  )
 );
+
+Druid.addQuestion(
+  new Question(
+    Druid,
+    "아까 여기 지나가지 않았어?",
+    "그 양반이 무슨 걱정을 해. 대충 잘 하고 있다고 전해줘!"
+  ),
+  "quest",
+  DaemoksuQuest.id
+);
+
 Druid.routine = (unit) => {
   const { x } = unit.position;
   const { x: originX } = originPosition;

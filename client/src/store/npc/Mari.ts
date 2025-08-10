@@ -1,4 +1,5 @@
 import { Character3Sprites } from "@/source/sprites";
+import Question from "@model/option/Question";
 import MarketNpc from "@model/unit/npc/MarketNpc";
 import { Taecho } from "@store/maps";
 
@@ -25,11 +26,14 @@ Mari.chatting.addComment(
   ["히노키 양반, 나무를 키워서 오나?", "왜 이렇게 늦는 거야."],
   "무기 빼고 다 팝니다~"
 );
-Mari.question.addQuestion(
+Mari.addQuestion(
+  new Question(
+    Mari,
   "처음 보는 얼굴이네? 나는 마리라고 해. 이 마을에서 잡화상을 하고 있어.",
   "아직 가게가 준비 안되서 보여줄 물건이 없네.",
-  "다음에 오면 내가 좋은 포션 하나 서비스로 줄게!",
-  "친구들도 데려오면 더 좋구!"
+    "다음에 오면 내가 좋은 포션 하나 서비스로 줄게!",
+    "친구들도 데려오면 더 좋구!"
+  )
 );
 // Mari.routine = (unit) => {
 //   const { x } = unit.position;

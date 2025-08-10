@@ -1,3 +1,4 @@
+import Question from "@model/option/Question";
 import { Npc } from "@model/unit";
 import { Taecho } from "@store/maps";
 import { UnitState } from "@variable/constant";
@@ -34,11 +35,14 @@ GM.chatting.addComment(
     "인벤토리로 이동합니다.",
   ]
 );
-GM.question.addQuestion(
-  "초기 버전의 게임보다 나은 환경을 조성 중 입니다.",
-  "다양한 오브젝트와 유닛의 상호작용이 다양해졌어요!",
-  "퀘스트와 상점 기능이 개발되고 있어요.",
-  "자세한 업데이트 내역은 추후 공지사항 컨텐츠가 개발되면 볼 수 있어요!"
+GM.addQuestion(
+  new Question(
+    GM,
+    "초기 버전의 게임보다 나은 환경을 조성 중 입니다.",
+    "다양한 오브젝트와 유닛의 상호작용이 다양해졌어요!",
+    "퀘스트와 상점 기능이 개발되고 있어요.",
+    "자세한 업데이트 내역은 추후 공지사항 컨텐츠가 개발되면 볼 수 있어요!"
+  )
 );
 GM.routine = (unit) => {
   const { y } = unit.position;

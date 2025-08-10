@@ -594,8 +594,8 @@ class Unit
     /* stroke */
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 3;
-    const offset = 30;
-    const height = 10;
+    const offset = 25;
+    const height = 15;
 
     const calcExp = this.exp / this.maxExp;
     const text = `${(calcExp * 100).toFixed(2)}% (${this.exp}/${this.maxExp})`;
@@ -645,11 +645,11 @@ class Unit
 
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = 3;
-    ctx.strokeText(text, innerWidth / 2, innerHeight - height * 2 - 1);
+    ctx.strokeText(text, innerWidth / 2, innerHeight - offset + height / 2);
     ctx.fillStyle = "#ffffff";
     /* font */
     ctx.textAlign = "center";
-    ctx.fillText(text, innerWidth / 2, innerHeight - height * 2 - 1);
+    ctx.fillText(text, innerWidth / 2, innerHeight - offset + height / 2);
   }
 
   drawNameByScale(

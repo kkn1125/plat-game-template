@@ -1,6 +1,8 @@
 import { Character4Sprites } from "@/source/sprites";
+import Question from "@model/option/Question";
 import QuestNpc from "@model/unit/npc/QuestNpc";
 import { Taecho } from "@store/maps";
+import { DaemoksuQuest } from "@store/quests/DaemoksuQuest";
 import { UnitState } from "@variable/constant";
 
 export const Daemoksu = new QuestNpc("대목수 히노키", {
@@ -27,11 +29,14 @@ Daemoksu.chatting.addComment(
   "내 밑에서 3년만 굴러봐!",
   "아니 옆에다 놓으라고! 몇 번을 말해!"
 );
-Daemoksu.question.addQuestion(
-  "뭐야 못 보던 얼굴인데? 모험가 양반이신가?",
-  "나는 대목수 히노키야. 이 마을에서 제일 가는 대목수지.",
-  "집 짓는 일이 아니라면 나중에 다시 오도록.",
-  "모험가 양반, 혹시 숲길에서 나무꾼 하나 못 봤어? 만약 놀고 있으면 내가 거꾸로 심어버린다고 전해주게."
+Daemoksu.addQuestion(
+  new Question(
+    Daemoksu,
+    "뭐야 못 보던 얼굴인데? 모험가 양반이신가?",
+    "나는 대목수 히노키야. 이 마을에서 제일 가는 대목수지.",
+    "집 짓는 일이 아니라면 나중에 다시 오도록.",
+    "모험가 양반, 혹시 숲길에서 나무꾼 하나 못 봤어? 만약 놀고 있으면 내가 거꾸로 심어버린다고 전해주게."
+  )
 );
 Daemoksu.routine = (unit) => {
   const { x } = unit.position;
@@ -61,3 +66,6 @@ Daemoksu.routine = (unit) => {
     }
   }
 };
+
+/* quest */
+Daemoksu.addQuest(DaemoksuQuest);

@@ -1,11 +1,15 @@
-import Item from '@model/unit/object/Item';
+import Item from "@model/unit/object/Item";
 
 export default class Reward {
   exp: number = 0;
   gold: number = 0;
   item: Item | null = null;
 
-  constructor() {}
+  constructor(exp: number, gold: number, item: Item | null) {
+    this.exp = exp;
+    this.gold = gold;
+    this.item = item;
+  }
 
   setItem(item: Item) {
     this.item = item;

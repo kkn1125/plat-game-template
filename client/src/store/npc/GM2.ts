@@ -1,5 +1,7 @@
+import Question from "@model/option/Question";
 import { Npc } from "@model/unit";
 import { TaechoFront } from "@store/maps";
+import { CarryQuest } from "@store/quests/CarryQuest";
 import { UnitState } from "@variable/constant";
 import { Character2Sprites } from "../../source/sprites";
 
@@ -28,10 +30,13 @@ GM2.chatting.addComment(
   "이건가?",
   "..."
 );
-GM2.question.addQuestion(
-  "어디갔지...",
-  "어.. 혹시 시간 된다면 나 좀 도와줄래?",
-  "중요한 물건을 잃어버렸어. 여기 근처였던거 같은데..."
+GM2.addQuestion(
+  new Question(
+    GM2,
+    "어디갔지...",
+    "어.. 혹시 시간 된다면 나 좀 도와줄래?",
+    "중요한 물건을 잃어버렸어. 여기 근처였던거 같은데..."
+  )
 );
 GM2.routine = (unit) => {
   const { x } = unit.position;
@@ -59,3 +64,5 @@ GM2.routine = (unit) => {
     }
   }
 };
+
+GM2.addQuest(CarryQuest);

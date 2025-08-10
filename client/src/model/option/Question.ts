@@ -1,9 +1,11 @@
 import Logger from '@util/Logger';
+import { makeId } from '@util/makeId';
+import { QuestionState } from '@variable/constant';
 import Npc from '../unit/npc/Npc';
-import { QuestionState, UnitState } from '@variable/constant';
-import { makeAutoObservable } from 'mobx';
 
 export default class Question {
+  id = makeId("question");
+  
   logger = new Logger<Question>(this);
   npc!: Npc;
 
@@ -12,8 +14,9 @@ export default class Question {
 
   state: QuestionState = QuestionState.Idle;
 
-  constructor(npc: Npc) {
+  constructor(npc: Npc, ...scripts: string[]) {
     this.npc = npc;
+    this.scripts = scripts;
   }
 
   addQuestion(...scripts: string[]) {

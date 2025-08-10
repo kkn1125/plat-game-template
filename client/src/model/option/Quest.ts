@@ -1,26 +1,38 @@
-import UseReward from '@model/unit/implement/UseReward';
-import { makeId } from '@util/makeId';
-import Reward from './Reward';
-import Item from '@model/unit/object/Item';
+import { Npc } from "@model/unit";
+import UseReward from "@model/unit/implement/UseReward";
+import Item from "@model/unit/object/Item";
+import { makeId } from "@util/makeId";
+import { makeObservable } from "mobx";
+import Reward from "./Reward";
 
 export default class Quest implements UseReward {
-  id = makeId('quest');
+  npc!: Npc;
+
+  id = makeId("quest");
 
   title!: string;
   content: string[] = [];
 
-  reward: Reward = new Reward();
+  reward: Reward;
 
-  setRewardGold(gold: number) {
-    this.setRewardGold(gold);
+  constructor(title: string, content: string[], reward: Reward) {
+    this.title = title;
+    this.content = content;
+    this.reward = reward;
+
+    makeObservable(this);
   }
 
-  setRewardExp(exp: number) {
-    this.setRewardExp(exp);
+  getNpc() {
+    return this.npc;
   }
 
-  setRewardItem(item: Item) {
-    this.setRewardItem(item);
+  getTitle() {
+    return this.title;
+  }
+
+  getContent() {
+    return this.content;
   }
 
   getReward() {
@@ -37,5 +49,33 @@ export default class Quest implements UseReward {
 
   getItem() {
     return this.reward.getItem();
+  }
+
+  setNpc(npc: Npc) {
+    this.npc = npc;
+  }
+
+  setTitle(title: string) {
+    this.title = title;
+  }
+
+  setContent(content: string[]) {
+    this.content = content;
+  }
+
+  setReward(reward: Reward) {
+    this.reward = reward;
+  }
+
+  setRewardGold(gold: number) {
+    this.reward.setGold(gold);
+  }
+
+  setRewardExp(exp: number) {
+    this.reward.setExp(exp);
+  }
+
+  setRewardItem(item: Item) {
+    this.reward.setItem(item);
   }
 }

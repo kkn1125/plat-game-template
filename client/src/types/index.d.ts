@@ -20,4 +20,12 @@ export declare global {
   };
   type OptionName =
     keyof (typeof MAP_CONF)["DISPLAY"][keyof (typeof MAP_CONF)["DISPLAY"]];
+
+  type QuestStatus = "pending" | "accepted" | "completed" | "done";
+
+  interface QuestRealMap {
+    quest: Quest;
+    status: QuestStatus;
+    process: number;
+  }
 }

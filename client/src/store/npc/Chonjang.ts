@@ -1,4 +1,7 @@
 import { Character4Sprites } from "@/source/sprites";
+import Quest from "@model/option/Quest";
+import Question from "@model/option/Question";
+import Reward from "@model/option/Reward";
 import QuestNpc from "@model/unit/npc/QuestNpc";
 import { GMHouse } from "@store/maps";
 import { UnitState } from "@variable/constant";
@@ -27,12 +30,15 @@ Chonjang.chatting.addComment(
   "누...누구더라..?",
   "에고고.."
 );
-Chonjang.question.addQuestion(
-  "에구구... 삭신이야..",
-  "마침 잘 왔네. 정말 중요한 일이 생겨서 말이지..!",
-  "...",
-  "전구 좀 갈아주겠나? 홀홀",
-  "(...나중에 다시오자)"
+Chonjang.addQuestion(
+  new Question(
+    Chonjang,
+    "에구구... 삭신이야..",
+    "마침 잘 왔네. 정말 중요한 일이 생겨서 말이지..!",
+    "...",
+    "전구 좀 갈아주겠나? 홀홀",
+    "(...나중에 다시오자)"
+  )
 );
 Chonjang.routine = (unit) => {
   const { x } = unit.position;
@@ -62,3 +68,12 @@ Chonjang.routine = (unit) => {
     }
   }
 };
+
+/* quest */
+Chonjang.addQuest(
+  new Quest(
+    "전구 좀 갈아주겠나?",
+    ["전구 좀 갈아주겠나?", "홀홀"],
+    new Reward(100, 100, null)
+  )
+);

@@ -1,28 +1,51 @@
+import GAME_CONF from "@config/game.conf";
+import Chatting from "@model/option/Chatting";
 import { makeId } from "@util/makeId";
 import { UnitState } from "@variable/constant";
 import { addConstraint, deleteConstraint } from "@variable/globalControl";
-import AutoMoveable from "../implement/AutoMoveable";
 import Question from "../../option/Question";
+import AutoMoveable from "../implement/AutoMoveable";
 import Unit from "../Unit";
-import Quest from "@model/option/Quest";
-import Chatting from "@model/option/Chatting";
-import GAME_CONF from "@config/game.conf";
-import { getRandomInList } from "@util/getRandomInRange";
 
 export default class Npc extends Unit implements AutoMoveable {
   isChatting: boolean = false;
   chattingTime: number = 0;
+  questionHistory: {
+    name: string;
+    type: string;
+    question: Question;
+  }[] = [];
 
   routine!: (unit: Unit) => void;
 
   chatting = new Chatting();
-  question = new Question(this);
+  question!: Question | null;
 
   constructor(name: string, option?: HealthOption) {
     super(name, option);
     this.id = makeId("npc");
 
     this.increaseSpeed = GAME_CONF.NPC_CONF.DEFAULT.INCREASE_SPEED;
+
+    // this.question = new Question(this);
+    // this.questionHistory = [this.question];
+  }
+
+  isIncludeQuestQuestion(quests: Map<string, QuestRealMap>) {
+    console.log("🚀 ~ Npc ~ isIncludeQuestQuestion ~ quests:", quests);
+    const isIncludeQuest = this.questionHistory.find((q) =>
+      Array.from(quests.values()).some((quest) => quest.quest.id === q.name)
+    );
+    return isIncludeQuest;
+  }
+
+  addQuestion(question: Question, type?: string, name?: string) {
+    this.questionHistory.push({
+      name: name ?? this.name,
+      type: type ?? "question",
+      question: question,
+    });
+    this.question = question;
   }
 
   draw(
@@ -152,13 +175,19 @@ export default class Npc extends Unit implements AutoMoveable {
 
   /* NPC 기능 */
   startConversation() {
-    this.question.start();
+    if (!this.question) {
+      return null;
+    }
+    this.question?.start();
     addConstraint("move");
     return this.question;
   }
 
   endConversation() {
+    if (!this.question) {
+      return null;
+    }
     deleteConstraint("move");
-    this.question.end();
+    this.question?.end();
   }
 }

@@ -3,9 +3,10 @@ import { Npc } from "..";
 import UseQuest from "../implement/UseQuest";
 
 export default class QuestNpc extends Npc implements UseQuest {
-  quest: Quest[] = [];
+  quests: Quest[] = [];
 
   addQuest(quest: Quest) {
-    this.quest.push(quest);
+    quest.setNpc(this);
+    this.quests.push(quest);
   }
 }

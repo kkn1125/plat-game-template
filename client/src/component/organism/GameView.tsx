@@ -1,7 +1,9 @@
 import Equipment from "@model/option/Equipment";
 import Inventory from "@model/option/Inventory";
+import Quest from "@model/option/Quest";
 import Question from "@model/option/Question";
 import { Npc } from "@model/unit";
+import QuestNpc from "@model/unit/npc/QuestNpc";
 import { Paper } from "@mui/material";
 import gameEngine from "@recoil/gameMapAtom";
 import { GameMode, GameState, QuestionState } from "@variable/constant";
@@ -16,10 +18,12 @@ import {
 } from "react";
 import FadeIn from "../atom/FadeIn";
 import GameLayer from "../atom/GameLayer";
-import QuestionBox from "../atom/Question";
+import QuestionBox from "../atom/QuestionBox";
 import EquipmentBox from "../molecular/EquipmentBox";
 import InventoryBox from "../molecular/InventoryBox";
 import MenuDialog from "../molecular/MenuDialog";
+import QuestBox from "../molecular/QuestBox";
+import QuestWindow from "../molecular/QuestWindow";
 
 interface GameViewProps {
   // layers: React.ReactElement[];
@@ -30,12 +34,16 @@ const GameView: React.FC<GameViewProps> = observer(() => {
   const [layers, setLayers] = useState<string[]>([]);
   const [multiMode, setMultiMode] = useState(false);
   const [isMultiModeConnected, setIsMultiModeConnected] = useState(false);
+  const [npcQuest, setNpcQuest] = useState<QuestNpc | null>(null);
+  const [onQuestWindow, setOnQuestWindow] = useState(false);
   const pressSpace = useRef(false);
   const pressEquipment = useRef(false);
+  const pressQuest = useRef(false);
   const pressInventory = useRef(false);
   const endConversation = useRef(() => {});
   // const endInventory = useRef(() => {});
   const [equipment, setEquipment] = useState<Equipment | null>(null);
+  const [quests, setQuests] = useState<Map<string, QuestRealMap> | null>(null);
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [question, setQuestion] = useState<Question | null>(null);
   const idRef = useRef<HTMLInputElement>(null);
@@ -73,9 +81,24 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           const controlUnit = gameEngine.controlUnit;
           if (!controlUnit) return;
           const closeUnit = controlUnit.closeUnit as Npc;
+
+          console.log("🚀 ~ quests:", quests);
+          const includedQuestQuestion =
+            closeUnit && quests
+              ? closeUnit.isIncludeQuestQuestion(quests)
+              : null;
+          if (includedQuestQuestion) {
+            closeUnit.question = includedQuestQuestion.question;
+          }
+
+          if (closeUnit && closeUnit instanceof QuestNpc) {
+            setNpcQuest(closeUnit);
+          }
+
           if (closeUnit && closeUnit instanceof Npc) {
             endConversation.current = () => closeUnit.endConversation();
-            if (closeUnit.question.state === QuestionState.Idle) {
+
+            if (closeUnit.question?.state === QuestionState.Idle) {
               const question = closeUnit.startConversation();
               setQuestion(() => question);
               gameEngine.eventManager.joystickEvent.clearMove();
@@ -83,6 +106,7 @@ const GameView: React.FC<GameViewProps> = observer(() => {
               gameEngine.eventManager.emit("conversationNext");
             }
           }
+
           pressSpace.current = true;
           break;
         }
@@ -106,8 +130,15 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           const controlUnit = gameEngine.controlUnit;
           if (!controlUnit) return;
           setEquipment((prev) => (prev ? null : controlUnit.equipment));
-
           pressEquipment.current = true;
+          break;
+        }
+        case "q": {
+          if (pressQuest.current) return;
+          const controlUnit = gameEngine.controlUnit;
+          if (!controlUnit) return;
+          setQuests((prev) => (prev ? null : controlUnit.questRealMap));
+          pressQuest.current = true;
           break;
         }
       }
@@ -130,6 +161,10 @@ const GameView: React.FC<GameViewProps> = observer(() => {
         if (!pressEquipment.current) return;
         pressEquipment.current = false;
         break;
+      case "q":
+        if (!pressQuest.current) return;
+        pressQuest.current = false;
+        break;
     }
   }, []);
 
@@ -142,10 +177,27 @@ const GameView: React.FC<GameViewProps> = observer(() => {
     };
   }, []);
 
+  function openQuest() {
+    closeConversation();
+    setOnQuestWindow(true);
+    const controlUnit = gameEngine.controlUnit;
+    if (!controlUnit) return;
+    const closeUnit = controlUnit.closeUnit as Npc;
+    console.log("🚀 ~ closeUnit:", controlUnit, closeUnit);
+    if (closeUnit && closeUnit instanceof QuestNpc) {
+      // setQuests((prev) => (closeUnit as QuestNpc).quests);
+      setNpcQuest(closeUnit);
+    }
+  }
+
   function closeConversation() {
     setQuestion(null);
     endConversation.current();
     endConversation.current = () => {};
+  }
+
+  function closeQuest() {
+    setQuests(() => null);
   }
 
   function closeInventory() {
@@ -153,6 +205,51 @@ const GameView: React.FC<GameViewProps> = observer(() => {
   }
   function closeEquipment() {
     setEquipment(() => null);
+  }
+  function closeNpcQuest() {
+    setNpcQuest(() => null);
+  }
+
+  function closeQuestWindow() {
+    setOnQuestWindow(false);
+    setNpcQuest(null);
+  }
+
+  function acceptQuest(quest: Quest) {
+    console.log("🚀 ~ acceptQuest ~ quest:", quest);
+    const controlUnit = gameEngine.controlUnit;
+    if (!controlUnit) return;
+    controlUnit.questRealMap.set(quest.id, {
+      quest: quest,
+      status: "accepted",
+      process: 0,
+    });
+    // controlUnit.questMap.set(quest, {
+    //   status: "accepted",
+    //   process: 0,
+    // });
+    closeQuestWindow();
+  }
+
+  function completeQuest(quest: Quest) {
+    const controlUnit = gameEngine.controlUnit;
+    if (!controlUnit) return;
+    controlUnit.questRealMap.set(quest.id, {
+      quest: quest,
+      status: "done",
+      process: 100,
+    });
+    const reward = quest.getReward();
+    if (reward.gold) {
+      controlUnit.gold += reward.gold;
+    }
+    if (reward.exp) {
+      controlUnit.addExp(reward.exp);
+    }
+    if (reward.item) {
+      controlUnit.inventory.addItem(reward.item);
+    }
+    closeQuestWindow();
   }
 
   function requestLogin() {
@@ -189,11 +286,28 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           <MenuDialog />
         </Paper>
       )}
+      {onQuestWindow && npcQuest && (
+        <QuestWindow
+          playerQuests={gameEngine.controlUnit?.questRealMap ?? null}
+          npcQuest={npcQuest}
+          acceptQuest={acceptQuest}
+          completeQuest={completeQuest}
+          closeQuest={closeQuest}
+          closeNpcQuest={closeNpcQuest}
+          closeQuestWindow={closeQuestWindow}
+        />
+      )}
       {equipment && <EquipmentBox closeEquipment={closeEquipment} />}
       {inventory && <InventoryBox closeInventory={closeInventory} />}
+      {pressQuest.current && quests && (
+        <QuestBox quests={quests} closeQuest={closeQuest} />
+      )}
       {question && (
         <QuestionBox
+          playerQuests={gameEngine.controlUnit?.questRealMap ?? null}
           question={question}
+          npcQuest={npcQuest}
+          openQuest={openQuest}
           closeConversation={closeConversation}
         />
       )}
