@@ -1,9 +1,13 @@
-import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import * as dotenv from "dotenv";
 import path from "path";
+import { defineConfig, loadEnv } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import pkg from "./package.json";
+
+const ReactCompilerConfig = {
+  target: "19", // '17' | '18' | '19'
+};
 
 dotenv.config({
   path: path.join(path.resolve(), ".env"),
@@ -48,6 +52,14 @@ export default defineConfig(({ mode }) => {
         keep_classnames: true,
       },
     },
-    plugins: [react(), tsconfigPaths()],
+    plugins: [
+      react({
+        // @ts-ignore
+        babel: {
+          plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
+        },
+      }),
+      tsconfigPaths(),
+    ],
   };
 });

@@ -1,4 +1,4 @@
-import GAME_CONF from "@config/game.conf";
+import GAME_CONF, { WINDOW_X_SIZE, WINDOW_Y_SIZE } from "@config/game.conf";
 import GameEngine from "@core/GameEngine";
 import Question from "@model/option/Question";
 import Item from "@model/unit/object/Item";
@@ -103,8 +103,8 @@ export default class UserInterface {
       width: number;
       height: number;
     } = {
-      width: innerWidth,
-      height: innerHeight,
+      width: WINDOW_X_SIZE,
+      height: WINDOW_Y_SIZE,
     }
   ) {
     canvas.width = option.width;
@@ -141,13 +141,13 @@ export default class UserInterface {
         this.handleCanvasResize.bind(this, canvas, { width: 300, height: 200 })
       );
     } else {
-      canvas.width = innerWidth;
-      canvas.height = innerHeight;
+      canvas.width = WINDOW_X_SIZE;
+      canvas.height = WINDOW_Y_SIZE;
       window.addEventListener(
         "resize",
         this.handleCanvasResize.bind(this, canvas, {
-          width: innerWidth,
-          height: innerHeight,
+          width: WINDOW_X_SIZE,
+          height: WINDOW_Y_SIZE,
         })
       );
     }
@@ -159,8 +159,8 @@ export default class UserInterface {
 
     if (fields) {
       ctx.translate(
-        (innerWidth * (1 - GAME_CONF.SCALE)) / 2,
-        (innerHeight * (1 - GAME_CONF.SCALE)) / 2
+        (WINDOW_X_SIZE * (1 - GAME_CONF.SCALE)) / 2,
+        (WINDOW_Y_SIZE * (1 - GAME_CONF.SCALE)) / 2
       );
     }
     ctx.scale(GAME_CONF.SCALE, GAME_CONF.SCALE);
@@ -177,13 +177,13 @@ export default class UserInterface {
     ctx.globalAlpha = 1;
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
+    canvas.width = WINDOW_X_SIZE;
+    canvas.height = WINDOW_Y_SIZE;
     window.addEventListener(
       "resize",
       this.handleCanvasResize.bind(this, canvas, {
-        width: innerWidth,
-        height: innerHeight,
+        width: WINDOW_X_SIZE,
+        height: WINDOW_Y_SIZE,
       })
     );
 
@@ -194,8 +194,8 @@ export default class UserInterface {
 
       if (fields) {
         ctx.translate(
-          (innerWidth * (1 - GAME_CONF.SCALE)) / 2,
-          (innerHeight * (1 - GAME_CONF.SCALE)) / 2
+          (WINDOW_X_SIZE * (1 - GAME_CONF.SCALE)) / 2,
+          (WINDOW_Y_SIZE * (1 - GAME_CONF.SCALE)) / 2
         );
       }
       ctx.scale(GAME_CONF.SCALE, GAME_CONF.SCALE);

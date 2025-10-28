@@ -1,4 +1,4 @@
-import GAME_CONF from "@config/game.conf";
+import GAME_CONF, { WINDOW_X_SIZE, WINDOW_Y_SIZE } from "@config/game.conf";
 import GameEngine from "@core/GameEngine";
 import AreaPortal from "@model/unit/portal/AreaPotal";
 import Portal from "@model/unit/portal/Portal";
@@ -64,8 +64,8 @@ class Renderer {
   /* 윈도우 사이즈 */
   get worldSize() {
     return {
-      x: innerWidth,
-      y: innerHeight,
+      x: WINDOW_X_SIZE,
+      y: WINDOW_Y_SIZE,
     };
   }
 
@@ -163,8 +163,8 @@ class Renderer {
     // 유닛 카메라 고정 범위 Y
     const limitScreenY = fieldHeight / 2;
 
-    const windowWidthAsScale = innerWidth / GAME_CONF.SCALE;
-    const windowHeightAsScale = innerHeight / GAME_CONF.SCALE;
+    const windowWidthAsScale = WINDOW_X_SIZE / GAME_CONF.SCALE;
+    const windowHeightAsScale = WINDOW_Y_SIZE / GAME_CONF.SCALE;
     // 윈도우 넘어가는 맵의 길이 만큼
     const windowOverflowX =
       windowWidthAsScale / 2 > limitScreenX

@@ -82,7 +82,6 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           if (!controlUnit) return;
           const closeUnit = controlUnit.closeUnit as Npc;
 
-          console.log("🚀 ~ quests:", quests);
           const includedQuestQuestion =
             closeUnit && quests
               ? closeUnit.isIncludeQuestQuestion(quests)
@@ -183,7 +182,6 @@ const GameView: React.FC<GameViewProps> = observer(() => {
     const controlUnit = gameEngine.controlUnit;
     if (!controlUnit) return;
     const closeUnit = controlUnit.closeUnit as Npc;
-    console.log("🚀 ~ closeUnit:", controlUnit, closeUnit);
     if (closeUnit && closeUnit instanceof QuestNpc) {
       // setQuests((prev) => (closeUnit as QuestNpc).quests);
       setNpcQuest(closeUnit);
@@ -216,7 +214,6 @@ const GameView: React.FC<GameViewProps> = observer(() => {
   }
 
   function acceptQuest(quest: Quest) {
-    console.log("🚀 ~ acceptQuest ~ quest:", quest);
     const controlUnit = gameEngine.controlUnit;
     if (!controlUnit) return;
     controlUnit.questRealMap.set(quest.id, {

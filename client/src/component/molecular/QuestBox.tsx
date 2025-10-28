@@ -7,10 +7,10 @@ interface QuestBoxProps {
 }
 
 const QuestBox: React.FC<QuestBoxProps> = ({ quests, closeQuest }) => {
-  console.log("🚀 ~ quests:", quests);
-  console.log("🚀 ~ quests:", Object.keys(quests));
-  console.log("🚀 ~ quests:", Object.entries(quests));
-  console.log("🚀 ~ quests:", Object.values(quests));
+  // console.log("🚀 ~ quests:", quests);
+  // console.log("🚀 ~ quests:", Object.keys(quests));
+  // console.log("🚀 ~ quests:", Object.entries(quests));
+  // console.log("🚀 ~ quests:", Object.values(quests));
   return (
     <Stack
       component={Paper}

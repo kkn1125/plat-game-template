@@ -10,6 +10,9 @@ import WEAPON_CONF from "./weapon/weapon.conf";
 // const params = new URLSearchParams(location.search);
 // const customMode = params.get('mode') || '1';
 
+export const WINDOW_X_SIZE = 900;
+export const WINDOW_Y_SIZE = 800;
+
 const GAME_CONF: {
   ITEM_CONF: typeof ITEM_CONF;
   UNIT_CONF: typeof UNIT_CONF;

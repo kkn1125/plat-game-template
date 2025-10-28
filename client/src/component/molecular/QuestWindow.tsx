@@ -42,7 +42,6 @@ const QuestWindow: React.FC<QuestWindowProps> = ({
   }
 
   function closeDetailQuest() {
-    setDetailQuest(null);
     setIsOpen(false);
   }
 
@@ -77,7 +76,7 @@ const QuestWindow: React.FC<QuestWindowProps> = ({
   };
 
   const buttonFeatureMap = (status: QuestStatus, quest: Quest) => {
-    console.log("🚀 ~ buttonFeatureMap ~ status:", playerQuests, status, quest);
+    // console.log("🚀 ~ buttonFeatureMap ~ status:", playerQuests, status, quest);
     switch (status) {
       case "pending":
         return () => acceptQuest(quest);
@@ -93,109 +92,121 @@ const QuestWindow: React.FC<QuestWindowProps> = ({
   };
 
   return (
-    <Box>
-      <Stack
-        component={Paper}
-        elevation={5}
-        gap={2}
-        p={3}
-        sx={{
-          position: "absolute",
-          top: "50%",
-          right: isOpen ? "calc(100% - 580px)" : "calc(40%)",
-          transform: "translateY(-50%)",
-          width: 300,
-          height: "60%",
-          backgroundColor: "white",
-          transition: "all 0.3s ease-in-out",
-        }}
-      >
+    <Box
+      position="absolute"
+      top="50%"
+      left="50%"
+      sx={{
+        transform: "translate(-50%,-50%)",
+        zIndex: 1000,
+      }}
+    >
+      <Stack position="relative" direction="row" justifyContent="center">
+        <Box
+          sx={{
+            maxWidth: isOpen ? "100%" : 0,
+            overflow: "hidden",
+            transition: "all 500ms ease-in-out",
+            mr: -1,
+          }}
+        >
+          <Stack
+            component={Paper}
+            elevation={5}
+            gap={2}
+            p={3}
+            sx={{
+              width: 300,
+              height: 500,
+              transition: "all 0.3s ease-in-out",
+            }}
+          >
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography variant="h6">{detailQuest?.getTitle()}</Typography>
+              <Button onClick={closeDetailQuest}>닫기</Button>
+            </Stack>
+            <Divider />
+            <Typography
+              variant="body1"
+              sx={{ whiteSpace: "pre-wrap", overflowY: "auto" }}
+            >
+              {detailQuest?.content.join(" ")}
+            </Typography>
+            <Typography variant="body1">
+              Exp: {detailQuest?.reward?.exp}
+            </Typography>
+            <Typography variant="body1">
+              Gold: {detailQuest?.reward?.gold}
+            </Typography>
+            {detailQuest?.reward?.item?.name && (
+              <Typography variant="body1">
+                Item: {detailQuest?.reward?.item?.name}
+              </Typography>
+            )}
+          </Stack>
+        </Box>
         <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
+          component={Paper}
+          elevation={5}
+          p={3}
+          sx={{
+            minWidth: 500,
+            height: 500,
+            zIndex: 100,
+            transition: 'all 500ms ease-in-out',
+            backgroundColor: isOpen ? "grey.400" : undefined,
+          }}
         >
-          <Typography variant="h6">{detailQuest?.getTitle()}</Typography>
-          <Button onClick={closeDetailQuest}>닫기</Button>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant="h6">퀘스트</Typography>
+            <Button onClick={closeQuestWindow}>닫기</Button>
+          </Stack>
+          <List sx={{ overflowY: "auto", maxHeight: "80vh" }}>
+            {npcQuest.quests.map((quest, index) => (
+              <ListItem key={index}>
+                <ListItemButton
+                  sx={{
+                    width: "100%",
+                    gap: 5,
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <ListItemText primary={quest.getTitle()} />
+                  <Stack direction="row" gap={1} alignItems="center">
+                    <ListItemIcon>
+                      <Button
+                        variant="outlined"
+                        onClick={buttonFeatureMap(
+                          playerQuests?.get(quest.id)?.status as QuestStatus,
+                          quest
+                        )}
+                        color={buttonColorMap(
+                          playerQuests?.get(quest.id)?.status as QuestStatus
+                        )}
+                      >
+                        {buttonTextMap(
+                          playerQuests?.get(quest.id)?.status as QuestStatus
+                        )}
+                      </Button>
+                    </ListItemIcon>
+                    <ListItemIcon onClick={() => setViewDetailQuest(quest)}>
+                      <Button variant="outlined">상세보기</Button>
+                    </ListItemIcon>
+                  </Stack>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
         </Stack>
-        <Divider />
-        <Typography
-          variant="body1"
-          sx={{ whiteSpace: "pre-wrap", overflowY: "auto" }}
-        >
-          {detailQuest?.content.join(" ")}
-        </Typography>
-        <Typography variant="body1">Exp: {detailQuest?.reward?.exp}</Typography>
-        <Typography variant="body1">
-          Gold: {detailQuest?.reward?.gold}
-        </Typography>
-        {detailQuest?.reward?.item?.name && (
-          <Typography variant="body1">
-            Item: {detailQuest?.reward?.item?.name}
-          </Typography>
-        )}
-      </Stack>
-      <Stack
-        component={Paper}
-        elevation={5}
-        p={3}
-        position="fixed"
-        top="50%"
-        left="50%"
-        sx={{
-          transform: "translate(-50%, -50%)",
-          minWidth: 500,
-          minHeight: 300,
-          height: 500,
-          maxHeight: "80vh",
-          zIndex: 1000,
-        }}
-      >
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Typography variant="h6">퀘스트</Typography>
-          <Button onClick={closeQuestWindow}>닫기</Button>
-        </Stack>
-        <List sx={{ overflowY: "auto", maxHeight: "80vh" }}>
-          {npcQuest.quests.map((quest, index) => (
-            <ListItem key={index}>
-              <ListItemButton
-                sx={{
-                  width: "100%",
-                  gap: 5,
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <ListItemText primary={quest.getTitle()} />
-                <Stack direction="row" gap={1} alignItems="center">
-                  <ListItemIcon>
-                    <Button
-                      variant="outlined"
-                      onClick={buttonFeatureMap(
-                        playerQuests?.get(quest.id)?.status as QuestStatus,
-                        quest
-                      )}
-                      color={buttonColorMap(
-                        playerQuests?.get(quest.id)?.status as QuestStatus
-                      )}
-                    >
-                      {buttonTextMap(
-                        playerQuests?.get(quest.id)?.status as QuestStatus
-                      )}
-                    </Button>
-                  </ListItemIcon>
-                  <ListItemIcon onClick={() => setViewDetailQuest(quest)}>
-                    <Button variant="outlined">상세보기</Button>
-                  </ListItemIcon>
-                </Stack>
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
       </Stack>
     </Box>
   );

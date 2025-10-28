@@ -17,37 +17,37 @@ const QuestionBox: React.FC<QuestionProps> = ({
   openQuest,
   closeConversation,
 }) => {
-  const telling = question.getNext();
+  const [telling, setTelling] = useState(question.getNext());
   const [current, setCurrent] = useState("");
   const pressSpace = useRef(true);
 
-  const next = useCallback(() => {
+  const next = () => {
     const content = telling.next();
 
     if (content.done) {
       const quests = Array.from(playerQuests?.values() ?? []);
-      console.log("🚀 ~ QuestionBox ~ quests:", quests);
       const quest = quests.find((quest) => {
         return npcQuest?.questionHistory.some((q) => q.name === quest.quest.id);
       });
-      console.log("🚀 ~ QuestionBox ~ quest:", quest);
-      if (quest) {
+      if (quest && quest.status !== "completed") {
         quest.status = "completed";
         quest.process = 100;
-        console.log("🚀 ~ quest:", quest);
       }
 
       closeConversation();
-
-      return;
+    } else {
+      setCurrent(() => content.value || "");
     }
-    setCurrent(() => content.value || "");
-  }, [current, npcQuest, playerQuests, telling]);
+  };
+
+  useEffect(() => {
+    setTelling(question.getNext());
+  }, [question]);
 
   const cancel = useCallback(() => {
     closeConversation();
     setCurrent(() => "");
-  }, []);
+  }, [closeConversation]);
 
   useEffect(() => {
     next();
@@ -105,7 +105,15 @@ const QuestionBox: React.FC<QuestionProps> = ({
         <Button variant="outlined" onClick={cancel}>
           취소
         </Button>
-        <Button variant="contained" onClick={next}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            if (question.scripts.indexOf(current) === 0) {
+              next();
+            }
+            next();
+          }}
+        >
           {question.scripts.indexOf(current) === question.scripts.length - 1
             ? "확인"
             : "다음"}

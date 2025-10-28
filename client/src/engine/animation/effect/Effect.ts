@@ -1,3 +1,4 @@
+import { WINDOW_X_SIZE, WINDOW_Y_SIZE } from "@config/game.conf";
 import { $ } from "@util/$";
 import Logger from "@util/Logger";
 import { makeId } from "@util/makeId";
@@ -58,8 +59,8 @@ export default class Effect {
   }
 
   handleResizeOnce() {
-    this.canvas.width = innerWidth;
-    this.canvas.height = innerHeight;
+    this.canvas.width = WINDOW_X_SIZE;
+    this.canvas.height = WINDOW_Y_SIZE;
   }
 
   draw(time: number) {

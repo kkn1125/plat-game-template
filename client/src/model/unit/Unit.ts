@@ -1,7 +1,7 @@
 import { CharacterSprites } from "@/source/sprites";
 import hitCountEffect from "@animation/effect/hitCountEffect";
 import levelupEffect from "@animation/effect/levelupEffect";
-import GAME_CONF from "@config/game.conf";
+import GAME_CONF, { WINDOW_X_SIZE, WINDOW_Y_SIZE } from "@config/game.conf";
 import GameEngine from "@core/GameEngine";
 import GameMap from "@model/gamemap/GameMap";
 import Equipment from "@model/option/Equipment";
@@ -310,6 +310,8 @@ class Unit
     this.level += level;
     this.maxHp = this.maxHp + Math.floor((this.level + 1) ** 1.5);
     this.maxMp = this.maxMp + Math.floor((this.level + 1) ** 1.5);
+    this.hp = this.maxHp;
+    this.mp = this.maxMp;
 
     this.stat.increaseStatPoint();
 
@@ -603,53 +605,57 @@ class Unit
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 8;
     ctx.strokeRect(
-      innerWidth * 0.05,
-      innerHeight - offset,
-      innerWidth * 0.9,
+      WINDOW_X_SIZE * 0.05,
+      WINDOW_Y_SIZE - offset,
+      WINDOW_X_SIZE * 0.9,
       height
     );
 
     ctx.strokeStyle = "#aaa";
     ctx.lineWidth = 6;
     ctx.strokeRect(
-      innerWidth * 0.05,
-      innerHeight - offset,
-      innerWidth * 0.9,
+      WINDOW_X_SIZE * 0.05,
+      WINDOW_Y_SIZE - offset,
+      WINDOW_X_SIZE * 0.9,
       height
     );
 
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 3;
     ctx.strokeRect(
-      innerWidth * 0.05,
-      innerHeight - offset,
-      innerWidth * 0.9,
+      WINDOW_X_SIZE * 0.05,
+      WINDOW_Y_SIZE - offset,
+      WINDOW_X_SIZE * 0.9,
       height
     );
 
     ctx.fillStyle = "gray";
     ctx.fillRect(
-      innerWidth * 0.05,
-      innerHeight - offset,
-      innerWidth * 0.9,
+      WINDOW_X_SIZE * 0.05,
+      WINDOW_Y_SIZE - offset,
+      WINDOW_X_SIZE * 0.9,
       height
     );
 
     ctx.fillStyle = "#f5ff8e";
     ctx.fillRect(
-      innerWidth * 0.05,
-      innerHeight - offset,
-      calcExp * innerWidth * 0.9,
+      WINDOW_X_SIZE * 0.05,
+      WINDOW_Y_SIZE - offset,
+      calcExp * WINDOW_X_SIZE * 0.9,
       height
     );
 
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = 3;
-    ctx.strokeText(text, innerWidth / 2, innerHeight - offset + height / 2);
+    ctx.strokeText(
+      text,
+      WINDOW_X_SIZE / 2,
+      WINDOW_Y_SIZE - offset + height / 2
+    );
     ctx.fillStyle = "#ffffff";
     /* font */
     ctx.textAlign = "center";
-    ctx.fillText(text, innerWidth / 2, innerHeight - offset + height / 2);
+    ctx.fillText(text, WINDOW_X_SIZE / 2, WINDOW_Y_SIZE - offset + height / 2);
   }
 
   drawNameByScale(
@@ -732,31 +738,31 @@ class Unit
     if (this.isControlUnit) {
       ctx.fillStyle = "gray";
       ctx.fillRect(
-        (innerWidth * 0.1) / 2,
-        innerHeight - 20 - offset - 30,
+        (WINDOW_X_SIZE * 0.1) / 2,
+        WINDOW_Y_SIZE - 20 - offset - 30,
         150,
         20
       );
 
       ctx.fillRect(
-        (innerWidth * 0.1) / 2,
-        innerHeight - 20 - offset - 52,
+        (WINDOW_X_SIZE * 0.1) / 2,
+        WINDOW_Y_SIZE - 20 - offset - 52,
         150,
         20
       );
 
       ctx.fillStyle = "blue";
       ctx.fillRect(
-        (innerWidth * 0.1) / 2,
-        innerHeight - 20 - offset - 30,
+        (WINDOW_X_SIZE * 0.1) / 2,
+        WINDOW_Y_SIZE - 20 - offset - 30,
         (this.mp / this.maxMp) * 150,
         20
       );
 
       ctx.fillStyle = "red";
       ctx.fillRect(
-        (innerWidth * 0.1) / 2,
-        innerHeight - 20 - offset - 52,
+        (WINDOW_X_SIZE * 0.1) / 2,
+        WINDOW_Y_SIZE - 20 - offset - 52,
         (this.hp / this.maxHp) * 150,
         20
       );
@@ -766,14 +772,14 @@ class Unit
       ctx.textAlign = "center";
       ctx.fillText(
         `${this.hp} / ${this.maxHp}`,
-        (innerWidth * 0.1) / 2 + 150 / 2,
-        innerHeight - 20 - offset - 52 + 14 - 4
+        (WINDOW_X_SIZE * 0.1) / 2 + 150 / 2,
+        WINDOW_Y_SIZE - 20 - offset - 52 + 14 - 4
       );
       ctx.fillStyle = "#ffffff";
       ctx.fillText(
         `${this.mp} / ${this.maxMp}`,
-        (innerWidth * 0.1) / 2 + 150 / 2,
-        innerHeight - 20 - offset - 32 + 16 - 4
+        (WINDOW_X_SIZE * 0.1) / 2 + 150 / 2,
+        WINDOW_Y_SIZE - 20 - offset - 32 + 16 - 4
       );
     } else {
       ctx.fillStyle = "gray";
