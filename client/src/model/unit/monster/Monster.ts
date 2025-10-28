@@ -12,7 +12,7 @@ export default class Monster extends Unit implements AutoMoveable, UseReward {
   dir = true;
   passable = true;
   respawnTime: number = GAME_CONF.MONSTER_CONF.DEFAULT.RESPAWN_TIME;
-  reward: Reward = new Reward();
+  reward: Reward = new Reward(10, 10, null);
 
   routine!: (unit: Unit) => void;
 
