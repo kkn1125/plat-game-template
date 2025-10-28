@@ -2,6 +2,7 @@ import Renderer from "@animation/Renderer";
 import UserInterface from "@animation/UserInterface";
 import GameEngine from "@core/GameEngine";
 import GameMapManager from "@core/GameMapManager";
+import { AudioManager } from "@engine/audio/AudioManager";
 import EventManager from "@event/EventManager";
 import { BuildingEmptyHouse } from "@store/buildings/BuildingEmptyHouse";
 import { BuildingGMHouse } from "@store/buildings/BuildingGMHouse";
@@ -16,6 +17,9 @@ const logger = new Logger("GameStart");
 
 export function gameStart(gameEngine: GameEngine) {
   /* init */
+  const audioManager = new AudioManager();
+  gameEngine.audioManager = audioManager;
+
   const gameMapManager = new GameMapManager(gameEngine);
   gameEngine.loadGameMapManager(gameMapManager);
 

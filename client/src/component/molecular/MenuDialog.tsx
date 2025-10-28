@@ -32,6 +32,7 @@ const MenuDialog: React.FC<MenuDialogProps> = () => {
         variant="contained"
         onClick={() => {
           gameEngine.ui.login("Test");
+          gameEngine.audioManager.playCurrentTrack();
           // setTimeout(() => {
           //   if (gameEngine.controlUnit) {
           //     gameEngine.controlUnit.gold += 1000;
@@ -47,7 +48,10 @@ const MenuDialog: React.FC<MenuDialogProps> = () => {
       </MenuButton>
       <MenuButton
         variant="contained"
-        onClick={() => gameEngine.ui.login("Single")}
+        onClick={() => {
+          gameEngine.ui.login("Single");
+          gameEngine.audioManager.playCurrentTrack();
+        }}
       >
         싱글플레이
       </MenuButton>

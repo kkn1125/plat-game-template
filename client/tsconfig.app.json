@@ -27,6 +27,7 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
+      "@audio/*": ["src/engine/audio/*"],
       "@assets/*": ["src/assets/*"],
       "@types/*": ["src/types/*"],
       "@variable/*": ["src/variable/*"],
@@ -42,10 +43,9 @@
       "@store/*": ["src/store/*"],
       "@util/*": ["src/util/*"],
       "@test/*": ["test/*"],
-
       "@recoil/*": ["src/recoil/*"],
       "@/*": ["src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }

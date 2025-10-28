@@ -24,6 +24,7 @@ import InventoryBox from "../molecular/InventoryBox";
 import MenuDialog from "../molecular/MenuDialog";
 import QuestBox from "../molecular/QuestBox";
 import QuestWindow from "../molecular/QuestWindow";
+import AudioControl from "../molecular/AudioControl";
 
 interface GameViewProps {
   // layers: React.ReactElement[];
@@ -308,6 +309,7 @@ const GameView: React.FC<GameViewProps> = observer(() => {
           closeConversation={closeConversation}
         />
       )}
+      <AudioControl />
     </div>
   );
 });

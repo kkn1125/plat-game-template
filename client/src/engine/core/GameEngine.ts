@@ -15,6 +15,7 @@ import Socket from "@websocket/Socket";
 import { makeAutoObservable } from "mobx";
 import GameMapManager from "./GameMapManager";
 import ShootObject from "@model/unit/object/ShootObject";
+import { AudioManager } from "@engine/audio/AudioManager";
 
 export default class GameEngine {
   logger = new Logger<GameEngine>(this);
@@ -26,6 +27,7 @@ export default class GameEngine {
   renderer!: Renderer;
   eventManager!: EventManager;
   gameMapManager!: GameMapManager;
+  audioManager!: AudioManager;
   socket!: Socket;
 
   controlUnit: Player | null = null;

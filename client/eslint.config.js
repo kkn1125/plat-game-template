@@ -29,6 +29,7 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-function-type": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/ban-ts-comment": "off",
+      "react-hooks/exhaustive-deps": "off",
     },
   }
 );
