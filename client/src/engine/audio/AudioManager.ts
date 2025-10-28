@@ -12,7 +12,7 @@ export class AudioManager {
 
   loadTracks() {
     const audio = new Audio();
-    audio.src = "/bgm/plat-game-main-bgm.wav";
+    audio.src = "/plat-game-template/bgm/plat-game-main-bgm.wav";
     audio.loop = true;
     audio.volume = 0.35;
     // 미리 로딩
